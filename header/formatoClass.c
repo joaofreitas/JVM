@@ -81,8 +81,8 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 		switch(tag) {
 			case 10:
 				//structure = (CONSTANT_Methodref*) malloc(sizeof(CONSTANT_Methodref));
-				cp->c_methodref->class_index = u2Read(fp);
-				cp->c_methodref->name_and_type_index = u2Read(fp);
+				//cp->c_methodref->class_index = u2Read(fp);
+				//cp->c_methodref->name_and_type_index = u2Read(fp);
 				break;
 			default:
 				break;
