@@ -79,9 +79,41 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 		tag = u1Read(fp);
 		cp->tag = tag;
 		switch(tag) {
+			case 3:
+				cp->c_integer.bytes = u4Read(fp);
+				break;
+			case 4:
+				cp->c_float.bytes = u4Read(fp);
+				break;
+			case 5:
+				cp->c_long.high_bytes = u4Read(fp);
+				cp->c_long.low_bytes = u4Read(fp);
+				break;
+			case 6:
+				cp->c_double.high_bytes = u4Read(fp);
+				cp->c_double.low_bytes = u4Read(fp);
+				break;
+			case 7:
+				cp->c_class.name_index = u2Read(fp);
+				break;
+			case 8:
+				cp->c_string.string_index = u2Read(fp);
+				break;
+			case 9:
+				cp->c_fieldref.class_index = u2Read(fp);
+				cp->c_fieldref.name_and_type_index = u2Read(fp);
+				break;
 			case 10:
 				cp->c_methodref.class_index = u2Read(fp);
 				cp->c_methodref.name_and_type_index = u2Read(fp);
+				break;
+			case 11:
+				cp->c_interface_methodref.class_index = u2Read(fp);
+				cp->c_interface_methodref.name_and_type_index = u2Read(fp);
+				break;
+			case 12:
+				cp->c_nametype.name_index = u2Read(fp);
+				cp->c_nametype.descriptor_index = u2Read(fp);
 				break;
 			default:
 				break;
