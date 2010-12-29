@@ -70,7 +70,6 @@ void readConstantPoolCount(classFileFormat *classFile, FILE *fp) {
 
 void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	u1 tag;
-	void *structure;
 	cp_info *cp;
 	u2 cp_size;
 
@@ -78,16 +77,15 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	classFile->constant_pool = malloc(sizeof(cp_info)*cp_size);
 	for (cp = classFile->constant_pool; cp < classFile->constant_pool + cp_size - 1; cp++){
 		tag = u1Read(fp);
+		cp->tag = tag;
 		switch(tag) {
 			case 10:
-				//structure = (CONSTANT_Methodref*) malloc(sizeof(CONSTANT_Methodref));
-				//cp->c_methodref->class_index = u2Read(fp);
-				//cp->c_methodref->name_and_type_index = u2Read(fp);
+				cp->c_methodref.class_index = u2Read(fp);
+				cp->c_methodref.name_and_type_index = u2Read(fp);
 				break;
 			default:
 				break;
 		}
 	}
-	printf("Tag: %d\n", tag);
 }
 
