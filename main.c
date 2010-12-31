@@ -28,11 +28,11 @@ int main(int argc, char **argv) {
 		switch(tag) {
 			case 1:
 				string_length = constant_pool->c_utf8.length;
-				printf("Length %d. String: (", string_length);
+				printf("Length %d. String: ", string_length);
 				for (i=0; i < string_length; i++) {
 					printf("%c", constant_pool->c_utf8.bytes[i]);
 				}
-				printf(")\n");
+				printf("\n");
 				break;
 			case 3:
 				printf("Value: %d\n", constant_pool->c_integer.bytes);
