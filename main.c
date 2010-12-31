@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 	printf("Magic Number: %X\n", classFile->magic);
 	printf("Minor Version: %d\n", classFile->minor_version);
 	printf("Major Version: %d\n", classFile->major_version);
-	printf("Constant Pool Count: %d\n-----------------\n", classFile->constant_pool_count);
+	printf("Constant Pool Count: %d\n-------------- CONSTANT POOL -----------------\n", classFile->constant_pool_count);
 
 	cp_size = classFile->constant_pool_count;
 	for (constant_pool = classFile->constant_pool; constant_pool < classFile->constant_pool + cp_size - 1; constant_pool++){
@@ -68,5 +68,10 @@ int main(int argc, char **argv) {
 				break;
 		}
 	}
+	printf("\n-------------- END -----------------\n\n");
+	printf("Access Flags: %d\n", classFile->access_flags);
+	printf("This class: %d\n", classFile->this_class);
+	printf("Super class: %d\n", classFile->super_class);
+	printf("Interface Count: %d\n", classFile->interfaces_count);
 	return 0;
 }

@@ -132,6 +132,12 @@ void readConstantPoolCount(classFileFormat *classFile, FILE *fp);
 
 void readConstantPool(classFileFormat *classFile, FILE *fp);
 
-void convertU2(u2 *input);
+void readAccessFlags(classFileFormat *classFile, FILE *fp);
+
+void readThisClass(classFileFormat *classFile, FILE *fp);
+
+void readSuperClass(classFileFormat *classFile, FILE *fp);
+
+void readInterfaceCount(classFileFormat *classFile, FILE *fp);
 
 #endif

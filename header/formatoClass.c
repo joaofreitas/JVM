@@ -155,3 +155,30 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	}
 }
 
+void readAccessFlags(classFileFormat *classFile, FILE *fp) {
+	u2 access_flags;
+
+	access_flags= u2Read(fp);
+	classFile->access_flags = access_flags;
+}
+
+void readThisClass(classFileFormat *classFile, FILE *fp) {
+	u2 this_class_index;
+
+	this_class_index= u2Read(fp);
+	classFile->this_class = this_class_index;
+}
+
+void readSuperClass(classFileFormat *classFile, FILE *fp) {
+	u2 super_class_index;
+
+	super_class_index = u2Read(fp);
+	classFile->super_class = super_class_index;
+}
+
+void readInterfaceCount(classFileFormat *classFile, FILE *fp) {
+	u2 interface_count;
+
+	interface_count = u2Read(fp);
+	classFile->interfaces_count = interface_count;
+}
