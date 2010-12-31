@@ -70,7 +70,7 @@ typedef struct CONSTANT_NameAndType_info {
 
 typedef struct CONSTANT_Utf8_info {
 	u2 length;
-	u1 bytes;
+	u1 *bytes;
 } CONSTANT_Utf8;
 
 

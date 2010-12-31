@@ -69,9 +69,10 @@ void readConstantPoolCount(classFileFormat *classFile, FILE *fp) {
 }
 
 void readConstantPool(classFileFormat *classFile, FILE *fp) {
-	u1 tag;
-	cp_info *cp;
+	u1 tag, char_utf8; //char_utf8 deve ser pelo menos 16 bits
 	u2 cp_size;
+	cp_info *cp;
+	int i, bytes_utf8_length, string_length;
 
 	cp_size = classFile->constant_pool_count;
 	classFile->constant_pool = malloc(sizeof(cp_info)*cp_size);
@@ -79,6 +80,41 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 		tag = u1Read(fp);
 		cp->tag = tag;
 		switch(tag) {
+			case 1:
+				bytes_utf8_length= u2Read(fp);
+				cp->c_utf8.bytes = malloc(sizeof(u1));
+				string_length = 0;
+
+				for (i=0; i < bytes_utf8_length; i++) {
+					char_utf8 = u1Read(fp);
+					//if((0x0001 <= char_utf8) && (char_utf8 <= 0x007f)) {
+					if (!((char_utf8 >> 7) | 0)) {
+						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
+						cp->c_utf8.bytes[string_length++] = (u1)char_utf8;
+
+					//} else if ((char_utf8 == 0x0000 )|| ( 0x0080 <= char_utf8 && char_utf8 <= 0x07ff )) {
+					} else if ((char_utf8 >> 5) & 0xC0) {
+						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+2));
+						cp->c_utf8.bytes[string_length++] = (0xC0 | ((char_utf8 >> 6) & 0x1f));
+
+						char_utf8 = u1Read(fp);
+						cp->c_utf8.bytes[string_length++] = (0x80 | (char_utf8 & 0x3f));
+
+					} else {
+						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+3));
+						cp->c_utf8.bytes[string_length++] = (0xe0 | ((char_utf8 >> 12) & 0x0f));
+
+						char_utf8 = u1Read(fp);
+						cp->c_utf8.bytes[string_length++] = (0x80 | ((char_utf8 >> 6) & 0x3f));
+
+						char_utf8 = u1Read(fp);
+						cp->c_utf8.bytes[string_length++] = (0x80 | ( char_utf8 & 0x3f));
+
+					}
+				}
+				cp->c_utf8.length = string_length;
+
+				break;
 			case 3:
 				cp->c_integer.bytes = u4Read(fp);
 				break;
