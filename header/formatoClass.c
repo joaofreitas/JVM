@@ -87,12 +87,10 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 				for (i=0; i < bytes_utf8_length; i++) {
 					char_utf8 = u1Read(fp);
-					//if((0x0001 <= char_utf8) && (char_utf8 <= 0x007f)) {
 					if (!((char_utf8 >> 7) | 0)) {
 						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
 						cp->c_utf8.bytes[string_length++] = (u1)char_utf8;
 
-					//} else if ((char_utf8 == 0x0000 )|| ( 0x0080 <= char_utf8 && char_utf8 <= 0x07ff )) {
 					} else if ((char_utf8 >> 5) & 0xC0) {
 						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+2));
 						cp->c_utf8.bytes[string_length++] = (0xC0 | ((char_utf8 >> 6) & 0x1f));
