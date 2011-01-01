@@ -8,11 +8,12 @@
 #include "header/formatoClass.h"
 
 int main(int argc, char **argv) {
-	FILE *fp;
 	classFileFormat *classFile;
 	cp_info *constant_pool;
+	field_info *field;
+	FILE *fp;
 	char *exemplo = "teste/Operacoes.class";
-	int cp_size, tag, string_length, i;
+	int cp_size, field_size, tag, string_length, i;
 
 	fp = fopen(exemplo, "r");
 	classFile = loadClassFile(fp);
@@ -20,9 +21,10 @@ int main(int argc, char **argv) {
 	printf("Magic Number: %X\n", classFile->magic);
 	printf("Minor Version: %d\n", classFile->minor_version);
 	printf("Major Version: %d\n", classFile->major_version);
-	printf("Constant Pool Count: %d\n-------------- CONSTANT POOL -----------------\n", classFile->constant_pool_count);
-
 	cp_size = classFile->constant_pool_count;
+
+	printf("Constant Pool Count: %d\n-------------- CONSTANT POOL -----------------\n", cp_size);
+
 	for (constant_pool = classFile->constant_pool; constant_pool < classFile->constant_pool + cp_size - 1; constant_pool++){
 		tag = constant_pool->tag;
 		switch(tag) {
@@ -73,5 +75,18 @@ int main(int argc, char **argv) {
 	printf("This class: %d\n", classFile->this_class);
 	printf("Super class: %d\n", classFile->super_class);
 	printf("Interface Count: %d\n", classFile->interfaces_count);
+	field_size = classFile->fields_count;
+
+	printf("Fields Count: %d\n-------------- FIELDS -----------------\n", field_size);
+	for (field = classFile->fields; field < classFile->fields+ field_size; field++) {
+		printf("Name index: %d\n", field->name_index);
+		printf("Descriptor index: %d\n", field->descriptor_index);
+		printf("Access Flags: 0x%x\n", field->access_flags);
+		printf("Attributes count: %d\n", field->attributes_count);
+	}
+	printf("\n-------------- END -----------------\n\n");
+
+	printf("Methods Count: %d\n", classFile->methods_count);
+
 	return 0;
 }

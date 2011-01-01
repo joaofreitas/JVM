@@ -19,6 +19,11 @@ classFileFormat* loadClassFile(FILE *fp) {
 	readThisClass(classFile, fp);
 	readSuperClass(classFile, fp);
 	readInterfaceCount(classFile, fp);
+	readInterface(classFile, fp);
+	readFieldsCount(classFile, fp);
+	readFields(classFile, fp);
+	readMethodsCount(classFile, fp);
+	readMethods(classFile, fp);
 
 	return classFile;
 }

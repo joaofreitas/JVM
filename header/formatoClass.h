@@ -16,12 +16,6 @@ typedef unsigned char u1;
 typedef unsigned short u2;
 typedef unsigned int u4;
 
-/*typedef struct constant_pool_entry {
-	u1 info;
-} cp_info;*/
-
-//Tipos da const pool
-
 typedef struct CONSTANT_Class_info {
 	u2 name_index;
 } CONSTANT_Class;
@@ -87,7 +81,7 @@ CONSTANT_Double	 			 6
 CONSTANT_NameAndType	 	 12
 CONSTANT_Utf8	 			 1
 */
-typedef struct constantPoolStructure {
+typedef struct constant_pool_structure {
 	u1 tag;
 	union {
 		CONSTANT_Class c_class;
@@ -104,7 +98,29 @@ typedef struct constantPoolStructure {
 	};
 } cp_info;
 
-typedef struct classFileStructure {
+typedef struct attribute_info_structure {
+	u2 attribute_name_index;
+	u4 attribute_length;
+	u1 *info;
+} attribute_info;
+
+typedef struct field_info_structure{
+	u2 access_flags;
+	u2 name_index;
+	u2 descriptor_index;
+	u2 attributes_count;
+	attribute_info *attributes;
+} field_info;
+
+typedef struct method_info_structure {
+	u2 access_flags;
+	u2 name_index;
+	u2 descriptor_index;
+	u2 attributes_count;
+	attribute_info *attributes;
+} method_info;
+
+typedef struct class_file_structure {
 	u4 magic;
 	u2 minor_version;
 	u2 major_version;
@@ -116,11 +132,11 @@ typedef struct classFileStructure {
 	u2 interfaces_count;
 	u2 *interfaces;
 	u2 fields_count;
-	//field_info fields[fields_count];
+	field_info *fields;
 	u2 methods_count;
-	//method_info methods[methods_count];
+	method_info *methods;
 	u2 attributes_count;
-	//attribute_info attributes[attributes_count];
+	attribute_info *attributes;
 
 } classFileFormat;
 
@@ -139,5 +155,15 @@ void readThisClass(classFileFormat *classFile, FILE *fp);
 void readSuperClass(classFileFormat *classFile, FILE *fp);
 
 void readInterfaceCount(classFileFormat *classFile, FILE *fp);
+
+void readInterface(classFileFormat *classFile, FILE *fp);
+
+void readFieldsCount(classFileFormat *classFile, FILE *fp);
+
+void readFields(classFileFormat *classFile, FILE *fp);
+
+void readMethodsCount(classFileFormat *classFile, FILE *fp);
+
+void readMethods(classFileFormat *classFile, FILE *fp);
 
 #endif

@@ -182,3 +182,82 @@ void readInterfaceCount(classFileFormat *classFile, FILE *fp) {
 	interface_count = u2Read(fp);
 	classFile->interfaces_count = interface_count;
 }
+
+void readInterface(classFileFormat *classFile, FILE *fp) {
+	int interface_size;
+	u2 *interface;
+
+	interface_size = classFile->interfaces_count;
+	classFile->interfaces = malloc(sizeof(u2)*interface_size);
+
+	for (interface = classFile->interfaces; interface < classFile->interfaces + interface_size; interface++){
+		*interface = u2Read(fp);
+	}
+}
+
+void readFieldsCount(classFileFormat *classFile, FILE *fp) {
+	u2 fields_count;
+
+	fields_count = u2Read(fp);
+	classFile->fields_count = fields_count;
+}
+
+void readFields(classFileFormat *classFile, FILE *fp) {
+	int fields_size, attribute_size;
+	field_info *field;
+	attribute_info *attribute;
+
+	fields_size = classFile->fields_count;
+	classFile->fields = malloc(sizeof(field_info)*fields_size);
+
+	for (field = classFile->fields; field < classFile->fields + fields_size; field++){
+		field->access_flags = u2Read(fp);
+		field->name_index = u2Read(fp);
+		field->descriptor_index = u2Read(fp);
+		field->attributes_count = u2Read(fp);
+
+		attribute_size = field->attributes_count;
+		field->attributes = malloc(sizeof(attribute_info)*attribute_size);
+		for (attribute = field->attributes; attribute < field->attributes + attribute_size; attribute++) {
+			attribute->attribute_name_index = u2Read(fp);
+			attribute->attribute_length = u4Read(fp);
+			//TODO Refatorar essa parte quando os atributos estiverem prontos.
+		}
+	}
+}
+
+void readMethodsCount(classFileFormat *classFile, FILE *fp) {
+	u2 methods_count;
+
+	methods_count = u2Read(fp);
+	classFile->methods_count = methods_count;
+}
+
+void readMethods(classFileFormat *classFile, FILE *fp) {
+	int method_size, attribute_size, index;
+	method_info *method;
+	attribute_info *attribute;
+
+	method_size = classFile->methods_count;
+	classFile->methods = malloc(sizeof(method_info)*method_size);
+
+	for (method = classFile->methods; method < classFile->methods + method_size; method++){
+		method->access_flags = u2Read(fp);
+		method->name_index = u2Read(fp);
+		method->descriptor_index = u2Read(fp);
+		method->attributes_count = u2Read(fp);
+
+		attribute_size = method->attributes_count;
+		printf("method->access_flags %d\nmethod->name_index %d\nmethod->descriptor_index %d\nmethod->attributes_count %d\n", method->access_flags, method->name_index, method->descriptor_index, method->attributes_count);
+		method->attributes = malloc(sizeof(attribute_info)*attribute_size);
+		for (attribute = method->attributes; attribute < method->attributes + attribute_size; attribute++) {
+			attribute->attribute_name_index = u2Read(fp);
+			attribute->attribute_length = u4Read(fp);
+			//printf("attribute->attribute_name_index %d\nattribute->attribute_length %d\n", attribute->attribute_name_index, attribute->attribute_length);
+			index = attribute->attribute_name_index;
+			printf("Attribute Name: %s\n", classFile->constant_pool[index].c_utf8.bytes);
+			//TODO Refatorar essa parte quando os atributos estiverem prontos.
+		}
+		break;
+	}
+}
