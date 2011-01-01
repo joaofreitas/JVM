@@ -15,4 +15,5 @@ EXECUTABLES :=
 SUBDIRS := \
 . \
 header \
+header/attribute \
 

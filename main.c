@@ -4,8 +4,10 @@
  *  Created on: 22/12/2010
  *      Author: joaofreitas
  */
+
+#include <stdio.h>
+#include <stdlib.h>
 #include "header/classLoader.h"
-#include "header/formatoClass.h"
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;

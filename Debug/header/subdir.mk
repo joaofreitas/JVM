@@ -4,16 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../header/classLoader.c \
-../header/formatoClass.c 
+../header/classFileReader.c \
+../header/classLoader.c 
 
 OBJS += \
-./header/classLoader.o \
-./header/formatoClass.o 
+./header/classFileReader.o \
+./header/classLoader.o 
 
 C_DEPS += \
-./header/classLoader.d \
-./header/formatoClass.d 
+./header/classFileReader.d \
+./header/classLoader.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

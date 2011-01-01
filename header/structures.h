@@ -1,15 +1,12 @@
 /*
- * formatoClass.c
+ * structures.h
  *
- *  Created on: 21/12/2010
+ *  Created on: 01/01/2011
  *      Author: joaofreitas
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef _FORMATOCLASS_H
-#define	_FORMATOCLASS_H
+#ifndef STRUCTURES_H_
+#define STRUCTURES_H_
 
 
 typedef unsigned char u1;
@@ -68,7 +65,7 @@ typedef struct CONSTANT_Utf8_info {
 } CONSTANT_Utf8;
 
 
-/*
+/* Pool de constantes
 CONSTANT_Class	 			 7
 CONSTANT_Fieldref	 		 9
 CONSTANT_Methodref	 	     10
@@ -140,30 +137,4 @@ typedef struct class_file_structure {
 
 } classFileFormat;
 
-void readMagicNumber(classFileFormat *classFile, FILE *fp);
-
-void readVersion(classFileFormat *classFile, FILE *fp);
-
-void readConstantPoolCount(classFileFormat *classFile, FILE *fp);
-
-void readConstantPool(classFileFormat *classFile, FILE *fp);
-
-void readAccessFlags(classFileFormat *classFile, FILE *fp);
-
-void readThisClass(classFileFormat *classFile, FILE *fp);
-
-void readSuperClass(classFileFormat *classFile, FILE *fp);
-
-void readInterfaceCount(classFileFormat *classFile, FILE *fp);
-
-void readInterface(classFileFormat *classFile, FILE *fp);
-
-void readFieldsCount(classFileFormat *classFile, FILE *fp);
-
-void readFields(classFileFormat *classFile, FILE *fp);
-
-void readMethodsCount(classFileFormat *classFile, FILE *fp);
-
-void readMethods(classFileFormat *classFile, FILE *fp);
-
-#endif
+#endif /* STRUCTURES_H_ */
