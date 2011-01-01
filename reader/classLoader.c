@@ -24,6 +24,8 @@ classFileFormat* loadClassFile(FILE *fp) {
 	readFields(classFile, fp);
 	readMethodsCount(classFile, fp);
 	readMethods(classFile, fp);
+	readAttributesCount(classFile, fp);
+	readAttributes(classFile, fp);
 
 	return classFile;
 }
@@ -203,9 +205,7 @@ void readFields(classFileFormat *classFile, FILE *fp) {
 		attribute_size = field->attributes_count;
 		field->attributes = malloc(sizeof(attribute_info)*attribute_size);
 		for (attribute = field->attributes; attribute < field->attributes + attribute_size; attribute++) {
-			attribute->attribute_name_index = u2Read(fp);
-			attribute->attribute_length = u4Read(fp);
-			//TODO Refatorar essa parte quando os atributos estiverem prontos.
+			readStructureAttribute(classFile, fp, attribute);
 		}
 	}
 }
@@ -218,7 +218,7 @@ void readMethodsCount(classFileFormat *classFile, FILE *fp) {
 }
 
 void readMethods(classFileFormat *classFile, FILE *fp) {
-	int method_size, attribute_size;
+	int method_size, attribute_count;
 	method_info *method;
 	attribute_info *attribute;
 
@@ -231,12 +231,29 @@ void readMethods(classFileFormat *classFile, FILE *fp) {
 		method->descriptor_index = u2Read(fp);
 		method->attributes_count = u2Read(fp);
 
-		attribute_size = method->attributes_count;
-		printf("method->access_flags %d\nmethod->name_index %d\nmethod->descriptor_index %d\nmethod->attributes_count %d\n", method->access_flags, method->name_index, method->descriptor_index, method->attributes_count);
-		method->attributes = malloc(sizeof(attribute_info)*attribute_size);
-		for (attribute = method->attributes; attribute < method->attributes + attribute_size; attribute++) {
+		attribute_count = method->attributes_count;
+		method->attributes = malloc(sizeof(attribute_info)*attribute_count);
+		for (attribute = method->attributes; attribute < method->attributes + attribute_count; attribute++) {
 			readStructureAttribute(classFile, fp, attribute);
 		}
-		break;
+	}
+}
+
+void readAttributesCount(classFileFormat *classFile, FILE *fp) {
+	u2 attribute_count;
+
+	attribute_count = u2Read(fp);
+	classFile->attributes_count = attribute_count;
+}
+
+void readAttributes(classFileFormat *classFile, FILE *fp) {
+	int attribute_count;
+	attribute_info *attribute;
+
+	attribute_count = classFile->attributes_count;
+	classFile->attributes = malloc(sizeof(field_info)*attribute_count);
+
+	for (attribute = classFile->attributes; attribute < classFile->attributes + attribute_count; attribute++){
+		readStructureAttribute(classFile, fp, attribute);
 	}
 }

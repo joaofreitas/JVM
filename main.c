@@ -7,19 +7,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "header/classLoader.h"
+#include "reader/classLoader.h"
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;
 	cp_info *constant_pool;
 	field_info *field;
+	method_info *method;
 	FILE *fp;
 	char *exemplo = "teste/Operacoes.class";
-	int cp_size, field_size, tag, string_length, i;
+	int cp_size, field_size, method_size, attribute_size, tag, string_length, i;
 
 	fp = fopen(exemplo, "r");
 	classFile = loadClassFile(fp);
 
+	printf("-------------- CLASS FILE -----------------\n");
 	printf("Magic Number: %X\n", classFile->magic);
 	printf("Minor Version: %d\n", classFile->minor_version);
 	printf("Major Version: %d\n", classFile->major_version);
@@ -88,7 +90,25 @@ int main(int argc, char **argv) {
 	}
 	printf("\n-------------- END -----------------\n\n");
 
-	printf("Methods Count: %d\n", classFile->methods_count);
-
+	method_size = classFile->methods_count;
+	printf("Methods Count: %d\n-------------- METHODS -----------------\n", method_size);
+	for (method = classFile->methods; method < classFile->methods + method_size; method++) {
+		printf("Access Flag: %d\n", method->access_flags);
+		printf("Name index: %d\n",  method->name_index);
+		printf("Descriptor index: %d\n", method->descriptor_index);
+		attribute_size = method->attributes_count;
+		printf("Attributes count: %d\n-------------- METHOD [%s] attribute\n", attribute_size, classFile->constant_pool[method->name_index-1].c_utf8.bytes);
+		for (i = 0; i < attribute_size; i++) {
+			printf("Attribute name index: %d\n", method->attributes[i].attribute_name_index);
+			printf("Attribute length: %d\n", method->attributes[i].attribute_length);
+		}
+		printf("-------------------------------\n");
+	}
+	printf("\n-------------- END -----------------\n\n");
+	printf("Attributes count: %d\n-------------- Attributes\n", attribute_size);
+	for (i = 0; i < attribute_size; i++) {
+		printf("Attribute name index: %d\n", classFile->attributes[i].attribute_name_index);
+		printf("Attribute length: %d\n", classFile->attributes[i].attribute_length);
+	}
 	return 0;
 }

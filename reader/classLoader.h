@@ -13,6 +13,7 @@
 
 #include "structures.h"
 #include "classFileReader.h"
+#include "attribute/attributeUtil.h"
 
 classFileFormat* loadClassFile(FILE *fp);
 
@@ -42,6 +43,8 @@ void readMethodsCount(classFileFormat *classFile, FILE *fp);
 
 void readMethods(classFileFormat *classFile, FILE *fp);
 
-//void readAttributes(classFileFormat *classFile, FILE *fp);
+void readAttributesCount(classFileFormat *classFile, FILE *fp);
+
+void readAttributes(classFileFormat *classFile, FILE *fp);
 
 #endif /* CLASSLOADER_H_ */

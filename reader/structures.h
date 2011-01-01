@@ -95,10 +95,16 @@ typedef struct constant_pool_structure {
 	};
 } cp_info;
 
+typedef struct ignored_attribute_info {
+	u1 *bytes;
+} ATTRIBUTE_ignored_attribute;
+
 typedef struct attribute_info_structure {
 	u2 attribute_name_index;
 	u4 attribute_length;
-	u1 *info;
+	union {
+		ATTRIBUTE_ignored_attribute *ignored_attribute;
+	};
 } attribute_info;
 
 typedef struct field_info_structure{
