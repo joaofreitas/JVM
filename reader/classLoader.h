@@ -47,4 +47,6 @@ void readAttributesCount(classFileFormat *classFile, FILE *fp);
 
 void readAttributes(classFileFormat *classFile, FILE *fp);
 
+cp_info getConstantPoolElementByIndex(classFileFormat *classFile, int index);
+
 #endif /* CLASSLOADER_H_ */

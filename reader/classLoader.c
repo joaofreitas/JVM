@@ -96,6 +96,8 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 					}
 				}
+				cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
+				cp->c_utf8.bytes[string_length++] = '\0';
 				cp->c_utf8.length = string_length;
 
 				break;
@@ -256,4 +258,12 @@ void readAttributes(classFileFormat *classFile, FILE *fp) {
 	for (attribute = classFile->attributes; attribute < classFile->attributes + attribute_count; attribute++){
 		readStructureAttribute(classFile, fp, attribute);
 	}
+}
+
+// Método auxiliar que retorna o elemento indicado pela index.
+cp_info getConstantPoolElementByIndex(classFileFormat *classFile, int index) {
+	cp_info cp;
+
+	cp = classFile->constant_pool[index-1];
+	return cp;	//Constant Pool começa do 0, logo o elemento atual é sempre o anterior
 }

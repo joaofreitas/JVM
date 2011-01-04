@@ -6,6 +6,7 @@
  */
 
 #include "attributeUtil.h"
+#include "../classLoader.h"
 
 static char* ATTRIBUTE_ConstantValue = "ConstantValue";
 static char* ATTRIBUTE_Code = "Code";
@@ -23,19 +24,6 @@ int compare(char *a, unsigned char *b, int size) {
 	return 0;
 }
 
-
-void readAttributeConstantValue() {}
-
-void readAttributeCode() {}
-
-void readAttributeExceptions() {}
-
-void readAttributeInnerClasses() {}
-
-void readAttributeSynthetic() {}
-
-void readAttributeSourceFile() {}
-
 void ignoreAttribute(attribute_info *attribute, FILE *fp, int length) {
 	int i;
 
@@ -48,21 +36,77 @@ void ignoreAttribute(attribute_info *attribute, FILE *fp, int length) {
 
 }
 
+void readAttributeConstantValue(attribute_info *attribute, FILE *fp) {
+	attribute->constant_value.attribute_name_index = u2Read(fp);
+	attribute->constant_value.attribute_length = u4Read(fp);
+	attribute->constant_value.constant_value_index = u2Read(fp);
+}
+
+void readAttributeCode(attribute_info *attribute, FILE *fp) {
+	int i, attribute_name_index, attribute_length;
+	attribute_info *new_attribute;
+
+	attribute->code.max_stack = u2Read(fp);
+	attribute->code.max_locals = u2Read(fp);
+	attribute->code.code_length= u4Read(fp);
+	attribute->code.code = malloc(sizeof(u1)*attribute->code.code_length + 1);
+
+	for (i=0; i < attribute->code.code_length; i++) {
+		attribute->code.code[i] = u1Read(fp);
+	}
+	attribute->code.code[i] = '\0';
+	attribute->code.exception_table_length = u2Read(fp);
+
+	for (i=0; i < attribute->code.exception_table_length; i++) {
+		attribute->code.exception_table->start_pc = u2Read(fp);
+		attribute->code.exception_table->end_pc = u2Read(fp);
+		attribute->code.exception_table->handler_pc = u2Read(fp);
+		attribute->code.exception_table->catch_type = u2Read(fp);
+	}
+
+	attribute->code.attributes_count = u2Read(fp);
+	attribute->code.attributes = malloc(sizeof(attribute_info)*attribute->code.attributes_count);
+
+	//Isso é opcional
+	for (i=0; i < attribute->code.attributes_count; i++) {
+		attribute_name_index = u2Read(fp);
+		attribute_length = u4Read(fp);
+
+		new_attribute = malloc(sizeof(attribute_info)*attribute_length);
+		new_attribute->attribute_name_index = attribute_name_index;
+		new_attribute->attribute_length = attribute_length;
+
+		//Apenas ignorando o conteudo do atributo, já que é opcional
+		ignoreAttribute(new_attribute, fp, new_attribute->attribute_length);
+
+	}
+}
+
+void readAttributeExceptions() {}
+
+void readAttributeInnerClasses() {}
+
+void readAttributeSynthetic() {}
+
+void readAttributeSourceFile() {}
+
 void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info *attribute) {
 	int string_index, string_length;
+	cp_info cp;
 	unsigned char *cte;
 
 	attribute->attribute_name_index = u2Read(fp);
 	attribute->attribute_length = u4Read(fp);
 	string_index = attribute->attribute_name_index;
-	string_length = classFile->constant_pool[string_index].c_utf8.length;
+	cp = getConstantPoolElementByIndex(classFile, string_index);
+	string_length = cp.c_utf8.length;
 
-	cte = classFile->constant_pool[string_index].c_utf8.bytes;
+	cte = cp.c_utf8.bytes;
 
 	if (compare(ATTRIBUTE_ConstantValue, cte, string_length) == 0) {
-		//TODO Implementar aqui a logica de constant value
+		readAttributeConstantValue(attribute, fp);
 	} else if (compare(ATTRIBUTE_Code, cte, string_length) == 0) {
-		//TODO Implementar aqui a logica de code
+		readAttributeCode(attribute, fp);
 	} else if (compare(ATTRIBUTE_Exception, cte, string_length) == 0) {
 		//TODO Implementar aqui a logica de exception
 	} else if (compare(ATTRIBUTE_InnerClasses, cte, string_length) == 0) {
@@ -70,7 +114,7 @@ void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info
 	} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
 		////TODO Implementar aqui a logica de syntetic
 	} else {
-		printf("Ignorando atributo: [%s]\n", classFile->constant_pool[string_index].c_utf8.bytes);
+		printf("Ignorando atributo: [%s]\n", cp.c_utf8.bytes);
 		ignoreAttribute(attribute, fp, attribute->attribute_length);
 	}
 

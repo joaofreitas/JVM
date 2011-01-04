@@ -35,10 +35,7 @@ int main(int argc, char **argv) {
 			case 1:
 				string_length = constant_pool->c_utf8.length;
 				printf("Length %d. String: ", string_length);
-				for (i=0; i < string_length; i++) {
-					printf("%c", constant_pool->c_utf8.bytes[i]);
-				}
-				printf("\n");
+				printf("%s\n", constant_pool->c_utf8.bytes);
 				break;
 			case 3:
 				printf("Value: %d\n", constant_pool->c_integer.bytes);
@@ -93,14 +90,16 @@ int main(int argc, char **argv) {
 	method_size = classFile->methods_count;
 	printf("Methods Count: %d\n-------------- METHODS -----------------\n", method_size);
 	for (method = classFile->methods; method < classFile->methods + method_size; method++) {
+		attribute_size = method->attributes_count;
+		printf("-------------- METHOD [%s]\n", classFile->constant_pool[method->name_index-1].c_utf8.bytes);
+		printf("Attributes count: %d", attribute_size);
 		printf("Access Flag: %d\n", method->access_flags);
 		printf("Name index: %d\n",  method->name_index);
 		printf("Descriptor index: %d\n", method->descriptor_index);
-		attribute_size = method->attributes_count;
-		printf("Attributes count: %d\n-------------- METHOD [%s] attribute\n", attribute_size, classFile->constant_pool[method->name_index-1].c_utf8.bytes);
+		printf("Attributes:\n");
 		for (i = 0; i < attribute_size; i++) {
-			printf("Attribute name index: %d\n", method->attributes[i].attribute_name_index);
-			printf("Attribute length: %d\n", method->attributes[i].attribute_length);
+			printf("\t-Attribute name index: %d\n", method->attributes[i].attribute_name_index);
+			printf("\t-Attribute length: %d\n", method->attributes[i].attribute_length);
 		}
 		printf("-------------------------------\n");
 	}

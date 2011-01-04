@@ -13,6 +13,12 @@ typedef unsigned char u1;
 typedef unsigned short u2;
 typedef unsigned int u4;
 
+
+/*---------------------------------------------------------
+ * Constantes
+ *---------------------------------------------------------
+ */
+
 typedef struct CONSTANT_Class_info {
 	u2 name_index;
 } CONSTANT_Class;
@@ -65,7 +71,9 @@ typedef struct CONSTANT_Utf8_info {
 } CONSTANT_Utf8;
 
 
-/* Pool de constantes
+/* ---------------------------------------------------------
+ * Pool de constantes
+ * ---------------------------------------------------------
 CONSTANT_Class	 			 7
 CONSTANT_Fieldref	 		 9
 CONSTANT_Methodref	 	     10
@@ -95,35 +103,82 @@ typedef struct constant_pool_structure {
 	};
 } cp_info;
 
-typedef struct ignored_attribute_info {
-	u1 *bytes;
-} ATTRIBUTE_ignored_attribute;
+/*---------------------------------------------------------
+ * Atributos
+ *---------------------------------------------------------
+ */
 
-typedef struct attribute_info_structure {
+typedef struct exception_table_attribute exception_table_info;
+typedef struct ignored_attribute_info ATTRIBUTE_ignored_attribute;
+typedef struct constant_value_attribute ATTRIBUTE_constant_value;
+typedef struct code_attribute_structure ATTRIBUTE_code;
+typedef struct attribute_info_structure attribute_info;
+
+struct exception_table_attribute{
+	u2 start_pc;
+	u2 end_pc;
+	u2 handler_pc;
+	u2 catch_type;
+};
+
+struct ignored_attribute_info {
+	u1 *bytes;
+};
+
+struct constant_value_attribute {
+	u2 attribute_name_index;
+	u4 attribute_length;
+	u2 constant_value_index;
+};
+
+
+struct code_attribute_structure {
+	u2 max_stack;
+	u2 max_locals;
+	u4 code_length;
+	u1 *code;
+	u2 exception_table_length;
+	exception_table_info *exception_table;
+	u2 attributes_count;
+	attribute_info *attributes;
+};
+
+struct attribute_info_structure {
 	u2 attribute_name_index;
 	u4 attribute_length;
 	union {
+		ATTRIBUTE_constant_value constant_value;
 		ATTRIBUTE_ignored_attribute *ignored_attribute;
+		ATTRIBUTE_code code;
 	};
-} attribute_info;
+};
 
-typedef struct field_info_structure{
+/*---------------------------------------------------------
+ * Field, Method e Class structures
+ *---------------------------------------------------------
+ */
+
+typedef struct field_info_structure field_info;
+typedef struct method_info_structure method_info;
+typedef struct class_file_structure classFileFormat;
+
+struct field_info_structure{
 	u2 access_flags;
 	u2 name_index;
 	u2 descriptor_index;
 	u2 attributes_count;
 	attribute_info *attributes;
-} field_info;
+};
 
-typedef struct method_info_structure {
+struct method_info_structure {
 	u2 access_flags;
 	u2 name_index;
 	u2 descriptor_index;
 	u2 attributes_count;
 	attribute_info *attributes;
-} method_info;
+};
 
-typedef struct class_file_structure {
+struct class_file_structure {
 	u4 magic;
 	u2 minor_version;
 	u2 major_version;
@@ -141,6 +196,6 @@ typedef struct class_file_structure {
 	u2 attributes_count;
 	attribute_info *attributes;
 
-} classFileFormat;
+};
 
 #endif /* STRUCTURES_H_ */
