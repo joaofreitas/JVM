@@ -108,26 +108,34 @@ typedef struct constant_pool_structure {
  *---------------------------------------------------------
  */
 
-typedef struct exception_table_attribute exception_table_info;
-typedef struct ignored_attribute_info ATTRIBUTE_ignored_attribute;
-typedef struct constant_value_attribute ATTRIBUTE_constant_value;
-typedef struct code_attribute_structure ATTRIBUTE_code;
+typedef struct exception_table_info exception_table;
+typedef struct class_member_info class_member;
+typedef struct ignored_attribute_structure 			ATTRIBUTE_ignored_attribute;
+typedef struct constant_value_attribute_structure 	ATTRIBUTE_constant_value;
+typedef struct code_attribute_structure 			ATTRIBUTE_code;
+typedef struct exceptions_attribute_structure 		ATTRIBUTE_exceptions;
+typedef struct inner_classes_structure				ATTRIBUTE_inner_classes;
 typedef struct attribute_info_structure attribute_info;
 
-struct exception_table_attribute{
+struct exception_table_info{
 	u2 start_pc;
 	u2 end_pc;
 	u2 handler_pc;
 	u2 catch_type;
 };
 
-struct ignored_attribute_info {
+struct class_member_info {
+	u2 inner_class_info_index;
+	u2 outer_class_info_index;
+	u2 inner_name_index;
+	u2 inner_class_access_flags;
+};
+
+struct ignored_attribute_structure {
 	u1 *bytes;
 };
 
-struct constant_value_attribute {
-	u2 attribute_name_index;
-	u4 attribute_length;
+struct constant_value_attribute_structure {
 	u2 constant_value_index;
 };
 
@@ -138,9 +146,19 @@ struct code_attribute_structure {
 	u4 code_length;
 	u1 *code;
 	u2 exception_table_length;
-	exception_table_info *exception_table;
+	exception_table *exception_table;
 	u2 attributes_count;
 	attribute_info *attributes;
+};
+
+struct exceptions_attribute_structure {
+	u2 number_of_exceptions;
+	u2 *exception_index_table;
+};
+
+struct inner_classes_structure {
+	u2 number_of_classes;
+	class_member *classes;
 };
 
 struct attribute_info_structure {
@@ -150,6 +168,8 @@ struct attribute_info_structure {
 		ATTRIBUTE_constant_value constant_value;
 		ATTRIBUTE_ignored_attribute *ignored_attribute;
 		ATTRIBUTE_code code;
+		ATTRIBUTE_exceptions exceptions;
+		ATTRIBUTE_inner_classes inner_classes;
 	};
 };
 

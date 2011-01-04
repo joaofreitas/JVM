@@ -12,7 +12,6 @@ static char* ATTRIBUTE_ConstantValue = "ConstantValue";
 static char* ATTRIBUTE_Code = "Code";
 static char* ATTRIBUTE_Exception = "Exception";
 static char* ATTRIBUTE_InnerClasses = "InnerClasses";
-static char* ATTRIBUTE_Syntetic = "Syntetic";
 
 //O método strcmp não funciona para unsigned char. Logo estou substituindo por esse compare
 int compare(char *a, unsigned char *b, int size) {
@@ -31,14 +30,11 @@ void ignoreAttribute(attribute_info *attribute, FILE *fp, int length) {
 	attribute->ignored_attribute->bytes = malloc(sizeof(u1)*length);
 	for (i = 0; i < length; i++) {
 		attribute->ignored_attribute->bytes[i] = u1Read(fp);
-		//printf("%c", attribute->ignored_attribute->bytes[i]);
 	}
 
 }
 
 void readAttributeConstantValue(attribute_info *attribute, FILE *fp) {
-	attribute->constant_value.attribute_name_index = u2Read(fp);
-	attribute->constant_value.attribute_length = u4Read(fp);
 	attribute->constant_value.constant_value_index = u2Read(fp);
 }
 
@@ -82,13 +78,34 @@ void readAttributeCode(attribute_info *attribute, FILE *fp) {
 	}
 }
 
-void readAttributeExceptions() {}
+void readAttributeExceptions(attribute_info *attribute, FILE *fp) {
+	u2 number;
+	int i;
 
-void readAttributeInnerClasses() {}
+	number = u2Read(fp);
+	attribute->exceptions.number_of_exceptions  = number;
+	attribute->exceptions.exception_index_table = malloc(sizeof(u2) * number);
 
-void readAttributeSynthetic() {}
+	for(i=0; i<number; i++) {
+		attribute->exceptions.exception_index_table[i] = u2Read(fp);
+	}
+}
 
-void readAttributeSourceFile() {}
+void readAttributeInnerClasses(attribute_info *attribute, FILE *fp) {
+	u2 number;
+	int i;
+
+	number = u2Read(fp);
+	attribute->inner_classes.number_of_classes = number;
+	attribute->inner_classes.classes = malloc(sizeof(class_member)*number);
+	for (i=0; i<number; i++) {
+		attribute->inner_classes.classes[i].inner_class_info_index = u2Read(fp);
+		attribute->inner_classes.classes[i].outer_class_info_index = u2Read(fp);
+		attribute->inner_classes.classes[i].inner_name_index = u2Read(fp);
+		attribute->inner_classes.classes[i].inner_class_access_flags = u2Read(fp);
+	}
+}
+
 
 void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info *attribute) {
 	int string_index, string_length;
@@ -108,10 +125,10 @@ void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info
 	} else if (compare(ATTRIBUTE_Code, cte, string_length) == 0) {
 		readAttributeCode(attribute, fp);
 	} else if (compare(ATTRIBUTE_Exception, cte, string_length) == 0) {
-		//TODO Implementar aqui a logica de exception
+		readAttributeExceptions(attribute, fp);
 	} else if (compare(ATTRIBUTE_InnerClasses, cte, string_length) == 0) {
-		//TODO Implementar aqui a logica de inner classes
-	} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
+		readAttributeInnerClasses(attribute, fp);
+	//} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
 		////TODO Implementar aqui a logica de syntetic
 	} else {
 		printf("Ignorando atributo: [%s]\n", cp.c_utf8.bytes);
