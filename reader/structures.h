@@ -161,8 +161,17 @@ struct inner_classes_structure {
 	class_member *classes;
 };
 
+/* Tag foi implementada para saber o que tem na union. Não existe essa tag originalmente na JVM!
+ *	ATTRIBUTE_ConstantValue -> 	tag = 1
+ *	ATTRIBUTE_Code -> 			tag = 2;
+ *	ATTRIBUTE_Exception ->		tag = 3;
+ *	ATTRIBUTE_InnerClasses ->	tag = 4;
+ *	ATTRIBUTE_Syntetic -> 		tag = 5;
+ *	Atributo ignorado -> 		tag = 6;
+ */
 struct attribute_info_structure {
 	u2 attribute_name_index;
+	u2 tag;
 	u4 attribute_length;
 	union {
 		ATTRIBUTE_constant_value constant_value;

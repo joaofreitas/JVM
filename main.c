@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 	method_info *method;
 	FILE *fp;
 	char *exemplo = "teste/Operacoes.class";
-	int cp_size, field_size, method_size, attribute_size, tag, string_length, i;
+	int cp_size, field_size, method_size, attribute_size, tag, string_length, i, j;
 
 	fp = fopen(exemplo, "r");
 	classFile = loadClassFile(fp);
@@ -98,6 +98,7 @@ int main(int argc, char **argv) {
 		printf("Descriptor index: %d\n", method->descriptor_index);
 		printf("Attributes:\n");
 		for (i = 0; i < attribute_size; i++) {
+			printf("\t-Attribute tag: %d\n", method->attributes[i].tag);
 			printf("\t-Attribute name index: %d\n", method->attributes[i].attribute_name_index);
 			printf("\t-Attribute length: %d\n", method->attributes[i].attribute_length);
 		}

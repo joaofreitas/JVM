@@ -12,6 +12,7 @@ static char* ATTRIBUTE_ConstantValue = "ConstantValue";
 static char* ATTRIBUTE_Code = "Code";
 static char* ATTRIBUTE_Exception = "Exception";
 static char* ATTRIBUTE_InnerClasses = "InnerClasses";
+static char* ATTRIBUTE_Syntetic = "Syntetic";
 
 //O método strcmp não funciona para unsigned char. Logo estou substituindo por esse compare
 int compare(char *a, unsigned char *b, int size) {
@@ -122,18 +123,22 @@ void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info
 
 	if (compare(ATTRIBUTE_ConstantValue, cte, string_length) == 0) {
 		readAttributeConstantValue(attribute, fp);
+		attribute->tag = 1;
 	} else if (compare(ATTRIBUTE_Code, cte, string_length) == 0) {
 		readAttributeCode(attribute, fp);
+		attribute->tag = 2;
 	} else if (compare(ATTRIBUTE_Exception, cte, string_length) == 0) {
 		readAttributeExceptions(attribute, fp);
+		attribute->tag = 3;
 	} else if (compare(ATTRIBUTE_InnerClasses, cte, string_length) == 0) {
 		readAttributeInnerClasses(attribute, fp);
-	//} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
-		////TODO Implementar aqui a logica de syntetic
+		attribute->tag = 4;
+	} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
+		attribute->tag = 5;
 	} else {
 		printf("Ignorando atributo: [%s]\n", cp.c_utf8.bytes);
+		attribute->tag = 6;
 		ignoreAttribute(attribute, fp, attribute->attribute_length);
 	}
 
-	//TODO Refatorar essa parte quando os atributos estiverem prontos.
 }
