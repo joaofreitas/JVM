@@ -55,6 +55,7 @@ void readConstantPoolCount(classFileFormat *classFile, FILE *fp) {
 }
 
 void readConstantPool(classFileFormat *classFile, FILE *fp) {
+	int counter = 0;
 	u1 tag, char_utf8; //char_utf8 deve ser pelo menos 16 bits
 	u2 cp_size;
 	cp_info *cp;
@@ -63,6 +64,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	cp_size = classFile->constant_pool_count;
 	classFile->constant_pool = malloc(sizeof(cp_info)*cp_size);
 	for (cp = classFile->constant_pool; cp < classFile->constant_pool + cp_size - 1; cp++){
+		counter++;
 		tag = u1Read(fp);
 		cp->tag = tag;
 		switch(tag) {
@@ -97,7 +99,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 					}
 				}
 				cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
-				cp->c_utf8.bytes[string_length++] = '\0';
+				cp->c_utf8.bytes[i] = '\0';
 				cp->c_utf8.length = string_length;
 
 				break;
@@ -107,13 +109,19 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 			case 4:
 				cp->c_float.bytes = u4Read(fp);
 				break;
-			case 5:
+			case 5:	//Nesse caso, long ocupa 2 espacos na constant pool
 				cp->c_long.high_bytes = u4Read(fp);
 				cp->c_long.low_bytes = u4Read(fp);
+				counter++;
+				cp++;
+				cp->tag = 13;
 				break;
-			case 6:
+			case 6: //Nesse caso, double ocupa 2 espacos na constant pool
 				cp->c_double.high_bytes = u4Read(fp);
 				cp->c_double.low_bytes = u4Read(fp);
+				counter++;
+				cp++;
+				cp->tag = 13;
 				break;
 			case 7:
 				cp->c_class.name_index = u2Read(fp);

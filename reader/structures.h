@@ -85,6 +85,7 @@ CONSTANT_Long	 			 5
 CONSTANT_Double	 			 6
 CONSTANT_NameAndType	 	 12
 CONSTANT_Utf8	 			 1
+REGIAO RESERVADA			 13
 */
 typedef struct constant_pool_structure {
 	u1 tag;

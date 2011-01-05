@@ -15,8 +15,9 @@ int main(int argc, char **argv) {
 	field_info *field;
 	method_info *method;
 	FILE *fp;
-	char *exemplo = "teste/Operacoes.class";
-	int cp_size, field_size, method_size, attribute_size, tag, string_length, i, j;
+	//char *exemplo = "teste/Operacoes.class";
+	char *exemplo = "/home/joaofreitas/workspacecpp/testes/ArquivosTesteLadeira/aritimetica/testeLogArit.class";
+	int cp_size, field_size, method_size, attribute_size, tag, string_length, i;
 
 	fp = fopen(exemplo, "r");
 	classFile = loadClassFile(fp);
@@ -28,9 +29,11 @@ int main(int argc, char **argv) {
 	cp_size = classFile->constant_pool_count;
 
 	printf("Constant Pool Count: %d\n-------------- CONSTANT POOL -----------------\n", cp_size);
-
+	i=0;
 	for (constant_pool = classFile->constant_pool; constant_pool < classFile->constant_pool + cp_size - 1; constant_pool++){
 		tag = constant_pool->tag;
+		printf("[%d] ", i+1);
+		i++;
 		switch(tag) {
 			case 1:
 				string_length = constant_pool->c_utf8.length;
@@ -44,10 +47,10 @@ int main(int argc, char **argv) {
 				printf("Value: %d\n", constant_pool->c_float.bytes );
 				break;
 			case 5:
-				printf("Value: %d%d\n", constant_pool->c_long.high_bytes, constant_pool->c_long.low_bytes );
+				printf("High Bytes: 0x%.5X. Low Bytes 0x%.5X\n", constant_pool->c_long.high_bytes, constant_pool->c_long.low_bytes );
 				break;
 			case 6:
-				printf("Value: %d%d\n", constant_pool->c_double.high_bytes, constant_pool->c_double.low_bytes);
+				printf("High Bytes: 0z%X. Low Bytes 0x%X\n", constant_pool->c_double.high_bytes, constant_pool->c_double.low_bytes);
 				break;
 			case 7:
 				printf("Class index: #%d\n", constant_pool->c_class.name_index);
@@ -67,12 +70,15 @@ int main(int argc, char **argv) {
 			case 12:
 				printf("Nametype class index: %d. Nametype name and type index: %d\n", constant_pool->c_nametype.name_index, constant_pool->c_nametype.descriptor_index);
 				break;
+			case 13:
+				printf("(large numeric continued)\n");
+				break;
 			default:
 				break;
 		}
 	}
 	printf("\n-------------- END -----------------\n\n");
-	printf("Access Flags: %d\n", classFile->access_flags);
+	printf("Access Flags: 0x%X\n", classFile->access_flags);
 	printf("This class: %d\n", classFile->this_class);
 	printf("Super class: %d\n", classFile->super_class);
 	printf("Interface Count: %d\n", classFile->interfaces_count);
@@ -92,7 +98,7 @@ int main(int argc, char **argv) {
 	for (method = classFile->methods; method < classFile->methods + method_size; method++) {
 		attribute_size = method->attributes_count;
 		printf("-------------- METHOD [%s]\n", classFile->constant_pool[method->name_index-1].c_utf8.bytes);
-		printf("Attributes count: %d", attribute_size);
+		printf("Attributes count: %d\n", attribute_size);
 		printf("Access Flag: %d\n", method->access_flags);
 		printf("Name index: %d\n",  method->name_index);
 		printf("Descriptor index: %d\n", method->descriptor_index);
