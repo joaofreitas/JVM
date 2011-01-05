@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 	method_info *method;
 	FILE *fp;
 	//char *exemplo = "teste/Operacoes.class";
-	char *exemplo = "/home/joaofreitas/workspacecpp/testes/ArquivosTesteLadeira/aritimetica/testeLogArit.class";
+	char *exemplo = "teste/Operacoes.class";
 	int cp_size, field_size, method_size, attribute_size, tag, string_length, i;
 
 	fp = fopen(exemplo, "r");
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 		}
 	}
 	printf("\n-------------- END -----------------\n\n");
-	printf("Access Flags: 0x%X\n", classFile->access_flags);
+	printf("Access Flags: 0x%.6X\n", classFile->access_flags);
 	printf("This class: %d\n", classFile->this_class);
 	printf("Super class: %d\n", classFile->super_class);
 	printf("Interface Count: %d\n", classFile->interfaces_count);
@@ -86,10 +86,10 @@ int main(int argc, char **argv) {
 
 	printf("Fields Count: %d\n-------------- FIELDS -----------------\n", field_size);
 	for (field = classFile->fields; field < classFile->fields+ field_size; field++) {
-		printf("Name index: %d\n", field->name_index);
+		printf("--------------\nName index: %d\n", field->name_index);
 		printf("Descriptor index: %d\n", field->descriptor_index);
 		printf("Access Flags: 0x%x\n", field->access_flags);
-		printf("Attributes count: %d\n", field->attributes_count);
+		printf("Attributes count: %d\n--------------\n", field->attributes_count);
 	}
 	printf("\n-------------- END -----------------\n\n");
 
