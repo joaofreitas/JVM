@@ -172,7 +172,10 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			printf("%sMaximum stack depth: %d\n", format, attribute.code.max_stack);
 			printf("%sMaximum local variables: %d\n", format, attribute.code.max_locals);
 			printf("%sCode Length: %d\n", format, attribute.code.code_length);
-			//TODO Deve imprimir o bytecode!
+			for (i=0 ; i< attribute.code.code_length; i++) {
+				//TODO Deve imprimir o mnemonico do bytecode e nao o hexadecimal!
+				printf("%X\n", attribute.code.code[i]);
+			}
 			break;
 		case 3:
 			printf("%sNumber of exceptions: %d\n", format, attribute.exceptions.number_of_exceptions);
