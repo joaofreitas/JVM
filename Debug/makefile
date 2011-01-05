@@ -11,6 +11,7 @@ RM := rm -rf
 -include subdir.mk
 -include reader/subdir.mk
 -include reader/attribute/subdir.mk
+-include classViewer/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

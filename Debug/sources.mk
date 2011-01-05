@@ -16,4 +16,5 @@ SUBDIRS := \
 reader \
 reader/attribute \
 . \
+classViewer \
 
