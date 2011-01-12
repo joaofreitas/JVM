@@ -1,3 +1,22 @@
+--------------------------------------------------
+COMPONENTES DO GRUPO
+  Gustavo Bicalho - 09/44050
+  João Paulo de Freitas Matos - 09/47636
+  Marcus Oliveira - 09/46524
+  Vinícius Alves - 09/16544
+--------------------------------------------------
+INSTRUÇÕES PARA COMPILAÇÃO
+  Entre no diretório Release.
+  Execute o seguinte comando do makefile
+    make clean
+  Para limpar todo o código de objeto gerado. Em seguida, digite:
+    make all
+  Para a compilação completa do projeto.
+--------------------------------------------------
+EXECUÇÃO DO PROJETO
+  Para a execução, basta digitar
+    ./jvm <parametro>
+  onde o parametro de arquivo é opcional
+
 Para compilar um arquivo para JDK 1.2, use o comando:
 	javac -target 1.2 -source 1.2 CodigoFonte.java
-
