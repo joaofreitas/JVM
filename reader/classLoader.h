@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "structures.h"
+#include "../structures/classFileStructures.h"
 #include "classFileReader.h"
 #include "attribute/attributeUtil.h"
 

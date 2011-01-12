@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../structures.h"
+#include "../../structures/classFileStructures.h"
 #include "../classFileReader.h"
 
 void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info *attribute);

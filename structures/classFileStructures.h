@@ -192,7 +192,7 @@ typedef struct field_info_structure field_info;
 typedef struct method_info_structure method_info;
 typedef struct class_file_structure classFileFormat;
 
-struct field_info_structure{
+struct field_info_structure{	//Variáveis de instancia e de classe
 	u2 access_flags;
 	u2 name_index;
 	u2 descriptor_index;

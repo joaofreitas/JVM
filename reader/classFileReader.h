@@ -10,7 +10,7 @@
 #define	CLASSFILEREADER_H
 
 #include <stdio.h>
-#include "structures.h"
+#include "../structures/classFileStructures.h"
 
 u1 u1Read(FILE *fp);
 
