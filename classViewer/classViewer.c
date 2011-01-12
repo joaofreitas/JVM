@@ -44,39 +44,39 @@ void printConstantPool(classFileFormat *classFile) {
 		i++;
 		switch(tag) {
 			case 1:
-				string_length = constant_pool->c_utf8.length;
+				string_length = constant_pool->constant_union.c_utf8.length;
 				printf("Length %d. String: ", string_length);
-				printf("%s\n", constant_pool->c_utf8.bytes);
+				printf("%s\n", constant_pool->constant_union.c_utf8.bytes);
 				break;
 			case 3:
-				printf("Value: %d\n", constant_pool->c_integer.bytes);
+				printf("Value: %d\n", constant_pool->constant_union.c_integer.bytes);
 				break;
 			case 4:
-				printf("Value: %d\n", constant_pool->c_float.bytes );
+				printf("Value: %d\n", constant_pool->constant_union.c_float.bytes );
 				break;
 			case 5:
-				printf("High Bytes: 0x%.5X. Low Bytes 0x%.5X\n", constant_pool->c_long.high_bytes, constant_pool->c_long.low_bytes );
+				printf("High Bytes: 0x%.5X. Low Bytes 0x%.5X\n", constant_pool->constant_union.c_long.high_bytes, constant_pool->constant_union.c_long.low_bytes );
 				break;
 			case 6:
-				printf("High Bytes: 0z%X. Low Bytes 0x%X\n", constant_pool->c_double.high_bytes, constant_pool->c_double.low_bytes);
+				printf("High Bytes: 0z%X. Low Bytes 0x%X\n", constant_pool->constant_union.c_double.high_bytes, constant_pool->constant_union.c_double.low_bytes);
 				break;
 			case 7:
-				printf("Class index: #%d\n", constant_pool->c_class.name_index);
+				printf("Class index: #%d\n", constant_pool->constant_union.c_class.name_index);
 				break;
 			case 8:
-				printf("String index: #%d\n", constant_pool->c_string.string_index);
+				printf("String index: #%d\n", constant_pool->constant_union.c_string.string_index);
 				break;
 			case 9:
-				printf("FieldRef class index: %d. Fieldref name and type index: %d\n", constant_pool->c_fieldref.class_index, constant_pool->c_fieldref.name_and_type_index);
+				printf("FieldRef class index: %d. Fieldref name and type index: %d\n", constant_pool->constant_union.c_fieldref.class_index, constant_pool->constant_union.c_fieldref.name_and_type_index);
 				break;
 			case 10:
-				printf("Metodref class index: %d. Metodref name and type index: %d\n", constant_pool->c_methodref.class_index, constant_pool->c_methodref.name_and_type_index);
+				printf("Metodref class index: %d. Metodref name and type index: %d\n", constant_pool->constant_union.c_methodref.class_index, constant_pool->constant_union.c_methodref.name_and_type_index);
 				break;
 			case 11:
-				printf("Interface class index: %d. Interface name and type index: %d\n", constant_pool->c_interface_methodref.class_index, constant_pool->c_interface_methodref.name_and_type_index);
+				printf("Interface class index: %d. Interface name and type index: %d\n", constant_pool->constant_union.c_interface_methodref.class_index, constant_pool->constant_union.c_interface_methodref.name_and_type_index);
 				break;
 			case 12:
-				printf("Nametype class index: %d. Nametype name and type index: %d\n", constant_pool->c_nametype.name_index, constant_pool->c_nametype.descriptor_index);
+				printf("Nametype class index: %d. Nametype name and type index: %d\n", constant_pool->constant_union.c_nametype.name_index, constant_pool->constant_union.c_nametype.descriptor_index);
 				break;
 			case 13:
 				printf("(large numeric continued)\n");
@@ -101,7 +101,7 @@ void printFields(classFileFormat *classFile) {
 	field_size = classFile->fields_count;
 	for (field = classFile->fields; field < classFile->fields+ field_size; field++) {
 		element = getConstantPoolElementByIndex(classFile, field->name_index);
-		printf("\t-----------> [%d] %s -----------\n", index, element.c_utf8.bytes);
+		printf("\t-----------> [%d] %s -----------\n", index, element.constant_union.c_utf8.bytes);
 
 		printf("\tName index: %d\n", field->name_index);
 		printf("\tDescriptor index: %d\n", field->descriptor_index);
@@ -126,7 +126,7 @@ void printMethods(classFileFormat *classFile) {
 		attribute_size = method->attributes_count;
 		element = getConstantPoolElementByIndex(classFile, method->name_index);
 
-		printf("\t-----------> [%d] %s -----------\n", index, element.c_utf8.bytes);
+		printf("\t-----------> [%d] %s -----------\n", index, element.constant_union.c_utf8.bytes);
 		printf("\tName index: %d\n",  method->name_index);
 		printf("\tDescriptor index: %d\n", method->descriptor_index);
 		printf("\tAccess Flag: %d\n", method->access_flags);
@@ -159,33 +159,33 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 
 	cp_element = getConstantPoolElementByIndex(classFile, attribute.attribute_name_index);
 
-	printf("%s[%d] %s\n", format, index, cp_element.c_utf8.bytes);
+	printf("%s[%d] %s\n", format, index, cp_element.constant_union.c_utf8.bytes);
 	printf("%sAttribute name index %d\n", format, attribute.attribute_name_index);
 	printf("%sAttribute length %d\n", format, attribute.attribute_length);
 	tag = attribute.tag;
 
 	switch(tag) {
 		case 1:
-			printf("%sConstant Value index: %d\n", format, attribute.constant_value.constant_value_index);
+			printf("%sConstant Value index: %d\n", format, attribute.attribute_union.constant_value.constant_value_index);
 			break;
 		case 2:
-			printf("%sMaximum stack depth: %d\n", format, attribute.code.max_stack);
-			printf("%sMaximum local variables: %d\n", format, attribute.code.max_locals);
-			printf("%sCode Length: %d\n", format, attribute.code.code_length);
-			for (i=0 ; i< attribute.code.code_length; i++) {
-				//TODO Deve imprimir o mnemonico do bytecode e nao o hexadecimal!
-				printf("%X\n", attribute.code.code[i]);
+			printf("%sMaximum stack depth: %d\n", format, attribute.attribute_union.code.max_stack);
+			printf("%sMaximum local variables: %d\n", format, attribute.attribute_union.code.max_locals);
+			printf("%sCode Length: %d\n", format, attribute.attribute_union.code.code_length);
+			for (i=0 ; i< attribute.attribute_union.code.code_length; i++) {
+				/*TODO Deve imprimir o mnemonico do bytecode e nao o hexadecimal!*/
+				printf("%X\n", attribute.attribute_union.code.code[i]);
 			}
 			break;
 		case 3:
-			printf("%sNumber of exceptions: %d\n", format, attribute.exceptions.number_of_exceptions);
-			for (i=0; i<attribute.exceptions.number_of_exceptions; i++) {
-				printf("Exception index table: %d\n", attribute.exceptions.exception_index_table[i]);
+			printf("%sNumber of exceptions: %d\n", format, attribute.attribute_union.exceptions.number_of_exceptions);
+			for (i=0; i<attribute.attribute_union.exceptions.number_of_exceptions; i++) {
+				printf("Exception index table: %d\n", attribute.attribute_union.exceptions.exception_index_table[i]);
 			}
 			break;
 		case 4:
-			printf("%sException index table: %d\n", format, attribute.inner_classes.number_of_classes);
-			for (cm = attribute.inner_classes.classes; cm < attribute.inner_classes.classes + attribute.inner_classes.number_of_classes; cm++) {
+			printf("%sException index table: %d\n", format, attribute.attribute_union.inner_classes.number_of_classes);
+			for (cm = attribute.attribute_union.inner_classes.classes; cm < attribute.attribute_union.inner_classes.classes + attribute.attribute_union.inner_classes.number_of_classes; cm++) {
 				printf("%s\tInner class access flags: %d\n", format, cm->inner_class_access_flags);
 				printf("%s\tInner class info index: %d\n", format, cm->inner_class_info_index);
 				printf("%s\tInner name index: %d\n", format, cm->inner_name_index);

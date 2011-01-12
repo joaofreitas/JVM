@@ -56,7 +56,7 @@ void readConstantPoolCount(classFileFormat *classFile, FILE *fp) {
 
 void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	int counter = 0;
-	u1 tag, char_utf8, char_utf8_aux; //char_utf8 deve ser pelo menos 16 bits
+	u1 tag, char_utf8, char_utf8_aux; /* char_utf8 deve ser pelo menos 16 bits */
 	u2 cp_size;
 	cp_info *cp;
 	int i, bytes_utf8_length, string_length;
@@ -70,14 +70,14 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 		switch(tag) {
 			case 1:
 				bytes_utf8_length= u2Read(fp);
-				cp->c_utf8.bytes = malloc(sizeof(u1));
+				cp->constant_union.c_utf8.bytes = malloc(sizeof(u1));
 				string_length = 0;
 
 				for (i=0; i < bytes_utf8_length; i++) {
 					char_utf8 = u1Read(fp);
-					cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
+					cp->constant_union.c_utf8.bytes = realloc(cp->constant_union.c_utf8.bytes, sizeof(u1)*(i+1));
 					if (!((char_utf8 >> 7) | 0)) {
-						cp->c_utf8.bytes[string_length++] = (u1)char_utf8;
+						cp->constant_union.c_utf8.bytes[string_length++] = (u1)char_utf8;
 
 					} else if ((char_utf8 >> 5) & 0xC0) {
 						char_utf8_aux = (0xC0 | ((char_utf8 >> 6) & 0x1f));
@@ -87,7 +87,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 						char_utf8_aux += (0x80 | (char_utf8 & 0x3f));
 
-						 cp->c_utf8.bytes[string_length++] = (u1)char_utf8_aux;
+						 cp->constant_union.c_utf8.bytes[string_length++] = (u1)char_utf8_aux;
 
 					} else {
 						char_utf8_aux = (0xe0 | ((char_utf8 >> 12) & 0x0f));
@@ -102,56 +102,56 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 						char_utf8_aux += (0x80 | ( char_utf8 & 0x3f));
 
-						cp->c_utf8.bytes[string_length++] = (u1)char_utf8_aux;
+						cp->constant_union.c_utf8.bytes[string_length++] = (u1)char_utf8_aux;
 
 					}
 				}
-				cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
-				cp->c_utf8.bytes[i] = '\0';
-				cp->c_utf8.length = string_length;
+				cp->constant_union.c_utf8.bytes = realloc(cp->constant_union.c_utf8.bytes, sizeof(u1)*(i+1));
+				cp->constant_union.c_utf8.bytes[i] = '\0';
+				cp->constant_union.c_utf8.length = string_length;
 
 				break;
 			case 3:
-				cp->c_integer.bytes = u4Read(fp);
+				cp->constant_union.c_integer.bytes = u4Read(fp);
 				break;
 			case 4:
-				cp->c_float.bytes = u4Read(fp);
+				cp->constant_union.c_float.bytes = u4Read(fp);
 				break;
-			case 5:	//Nesse caso, long ocupa 2 espacos na constant pool
-				cp->c_long.high_bytes = u4Read(fp);
-				cp->c_long.low_bytes = u4Read(fp);
+			case 5:	/*Nesse caso, long ocupa 2 espacos na constant pool*/
+				cp->constant_union.c_long.high_bytes = u4Read(fp);
+				cp->constant_union.c_long.low_bytes = u4Read(fp);
 				counter++;
 				cp++;
 				cp->tag = 13;
 				break;
-			case 6: //Nesse caso, double ocupa 2 espacos na constant pool
-				cp->c_double.high_bytes = u4Read(fp);
-				cp->c_double.low_bytes = u4Read(fp);
+			case 6: /*Nesse caso, double ocupa 2 espacos na constant pool*/
+				cp->constant_union.c_double.high_bytes = u4Read(fp);
+				cp->constant_union.c_double.low_bytes = u4Read(fp);
 				counter++;
 				cp++;
 				cp->tag = 13;
 				break;
 			case 7:
-				cp->c_class.name_index = u2Read(fp);
+				cp->constant_union.c_class.name_index = u2Read(fp);
 				break;
 			case 8:
-				cp->c_string.string_index = u2Read(fp);
+				cp->constant_union.c_string.string_index = u2Read(fp);
 				break;
 			case 9:
-				cp->c_fieldref.class_index = u2Read(fp);
-				cp->c_fieldref.name_and_type_index = u2Read(fp);
+				cp->constant_union.c_fieldref.class_index = u2Read(fp);
+				cp->constant_union.c_fieldref.name_and_type_index = u2Read(fp);
 				break;
 			case 10:
-				cp->c_methodref.class_index = u2Read(fp);
-				cp->c_methodref.name_and_type_index = u2Read(fp);
+				cp->constant_union.c_methodref.class_index = u2Read(fp);
+				cp->constant_union.c_methodref.name_and_type_index = u2Read(fp);
 				break;
 			case 11:
-				cp->c_interface_methodref.class_index = u2Read(fp);
-				cp->c_interface_methodref.name_and_type_index = u2Read(fp);
+				cp->constant_union.c_interface_methodref.class_index = u2Read(fp);
+				cp->constant_union.c_interface_methodref.name_and_type_index = u2Read(fp);
 				break;
 			case 12:
-				cp->c_nametype.name_index = u2Read(fp);
-				cp->c_nametype.descriptor_index = u2Read(fp);
+				cp->constant_union.c_nametype.name_index = u2Read(fp);
+				cp->constant_union.c_nametype.descriptor_index = u2Read(fp);
 				break;
 			default:
 				break;
@@ -276,10 +276,12 @@ void readAttributes(classFileFormat *classFile, FILE *fp) {
 	}
 }
 
-// Método auxiliar que retorna o elemento indicado pela index.
+/*
+ *  Método auxiliar que retorna o elemento indicado pela index.
+ */
 cp_info getConstantPoolElementByIndex(classFileFormat *classFile, int index) {
 	cp_info cp;
 
 	cp = classFile->constant_pool[index-1];
-	return cp;	//Constant Pool começa do 0, logo o elemento atual é sempre o anterior
+	return cp;	/*Constant Pool começa do 0, logo o elemento atual é sempre o anterior*/
 }

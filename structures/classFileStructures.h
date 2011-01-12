@@ -51,13 +51,13 @@ typedef struct CONSTANT_Float_info {
 } CONSTANT_Float;
 
 typedef struct CONSTANT_Long_info {
-	u4 high_bytes;			// unsigned
-	u4 low_bytes;			// unsigned
+	u4 high_bytes;
+	u4 low_bytes;
 } CONSTANT_Long;
 
 typedef struct CONSTANT_Double_info {
-	u4 high_bytes;				// unsigned
-	u4 low_bytes;				// unsigned
+	u4 high_bytes;
+	u4 low_bytes;
 } CONSTANT_Double;
 
 typedef struct CONSTANT_NameAndType_info {
@@ -101,7 +101,7 @@ typedef struct constant_pool_structure {
 		CONSTANT_Double c_double;
 		CONSTANT_NameAndType c_nametype;
 		CONSTANT_Utf8 c_utf8;
-	};
+	} constant_union;
 } cp_info;
 
 /*---------------------------------------------------------
@@ -180,7 +180,7 @@ struct attribute_info_structure {
 		ATTRIBUTE_code code;
 		ATTRIBUTE_exceptions exceptions;
 		ATTRIBUTE_inner_classes inner_classes;
-	};
+	} attribute_union;
 };
 
 /*---------------------------------------------------------
@@ -192,7 +192,7 @@ typedef struct field_info_structure field_info;
 typedef struct method_info_structure method_info;
 typedef struct class_file_structure classFileFormat;
 
-struct field_info_structure{	//Variáveis de instancia e de classe
+struct field_info_structure{	/*Variáveis de instancia e de classe*/
 	u2 access_flags;
 	u2 name_index;
 	u2 descriptor_index;
