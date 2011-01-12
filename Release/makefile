@@ -9,7 +9,10 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
--include header/subdir.mk
+-include reader/subdir.mk
+-include reader/attribute/subdir.mk
+-include mnemonics/subdir.mk
+-include classViewer/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -28,8 +31,8 @@ all: jvm
 # Tool invocations
 jvm: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: GCC C Linker'
-	gcc  -o"jvm" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: MacOS X C Linker'
+	gcc  -o "jvm" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

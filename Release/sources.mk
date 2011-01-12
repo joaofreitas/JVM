@@ -13,6 +13,9 @@ EXECUTABLES :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+reader \
+reader/attribute \
+mnemonics \
 . \
-header \
+classViewer \
 

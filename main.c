@@ -9,14 +9,16 @@
 #include <stdlib.h>
 #include "reader/classLoader.h"
 #include "classViewer/classViewer.h"
+#include "mnemonics/mnemonics.h"
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;
+	opcode_info *op_info;
 	FILE *fp;
 	char *exemplo[58];
 	int i;
 
-	exemplo[0] = "./testes/Testes/Operacoes.class";
+	/*exemplo[0] = "./testes/Testes/Operacoes.class";
 	exemplo[1] = "./testes/Testes/Test2_a.class";
 	exemplo[2] = "./testes/Testes/lookupswitch_basic1.class";
 	exemplo[3] = "./testes/Testes/switch_basic4.class";
@@ -80,9 +82,16 @@ int main(int argc, char **argv) {
 		fp = fopen(exemplo[i], "r");
 		classFile = loadClassFile(fp);
 		printf("Teste Executado!\n");
-		/*inspectClassFile(classFile);*/
+		//inspectClassFile(classFile);
 	}
-	printf("Testes executados com sucesso!\n");
+	printf("Testes executados com sucesso!\n");*/
+
+	//op_info = get_opcode_info();
+
+	fp = fopen("testes/Testes/Operacoes.class", "r");
+
+	classFile = loadClassFile(fp);
+	inspectClassFile(classFile);
 
 	return 0;
 }
