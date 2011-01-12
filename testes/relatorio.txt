@@ -1,0 +1,16 @@
+                                  ./double/double_aritmetica.class  ./long/long_load.class          ./short/short_cast.class
+./Belote/Belote.class             ./double/double_cast.class        ./long/long_logico.class        ./short/short_load.class
+./Belote/Jogador.class            ./double/double_logico.class      ./methods/int_aritmetica.class  ./static/static_test.class
+./Belote/Carta.class              ./float/float_aritmetica.class    ./methods/method_test.class     ./static/testeStatic.class
+./Belote/teste.class              ./float/float_cast.class          ./objects/objeto.class          ./switch/tableswitch.class
+./Belote/Belotinho.class          ./float/float_logico.class        ./objects/objeto_teste.class    ./while/CountWheat.class
+./aritimetica/testeLogArit.class  ./int/int_aritmetica.class        ./objects/testeChaMetObj.class  ./while/Fibonacci.class
+./arrays/multi.class              ./int/int_cast.class              ./objects/testeChaObj.class     ./while/HarmonicSeries.class
+./arrays/testeArray.class         ./int/int_logico.class            ./objects/testeMetObj.class
+./arrays/testeMultArray.class     ./long/long_aritmetica.class      ./objects/testeObj.class
+./arrays/vetor.class              ./long/long_cast.class            ./short/short_aritmetica.class
+
+ls -t `find . -name \*.class\* `
+
+Deram pau:
+Belote/Belote.class
