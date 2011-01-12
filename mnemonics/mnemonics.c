@@ -217,7 +217,6 @@ opcode_info* get_opcode_info() {
 	strcpy(op_info[0xca].mnemonic, "breakpoint");
 	strcpy(op_info[0xfe].mnemonic, "impdep1");
 	strcpy(op_info[0xff].mnemonic, "impdep2");
-	//strcpy(op_info[0xcb-fd].mnemonic, "(no name)");
 	strcpy(op_info[0xba].mnemonic, "xxxunusedxxx");
 
 	for (i = 0xcb; i < 0xfe; i++) {
@@ -429,7 +428,6 @@ opcode_info* get_opcode_info() {
 	op_info[0xca].operands_count = 0;
 	op_info[0xfe].operands_count = 0;
 	op_info[0xff].operands_count = 0;
-	//op_info[0xcb-fd].operands_count = 0;
 	op_info[0xba].operands_count = 0;
 
 	for (i = 0xcb; i < 0xfe; i++) {

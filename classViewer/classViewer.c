@@ -185,7 +185,6 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 				for(j = 0; j < op_info[code].operands_count; j++, i++) {
 					op_info[code].operands[j] = attribute.attribute_union.code.code[i];
 				}
-				//printf("%X\n", attribute.attribute_union.code.code[i]);
 			}
 			break;
 		case 3:
