@@ -56,7 +56,7 @@ void readConstantPoolCount(classFileFormat *classFile, FILE *fp) {
 
 void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	int counter = 0;
-	u1 tag, char_utf8; //char_utf8 deve ser pelo menos 16 bits
+	u1 tag, char_utf8, char_utf8_aux; //char_utf8 deve ser pelo menos 16 bits
 	u2 cp_size;
 	cp_info *cp;
 	int i, bytes_utf8_length, string_length;
@@ -75,26 +75,34 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 				for (i=0; i < bytes_utf8_length; i++) {
 					char_utf8 = u1Read(fp);
+					cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
 					if (!((char_utf8 >> 7) | 0)) {
-						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+1));
 						cp->c_utf8.bytes[string_length++] = (u1)char_utf8;
 
 					} else if ((char_utf8 >> 5) & 0xC0) {
-						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+2));
-						cp->c_utf8.bytes[string_length++] = (0xC0 | ((char_utf8 >> 6) & 0x1f));
+						char_utf8_aux = (0xC0 | ((char_utf8 >> 6) & 0x1f));
 
 						char_utf8 = u1Read(fp);
-						cp->c_utf8.bytes[string_length++] = (0x80 | (char_utf8 & 0x3f));
+						i++;
+
+						char_utf8_aux += (0x80 | (char_utf8 & 0x3f));
+
+						 cp->c_utf8.bytes[string_length++] = (u1)char_utf8_aux;
 
 					} else {
-						cp->c_utf8.bytes = realloc(cp->c_utf8.bytes, sizeof(u1)*(i+3));
-						cp->c_utf8.bytes[string_length++] = (0xe0 | ((char_utf8 >> 12) & 0x0f));
+						char_utf8_aux = (0xe0 | ((char_utf8 >> 12) & 0x0f));
 
 						char_utf8 = u1Read(fp);
-						cp->c_utf8.bytes[string_length++] = (0x80 | ((char_utf8 >> 6) & 0x3f));
+						i++;
+
+						char_utf8_aux += (0x80 | ((char_utf8 >> 6) & 0x3f));
 
 						char_utf8 = u1Read(fp);
-						cp->c_utf8.bytes[string_length++] = (0x80 | ( char_utf8 & 0x3f));
+						i++;
+
+						char_utf8_aux += (0x80 | ( char_utf8 & 0x3f));
+
+						cp->c_utf8.bytes[string_length++] = (u1)char_utf8_aux;
 
 					}
 				}

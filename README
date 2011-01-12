@@ -1,0 +1,3 @@
+Para compilar um arquivo para JDK 1.2, use o comando:
+	javac -target 1.2 -source 1.2 CodigoFonte.java
+

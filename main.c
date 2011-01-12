@@ -13,7 +13,7 @@
 int main(int argc, char **argv) {
 	classFileFormat *classFile;
 	FILE *fp;
-	char *exemplo = "teste/Operacoes.class";
+	char *exemplo = "teste/TesteAcento.class";
 
 	fp = fopen(exemplo, "r");
 	classFile = loadClassFile(fp);
