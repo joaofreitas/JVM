@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../reader/classLoader.h"
-#include "../mnemonics/mnemonics.h"
+#include "mnemonics/mnemonics.h"
 
 void inspectClassFile(classFileFormat *classFile);
 

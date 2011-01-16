@@ -4,7 +4,8 @@ main.d main.o: ../main.c ../reader/classLoader.h \
  ../reader/attribute/../../structures/classFileStructures.h \
  ../reader/attribute/../classFileReader.h ../classViewer/classViewer.h \
  ../classViewer/../reader/classLoader.h \
- ../classViewer/../mnemonics/mnemonics.h ../mnemonics/mnemonics.h
+ ../classViewer/mnemonics/mnemonics.h \
+ ../classViewer/mnemonics/mnemonics.h
 
 ../reader/classLoader.h:
 
@@ -22,6 +23,6 @@ main.d main.o: ../main.c ../reader/classLoader.h \
 
 ../classViewer/../reader/classLoader.h:
 
-../classViewer/../mnemonics/mnemonics.h:
+../classViewer/mnemonics/mnemonics.h:
 
-../mnemonics/mnemonics.h:
+../classViewer/mnemonics/mnemonics.h:

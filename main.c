@@ -10,7 +10,7 @@
 #include <string.h>
 #include "reader/classLoader.h"
 #include "classViewer/classViewer.h"
-#include "mnemonics/mnemonics.h"
+#include "classViewer/mnemonics/mnemonics.h"
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;

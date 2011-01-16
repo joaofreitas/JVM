@@ -15,7 +15,7 @@ EXECUTABLES :=
 SUBDIRS := \
 reader \
 reader/attribute \
-mnemonics \
 . \
+classViewer/mnemonics \
 classViewer \
 
