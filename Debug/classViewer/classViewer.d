@@ -6,7 +6,7 @@ classViewer/classViewer.d classViewer/classViewer.o: \
  ../classViewer/../reader/attribute/attributeUtil.h \
  ../classViewer/../reader/attribute/../../structures/classFileStructures.h \
  ../classViewer/../reader/attribute/../classFileReader.h \
- ../classViewer/mnemonics/mnemonics.h
+ ../classViewer/../structures/mnemonics.h
 
 ../classViewer/classViewer.h:
 
@@ -22,4 +22,4 @@ classViewer/classViewer.d classViewer/classViewer.o: \
 
 ../classViewer/../reader/attribute/../classFileReader.h:
 
-../classViewer/mnemonics/mnemonics.h:
+../classViewer/../structures/mnemonics.h:
