@@ -1,0 +1,11 @@
+Steps the virtual machine: loading, linking, initialization and invoke the main method processes that are described further in later sections.
+
+  1. Loading - ClassLoader
+  2. Linking - Involves verification, preparation, and (optionally) resolution
+    2.1 - Verification: checks that the loaded is well formed, with a proper symbol table. Verification also checks that the code obeys the semantic requirements of JVM
+    2.2 - Preparation: involves allocation of static storage and any data structures that are used internally by the virtual machine, such as method tables.
+    2.3 - Resolution (optionally): is the process of checking symbolic references from a class to other classes and interfaces, by loading the
+other classes and interfaces that are mentioned and checking that the references are correct.
+  3. Initialization consists of execution of any class variable initializers and static initializers of the class, in textual order. But before the class can be 
+initialized, its direct superclass must be initialized.
+  4. Invoke the main method: The method main of class is invoked.
