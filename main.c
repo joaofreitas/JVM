@@ -11,6 +11,7 @@
 #include "reader/classLoader.h"
 #include "classViewer/classViewer.h"
 #include "structures/mnemonics.h"
+#include "engine/executeEngine.h"
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;
@@ -29,7 +30,8 @@ int main(int argc, char **argv) {
 		printf("Arquivo nao existe!\n");
 	} else {
 		classFile = loadClassFile(fp);
-		inspectClassFile(classFile);
+		/*inspectClassFile(classFile);*/
+		exec(classFile);
 	}
 
 

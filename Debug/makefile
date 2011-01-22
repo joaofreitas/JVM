@@ -12,6 +12,7 @@ RM := rm -rf
 -include structures/subdir.mk
 -include reader/subdir.mk
 -include reader/attribute/subdir.mk
+-include engine/subdir.mk
 -include classViewer/subdir.mk
 -include objects.mk
 
@@ -31,8 +32,8 @@ all: jvm
 # Tool invocations
 jvm: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: MacOS X C Linker'
-	gcc  -o "jvm" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: GCC C Linker'
+	gcc  -o"jvm" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

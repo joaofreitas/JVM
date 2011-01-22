@@ -17,5 +17,6 @@ structures \
 reader \
 reader/attribute \
 . \
+engine \
 classViewer \
 

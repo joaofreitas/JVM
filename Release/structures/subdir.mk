@@ -4,12 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../structures/frame.c \
+../structures/heap.c \
+../structures/methodArea.c \
 ../structures/mnemonics.c 
 
 OBJS += \
+./structures/frame.o \
+./structures/heap.o \
+./structures/methodArea.o \
 ./structures/mnemonics.o 
 
 C_DEPS += \
+./structures/frame.d \
+./structures/heap.d \
+./structures/methodArea.d \
 ./structures/mnemonics.d 
 
 

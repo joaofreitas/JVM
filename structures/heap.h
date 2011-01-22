@@ -8,21 +8,30 @@
 #ifndef HEAP_H_
 #define HEAP_H_
 
-typedef struct instance_structure {
+#include "classFileStructures.h"
+#include "stdlib.h"
+
+typedef struct object_instance {
 	u1 *class_name;
+	u4 id;
 	struct instance *super_class;
-};
+} instance_structure;
 
-typedef struct heap_structure {
-	u2 *index;
+typedef struct heap_instance {
+	u2 index;
 	instance_structure *object;
-	heap_structure *next;
-};
+	struct heap_instance *next;
+} heap_structure;
 
-/* Adiciona um objeto ˆ lista de objetos */
-void addObject(instance_struct *object);
+heap_structure *heap_pointer;
+heap_structure *heap_end;
+
+/* Adiciona um objeto lista de objetos */
+void addObject(instance_structure *object);
 
 /* Retorna um objeto no indice dado*/
-instance_struct *getObject(u2 index);
+instance_structure *getObject(u2 index);
+
+
 
 #endif /* HEAP_H_ */

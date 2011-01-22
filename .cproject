@@ -51,12 +51,11 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="structures"/>
+						<entry excluding="engine|header|structures|mnemonics|reader|classViewer|attribute" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="attribute" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="reader"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="classViewer"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="reader/attribute"/>
-						<entry excluding="header|reader|mnemonics|structures|classViewer|attribute|runner" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="attribute" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="reader"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="runner"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="structures"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -355,12 +354,11 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="structures"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="reader/attribute"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="classViewer"/>
-						<entry excluding="reader|mnemonics|structures|runner|classViewer|attribute|header" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="runner"/>
 						<entry excluding="attribute" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="reader"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="classViewer"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="structures"/>
+						<entry excluding="engine|header|structures|mnemonics|reader|classViewer|attribute" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

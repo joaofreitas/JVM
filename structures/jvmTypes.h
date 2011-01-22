@@ -12,15 +12,15 @@
 
 /*TIPOS PRIMITIVOS*/
 /*Tipos integrais*/
-typedef int t_int;
-typedef char t_byte;
-typedef short t_short;
-typedef unsigned short t_char;
-typedef long t_long;
+typedef int jvm_int;
+typedef char jvm_byte;
+typedef short jvm_short;
+typedef unsigned short jvm_char;
+typedef long jvm_long;
 
 /*Tipos ponto flutuante*/
-typedef float t_float;
-typedef double t_double;
+typedef float jvm_float;
+typedef double jvm_double;
 
 /*Tipos booleanos*/
 typedef unsigned char boolean;
@@ -30,13 +30,13 @@ typedef unsigned int returnAddress;
 
 /*TIPOS DE REFERENCIA*/
 /*Tipos de classes*/
-typedef void * t_classReference;
+typedef void * jvm_classReference;
 
 /*Tipos de array*/
-typedef void * t_arrayReference;
+typedef void * jvm_arrayReference;
 
 /*Tipos de interface*/
-typedef void * t_interfaceReference;
+typedef void * jvm_interfaceReference;
 
 /*ESTRUTURAS DE DADOS EM TEMPO DE EXECUCAO*/
 /**/
