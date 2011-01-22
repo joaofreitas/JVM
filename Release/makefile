@@ -12,6 +12,7 @@ RM := rm -rf
 -include structures/subdir.mk
 -include reader/subdir.mk
 -include reader/attribute/subdir.mk
+-include engine/subdir.mk
 -include classViewer/subdir.mk
 -include objects.mk
 
