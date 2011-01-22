@@ -36,12 +36,12 @@ typedef struct frame_stack_struct {
 	local_variables_array *local_variables;     /* Ponteiro para o vetor de variáveis locais */
 	operand_stack *opStack;     				/* Ponteiro para a pilha de operandos */
 	cp_info *cp;			                    /* Ponteiro para o constant pool TODO: Deve ser para Runtime constant pool*/
-} frame_stack;
+}frame_stack;
 
 frame_stack *createFrame(int max_locals_variables, cp_info *cp);
 
 u4 popOperand(frame_stack *frame);
 
-void pushOperand(frame_stack *frame);
+void pushOperand(frame_stack *frame, u4 data);
 
 #endif /* FRAME_H_ */

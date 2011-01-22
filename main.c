@@ -26,11 +26,12 @@ int main(int argc, char **argv) {
 
 	fp = fopen(exemplo, "r");
 	if (fp == NULL) {
-		printf("Arquivo não existe!\n");
+		printf("Arquivo nao existe!\n");
 	} else {
 		classFile = loadClassFile(fp);
 		inspectClassFile(classFile);
 	}
+
 
 	return 0;
 }

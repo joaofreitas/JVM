@@ -10,7 +10,7 @@
 frame_stack *createFrame(int max_locals_variables, cp_info *cp) {
 	frame_stack *frame_unit;
 
-	frame_unit = malloc(sizeof(frame_stack_));
+	frame_unit = malloc(sizeof(frame_stack));
 
 	frame_unit->opStack = NULL;
 	frame_unit->local_variables = calloc(max_locals_variables, sizeof(u4));
