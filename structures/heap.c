@@ -7,6 +7,11 @@
 
 #include "heap.h"
 
+void initHeap() {
+	heap_pointer = NULL;
+	heap_end = NULL;
+}
+
 void addObject(instance_structure *object)
 {
 	heap_structure *hs;

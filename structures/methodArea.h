@@ -10,13 +10,13 @@
 
 #include "classFileStructures.h"
 #include "stdlib.h"
+#include "../reader/classLoader.h"
 
 /*Subestrutura do method area */
 
 typedef struct static_variables_structure {
 	u1 *variable_name;
 	u1 *type;
-	u2 access_flag;
 } static_variables;
 
 typedef struct class_structure {
@@ -35,6 +35,10 @@ method_area *method_area_end;
 
 /* Adiciona um objeto lista de objetos */
 void addClass(class *);
+
+void initMethodArea();
+
+void instanceClassFromClassFile(classFileFormat *);
 
 /* Retorna um objeto no indice dado*/
 class *getClass(u2 index);

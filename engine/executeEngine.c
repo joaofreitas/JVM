@@ -6,15 +6,9 @@
  */
 
 #include "executeEngine.h"
-#include "../structures/classFileStructures.h"
-
-void constructMethodArea(classFileFormat *classFile) {
-
-
-
-}
 
 void exec(classFileFormat *classFile) {
-	constructMethodArea(classFile);
-
+	initMethodArea();
+	initHeap();
+	instanceClassFromClassFile(classFile);
 }

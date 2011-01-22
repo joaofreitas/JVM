@@ -14,7 +14,7 @@
 typedef struct object_instance {
 	u1 *class_name;
 	u4 id;
-	struct instance *super_class;
+	struct object_instance *super_class;
 } instance_structure;
 
 typedef struct heap_instance {
@@ -28,6 +28,10 @@ heap_structure *heap_end;
 
 /* Adiciona um objeto lista de objetos */
 void addObject(instance_structure *object);
+
+void initHeap();
+
+void instanceObject(u1 *class_name, instance_structure *super_class);
 
 /* Retorna um objeto no indice dado*/
 instance_structure *getObject(u2 index);

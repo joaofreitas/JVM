@@ -7,6 +7,34 @@
 
 #include "methodArea.h"
 
+void initMethodArea() {
+	method_area_pointer = NULL;
+	method_area_end = NULL;
+}
+
+void instanceClassFromClassFile(classFileFormat *classFile) {
+	class *cl;
+	field_info *field;
+	cp_info cp;
+	int count = 0;
+
+	cl = malloc(sizeof(class));
+	field = classFile->fields;
+
+	for (field = classFile->fields; field < classFile->fields + classFile->fields_count; field++) {
+		if (field->access_flags & 0x0008) {
+			cl->static_vars = realloc(cl->static_vars, count+1);
+			cp = getConstantPoolElementByIndex(classFile, field->name_index);
+			cl->static_vars[count].variable_name = cp.constant_union.c_utf8.bytes;
+			cp = getConstantPoolElementByIndex(classFile, field->descriptor_index);
+			cl->static_vars[count].type = cp.constant_union.c_utf8.bytes;
+			count++;
+		}
+	}
+	cl->class_file = classFile;
+	addClass(cl);
+}
+
 void addClass(class *class)
 {
 	method_area *m_as;
@@ -32,7 +60,7 @@ void addClass(class *class)
 }
 
 class *getClass(u2 index) {
-	class *c;
+	/*class *c;
 
-	/*TODO*/
+	TODO*/
 }

@@ -9,11 +9,13 @@
 #define EXEC_H_
 
 #include "../structures/methodArea.h"
+#include "../structures/heap.h"
+#include "../structures/classFileStructures.h"
 #include "../reader/classLoader.h"
+#include <stdlib.h>
 
 method_area *m_area;
 
 void exec(classFileFormat *);
-void constructMethodArea(classFileFormat *);
 
 #endif /* EXEC_H_ */
