@@ -38,7 +38,6 @@ void instanceClassFromClassFile(classFileFormat *classFile) {
 void addClass(class *class)
 {
 	method_area *m_as;
-	u2 index = method_area_end->index;
 
 	if (method_area_pointer == NULL)
 	{
@@ -50,6 +49,7 @@ void addClass(class *class)
 	}
 	else
 	{
+		u2 index = method_area_end->index;
 		m_as = malloc(sizeof(method_area));
 		m_as->index = index+1;
 		m_as->class = class;
