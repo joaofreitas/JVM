@@ -41,8 +41,5 @@ typedef void * t_interfaceReference;
 /*ESTRUTURAS DE DADOS EM TEMPO DE EXECUCAO*/
 /**/
 
-#define TRUE 1
-#define FALSE 0
-
 
 #endif /* TYPES_H_ */
