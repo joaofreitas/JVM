@@ -39,5 +39,6 @@ void addObject(instance_structure *object)
 instance_structure *getObject(u2 index) {
 
 
-	/*TODO*/
+	/*TODO Fazer metodo getObject*/
+	return NULL;
 }

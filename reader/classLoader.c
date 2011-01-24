@@ -7,8 +7,16 @@
 
 #include "classLoader.h"
 
-classFileFormat* loadClassFile(FILE *fp) {
+classFileFormat* loadClassFile(char *arquivo) {
 	classFileFormat *classFile;
+	FILE *fp;
+
+	fp = fopen(arquivo, "r");
+	if (fp == NULL) {
+		printf("Arquivo nao existe!\n");
+	} else {
+		exit;
+	}
 
 	classFile = malloc(sizeof(classFileFormat));
 	readMagicNumber(classFile, fp);
@@ -26,6 +34,7 @@ classFileFormat* loadClassFile(FILE *fp) {
 	readMethods(classFile, fp);
 	readAttributesCount(classFile, fp);
 	readAttributes(classFile, fp);
+	fclose(fp);
 
 	return classFile;
 }

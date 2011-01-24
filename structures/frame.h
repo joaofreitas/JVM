@@ -31,17 +31,28 @@ typedef struct operand_stack_struct {
 	struct operand_stack_struct *next;
 }operand_stack;
 
-typedef struct frame_stack_struct {
+typedef struct frame_struct {
 	u2 variables_count;              			/* Contador de variáveis locais */
 	local_variables_array *local_variables;     /* Ponteiro para o vetor de variáveis locais */
 	operand_stack *opStack;     				/* Ponteiro para a pilha de operandos */
-	cp_info *cp;			                    /* Ponteiro para o constant pool TODO: Deve ser para Runtime constant pool*/
-}frame_stack;
+	cp_info *cp;			                    /* Ponteiro para o constant pool */
+}frame_t;
 
-frame_stack *createFrame(int max_locals_variables, cp_info *cp);
+typedef struct frame_stack_struct {
+	frame_t *frame;
+	struct frame_stack_struct *next;
+}frame_stack_t;
 
-u4 popOperand(frame_stack *frame);
+frame_stack_t *frame_stack;
 
-void pushOperand(frame_stack *frame, u4 data);
+frame_t *createFrame(u2 max_locals_variables, cp_info *cp);
+
+u4 popOperand(frame_t *frame);
+
+void pushOperand(frame_t *frame, u4 data);
+
+frame_t *popFrame();
+
+void pushFrame(frame_t *frame_unit);
 
 #endif /* FRAME_H_ */

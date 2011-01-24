@@ -88,7 +88,7 @@ void printConstantPool(classFileFormat *classFile) {
 }
 
 void printInterfaces(classFileFormat *classFile) {
-
+/*TODO fazer método para imprimir interfaces*/
 }
 
 void printFields(classFileFormat *classFile) {

@@ -6,6 +6,8 @@
  */
 
 #include "methodArea.h"
+#include "stdlib.h"
+#include "string.h"
 
 void initMethodArea() {
 	method_area_pointer = NULL;
@@ -59,8 +61,22 @@ void addClass(class *class)
 	}
 }
 
-class *getClass(u2 index) {
-	/*class *c;
+method_info *getMethod(classFileFormat *classFile, char *method_name) {
+	method_info *method;
 
-	TODO*/
+	for (method = classFile->methods;method < classFile->methods+classFile->methods_count; method++) {
+		if (strcmp(method_name, (char *)classFile->constant_pool[method->name_index-1].constant_union.c_utf8.bytes) == 0) {
+			return method;
+		}
+	}
+	return NULL;
+}
+
+char *getClassName(classFileFormat *cf, u2 index) {
+	return (char *)cf->constant_pool[index-1].constant_union.c_utf8.bytes;
+}
+
+class *getClass(u2 index) {
+	/*TODO fazer método getClass da methodArea*/
+	return NULL;
 }

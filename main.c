@@ -15,24 +15,19 @@
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;
-	FILE *fp;
-	char exemplo[100];
+	char *exemplo;
 
 	if (argc > 1) {
-		strcpy(exemplo, *argv++);
+		exemplo = *argv++;
 	} else {
 		printf("Digite o nome do classFile a ser executado:\n");
+		exemplo = malloc(sizeof(char)*100);
 		scanf("%s", exemplo);
 	}
 
-	fp = fopen(exemplo, "r");
-	if (fp == NULL) {
-		printf("Arquivo nao existe!\n");
-	} else {
-		classFile = loadClassFile(fp);
-		/*inspectClassFile(classFile);*/
-		exec(classFile);
-	}
+	classFile = loadClassFile(exemplo);
+	/*inspectClassFile(classFile);*/
+	exec(classFile);
 
 
 	return 0;

@@ -9,7 +9,6 @@
 #define METHODAREA_H_
 
 #include "classFileStructures.h"
-#include "stdlib.h"
 #include "../reader/classLoader.h"
 
 /*Subestrutura do method area */
@@ -20,6 +19,7 @@ typedef struct static_variables_structure {
 } static_variables;
 
 typedef struct class_structure {
+	struct class_structure *super_class;
 	static_variables *static_vars;
 	classFileFormat *class_file;
 } class;
@@ -38,7 +38,11 @@ void addClass(class *);
 
 void initMethodArea();
 
-void instanceClassFromClassFile(classFileFormat *);
+void instanceClassFromClassFile(classFileFormat *classFile);
+
+method_info *getMethod(classFileFormat *classFile, char *method_name);
+
+char *getClassName(classFileFormat *cf, u2 index);
 
 /* Retorna um objeto no indice dado*/
 class *getClass(u2 index);

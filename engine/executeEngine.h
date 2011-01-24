@@ -10,6 +10,7 @@
 
 #include "../structures/methodArea.h"
 #include "../structures/heap.h"
+#include "../structures/frame.h"
 #include "../structures/classFileStructures.h"
 #include "../reader/classLoader.h"
 #include <stdlib.h>

@@ -14,7 +14,7 @@
 typedef struct object_instance {
 	u1 *class_name;
 	u4 id;
-	struct object_instance *super_class;
+	struct object_instance *super;
 } instance_structure;
 
 typedef struct heap_instance {
