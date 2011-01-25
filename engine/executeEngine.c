@@ -13,13 +13,14 @@ void runMethod(method_info *method, cp_info *cp) {
 	u2 max_locals_variables = method->attributes->attribute_union.code.max_locals;
 
 	frame = createFrame(max_locals_variables, cp);
+	pushFrame(frame);
 	code_length = method->attributes->attribute_union.code.code_length;
 
 	while (code_length != 0) {
 		/*TODO executar instrucoes*/
 	}
+	popFrame();
 }
-
 
 void runInitMethod(classFileFormat *classFile) {
 	method_info *clinit_method;
@@ -29,6 +30,7 @@ void runInitMethod(classFileFormat *classFile) {
 
 	clinit_method = getMethod(classFile, "<clinit>");
 	super_class_name = getClassName(classFile, classFile->super_class);
+
 	if (strcmp("java/lang/Object", super_class_name) != 0) {
 		/*TODO Fazer alguma coisa pra pegar o path do arquivo do classFile */
 		super_class_file = loadClassFile(super_class_name);
@@ -46,11 +48,13 @@ void exec(classFileFormat *classFile) {
 
 	initMethodArea();
 	initHeap();
+	initFrameStack();
 	instanceClassFromClassFile(classFile);
 	main_method = getMethod(classFile, "main");
 	if (main_method == NULL) {
 		printf("Nao existe metodo main nesta classe!\n");
-		return ;
+		return;
 	}
 	runInitMethod(classFile);
+	runMethod(main_method, classFile->constant_pool);
 }

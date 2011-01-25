@@ -55,4 +55,6 @@ frame_t *popFrame();
 
 void pushFrame(frame_t *frame_unit);
 
+void initFrameStack();
+
 #endif /* FRAME_H_ */

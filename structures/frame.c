@@ -45,12 +45,9 @@ frame_t *createFrame(u2 max_locals_variables, cp_info *cp) {
 	frame_t *frame_unit;
 
 	frame_unit = malloc(sizeof(frame_t));
-
 	frame_unit->opStack = NULL;
 	frame_unit->local_variables = calloc(max_locals_variables, sizeof(u4));
 	frame_unit->cp = cp;
-
-	pushFrame(frame_unit);
 	return frame_unit;
 }
 
