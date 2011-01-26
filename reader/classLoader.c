@@ -14,8 +14,7 @@ classFileFormat* loadClassFile(char *arquivo) {
 	fp = fopen(arquivo, "r");
 	if (fp == NULL) {
 		printf("Arquivo nao existe!\n");
-	} else {
-		exit;
+		exit(1);
 	}
 
 	classFile = malloc(sizeof(classFileFormat));

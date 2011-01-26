@@ -175,16 +175,11 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			printf("%sCode Length: %d\n", format, attribute.attribute_union.code.code_length);
 			op_info = get_opcode_info();
 			for (i=0 ; i< attribute.attribute_union.code.code_length; i++) {
-				/*TODO Deve imprimir o mnemonico do bytecode e nao o hexadecimal!*/
+
+				/*TODO lookupswitch, tableswitch devem ser corrigidos*/
 				u1 code = attribute.attribute_union.code.code[i];
-
 				printf("%s\n", op_info[code].mnemonic);
-
-				op_info[code].operands = malloc(sizeof(op_info[code].operands_count));
-
-				for(j = 0; j < op_info[code].operands_count; j++, i++) {
-					op_info[code].operands[j] = attribute.attribute_union.code.code[i];
-				}
+				i += op_info[code].operands_count;
 			}
 			break;
 		case 3:

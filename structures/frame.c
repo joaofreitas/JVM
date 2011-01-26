@@ -41,13 +41,15 @@ frame_t *popFrame() {
 	return f;
 }
 
-frame_t *createFrame(u2 max_locals_variables, cp_info *cp) {
+frame_t *createFrame(method_info *method, cp_info *cp) {
 	frame_t *frame_unit;
 
 	frame_unit = malloc(sizeof(frame_t));
 	frame_unit->opStack = NULL;
-	frame_unit->local_variables = calloc(max_locals_variables, sizeof(u4));
+	frame_unit->local_variables = calloc(method->attributes->attribute_union.code.max_locals, sizeof(u4));
 	frame_unit->cp = cp;
+	frame_unit->pc = 0;
+	frame_unit->code_length = method->attributes->attribute_union.code.code_length;
 	return frame_unit;
 }
 

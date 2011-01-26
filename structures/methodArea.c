@@ -73,7 +73,7 @@ method_info *getMethod(classFileFormat *classFile, char *method_name) {
 }
 
 char *getClassName(classFileFormat *cf, u2 index) {
-	return (char *)cf->constant_pool[index-1].constant_union.c_utf8.bytes;
+	return (char *)cf->constant_pool[cf->constant_pool[index-1].constant_union.c_class.name_index-1].constant_union.c_utf8.bytes;
 }
 
 class *getClass(u2 index) {

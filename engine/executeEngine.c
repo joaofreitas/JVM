@@ -6,27 +6,28 @@
  */
 /*TODO Resolver as dependências de includes */
 #include "executeEngine.h"
+#include "instructions.h"
+#include "../structures/mnemonics.h"
 
-void runMethod(method_info *method, cp_info *cp) {
-	u4 code_length;
-	frame_t *frame;
-	u2 max_locals_variables = method->attributes->attribute_union.code.max_locals;
+void runMethod(method_info *method) {
 
-	frame = createFrame(max_locals_variables, cp);
-	pushFrame(frame);
-	code_length = method->attributes->attribute_union.code.code_length;
-
-	while (code_length != 0) {
+	while (frame_stack->frame->pc < frame_stack->frame->code_length) {
 		/*TODO executar instrucoes*/
+		op_info[method->attributes->attribute_union.code.code[frame_stack->frame->pc]].func();
+		if (frame_stack == NULL) {
+			break;
+		}
+		frame_stack->frame->pc++;
 	}
-	popFrame();
+
 }
 
 void runInitMethod(classFileFormat *classFile) {
 	method_info *clinit_method;
 	classFileFormat *super_class_file;
+	frame_t *frame;
 	char *super_class_name;
-	u4 code_length, pc;
+	u2 max_locals_variables;
 
 	clinit_method = getMethod(classFile, "<clinit>");
 	super_class_name = getClassName(classFile, classFile->super_class);
@@ -39,16 +40,22 @@ void runInitMethod(classFileFormat *classFile) {
 	}
 
 	if (clinit_method != NULL) {
-		runMethod(clinit_method, classFile->constant_pool);
+		max_locals_variables = clinit_method->attributes->attribute_union.code.max_locals;
+		frame = createFrame(clinit_method, classFile->constant_pool);
+		pushFrame(frame);
+		runMethod(clinit_method);
 	}
 }
 
 void exec(classFileFormat *classFile) {
 	method_info *main_method;
+	frame_t *frame;
 
 	initMethodArea();
 	initHeap();
 	initFrameStack();
+	initOperands();
+
 	instanceClassFromClassFile(classFile);
 	main_method = getMethod(classFile, "main");
 	if (main_method == NULL) {
@@ -56,5 +63,7 @@ void exec(classFileFormat *classFile) {
 		return;
 	}
 	runInitMethod(classFile);
-	runMethod(main_method, classFile->constant_pool);
+	frame = createFrame(main_method,classFile->constant_pool);
+	pushFrame(frame);
+	runMethod(main_method);
 }

@@ -36,6 +36,8 @@ typedef struct frame_struct {
 	local_variables_array *local_variables;     /* Ponteiro para o vetor de variáveis locais */
 	operand_stack *opStack;     				/* Ponteiro para a pilha de operandos */
 	cp_info *cp;			                    /* Ponteiro para o constant pool */
+	u4 pc;
+	u4 code_length;
 }frame_t;
 
 typedef struct frame_stack_struct {
@@ -45,7 +47,7 @@ typedef struct frame_stack_struct {
 
 frame_stack_t *frame_stack;
 
-frame_t *createFrame(u2 max_locals_variables, cp_info *cp);
+frame_t *createFrame(method_info *method, cp_info *cp);
 
 u4 popOperand(frame_t *frame);
 

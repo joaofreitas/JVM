@@ -8,7 +8,6 @@
 #include "mnemonics.h"
 
 opcode_info* get_opcode_info() {
-	opcode_info *op_info;
 	int i;
 
 	op_info = malloc(sizeof(opcode_info)*255);

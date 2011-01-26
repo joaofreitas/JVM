@@ -11,15 +11,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct OPCODE_info opcode_info;
+
 struct OPCODE_info {
 	char mnemonic[20];
 	unsigned short operands_count;
 	unsigned int *operands;
+	void (*func)();
 };
 
-typedef struct OPCODE_info opcode_info;
+opcode_info *op_info;
 
 opcode_info* get_opcode_info();
+
 
 #endif /* MNEMONICS_H_ */
 

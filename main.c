@@ -16,10 +16,11 @@
 char path[100];
 
 void saveFilePath(char *classPath) {
-	char *straux;
+	char *straux, *classPathAux;
 
+	strcpy(classPathAux, classPath);
 	path[0] = 0;
-	straux = strtok(classPath, "/");
+	straux = strtok(classPathAux, "/");
 	while(straux != NULL) {
 		if (strstr(straux, ".class") != NULL) {
 			break;
@@ -43,9 +44,9 @@ int main(int argc, char **argv) {
 		scanf("%s", exemplo);
 	}
 
-	saveFilePath(exemplo);
+	/*saveFilePath(exemplo);*/
 	classFile = loadClassFile(exemplo);
-	/*inspectClassFile(classFile);*/
+	inspectClassFile(classFile);
 	exec(classFile);
 
 
