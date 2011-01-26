@@ -15,7 +15,7 @@
 
 char path[100];
 
-void saveFilePath(char *classPath) {
+/*void saveFilePath(char *classPath) {
 	char *straux, *classPathAux;
 
 	strcpy(classPathAux, classPath);
@@ -30,7 +30,7 @@ void saveFilePath(char *classPath) {
 		straux = strtok(NULL, "/");
 	}
 	printf("%s\n", path);
-}
+}*/
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;

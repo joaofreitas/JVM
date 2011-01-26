@@ -19,12 +19,6 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-/* Array de variáveis locais */
-typedef struct local_variables_struct {
-	u4 data;
-	struct local_variables_struct *next;
-} local_variables_array;
-
 /* Pilha de operandos */
 typedef struct operand_stack_struct {
 	u4 data;
@@ -32,10 +26,11 @@ typedef struct operand_stack_struct {
 }operand_stack;
 
 typedef struct frame_struct {
-	u2 variables_count;              			/* Contador de variáveis locais */
-	local_variables_array *local_variables;     /* Ponteiro para o vetor de variáveis locais */
 	operand_stack *opStack;     				/* Ponteiro para a pilha de operandos */
+	method_info *method;
 	cp_info *cp;			                    /* Ponteiro para o constant pool */
+	u4 *local_variables;     /* Ponteiro para o vetor de variáveis locais */
+	u2 variables_count;              			/* Contador de variáveis locais */
 	u4 pc;
 	u4 code_length;
 }frame_t;
@@ -47,16 +42,18 @@ typedef struct frame_stack_struct {
 
 frame_stack_t *frame_stack;
 
-frame_t *createFrame(method_info *method, cp_info *cp);
+frame_t *createFrame(method_info *method, cp_info *cp, u4 pc);
 
-u4 popOperand(frame_t *frame);
+u4 popOperand();
 
-void pushOperand(frame_t *frame, u4 data);
+void pushOperand(u4 data);
 
 frame_t *popFrame();
 
 void pushFrame(frame_t *frame_unit);
 
 void initFrameStack();
+
+cp_info getConstanPoolElement(u4 index);
 
 #endif /* FRAME_H_ */

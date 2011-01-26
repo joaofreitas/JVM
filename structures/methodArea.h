@@ -30,7 +30,7 @@ typedef struct method_area_structure {
 	struct method_area_structure *next;
 } method_area;
 
-method_area *method_area_pointer;
+method_area *method_area_ini;
 method_area *method_area_end;
 
 /* Adiciona um objeto lista de objetos */
@@ -40,12 +40,14 @@ void initMethodArea();
 
 void instanceClassFromClassFile(classFileFormat *classFile);
 
-method_info *getMethod(classFileFormat *classFile, char *method_name);
+method_info *getMethod(classFileFormat *cf, char *method_name, char *class_type);
+
+class *getClass(char *class_name);
 
 char *getClassName(classFileFormat *cf, u2 index);
 
-/* Retorna um objeto no indice dado*/
-class *getClass(u2 index);
+char *getMethodName(classFileFormat *cf, u2 index);
+
 
 
 #endif /* METHODAREA_H_ */

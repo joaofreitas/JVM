@@ -5,9 +5,29 @@
  *      Author: joaofreitas
  */
 
+#include "executeInstructions.h"
+#include "../structures/frame.h"
+
+u2 getParameterCount(char *method_descriptor) {
+	u2 count;
+
+	while (method_descriptor != NULL) {
+		if (*method_descriptor == '[') {
+			method_descriptor++;
+		}
+		if (*method_descriptor == 'L') {
+			while (*method_descriptor != ';') {
+				method_descriptor++;
+			}
+			count++;
+		}
+		count++;
+		method_descriptor++;
+	}
+	return count;
+}
+
 void func_aaload(){
-
-
 
 }
 
@@ -18,18 +38,23 @@ void func_aconst_null(){
 }
 
 void func_aload(){
+
 }
 
 void func_aload_0(){
+	pushOperand(frame_stack->frame->local_variables[0]);
 }
 
 void func_aload_1(){
+	pushOperand(frame_stack->frame->local_variables[1]);
 }
 
 void func_aload_2(){
+	pushOperand(frame_stack->frame->local_variables[2]);
 }
 
 void func_aload_3(){
+	pushOperand(frame_stack->frame->local_variables[3]);
 }
 
 void func_anewarray(){
@@ -309,18 +334,23 @@ void func_iconst_0(){
 }
 
 void func_iconst_1(){
+	pushOperand(1);
 }
 
 void func_iconst_2(){
+	pushOperand(2);
 }
 
 void func_iconst_3(){
+	pushOperand(3);
 }
 
 void func_iconst_4(){
+	pushOperand(4);
 }
 
 void func_iconst_5(){
+	pushOperand(5);
 }
 
 void func_idiv(){
@@ -405,6 +435,41 @@ void func_invokeinterface(){
 }
 
 void func_invokespecial(){
+	unsigned char indexbyte1;
+	unsigned char indexbyte2;
+	char *class_name, *method_descriptor;
+	cp_info method_ref_info, class_info, method_name_type_ref_info, class_ref_info;
+	method_info *method;
+	frame_t *frame;
+	u4 *object_ref;
+	u2 index, parameter_count;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	index = indexbyte1 << 8 | indexbyte2;
+	method_ref_info = getConstanPoolElement(index);
+
+	class_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
+	class_name = (char *)getConstanPoolElement(class_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+
+	method_name_type_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.name_and_type_index);
+	method_descriptor = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
+
+	/*method = getMethod();*/
+	parameter_count = getParameterCount(method_descriptor);
+
+	/*frame = createFrame()
+	while (parameter_count > 0) {
+
+	}*/
+	*object_ref = popOperand();
+	class_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
+	/*className = (char *)getConstanPoolElement(class_ref_info.c_class.name_index).c_utf8.bytes;*/
+
+
+
 }
 
 void func_invokestatic(){

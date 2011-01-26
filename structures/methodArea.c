@@ -10,7 +10,7 @@
 #include "string.h"
 
 void initMethodArea() {
-	method_area_pointer = NULL;
+	method_area_ini = NULL;
 	method_area_end = NULL;
 }
 
@@ -41,13 +41,13 @@ void addClass(class *class)
 {
 	method_area *m_as;
 
-	if (method_area_pointer == NULL)
+	if (method_area_ini == NULL)
 	{
-		method_area_pointer = malloc(sizeof(method_area));
-		method_area_pointer->index = 0;
-		method_area_pointer->class = class;
-		method_area_pointer->next = NULL;
-		method_area_end = method_area_pointer;
+		method_area_ini = malloc(sizeof(method_area));
+		method_area_ini->index = 0;
+		method_area_ini->class = class;
+		method_area_ini->next = NULL;
+		method_area_end = method_area_ini;
 	}
 	else
 	{
@@ -61,12 +61,30 @@ void addClass(class *class)
 	}
 }
 
-method_info *getMethod(classFileFormat *classFile, char *method_name) {
+method_info *getMethod(classFileFormat *cf, char *method_name, char *class_type) {
 	method_info *method;
+	cp_info cp;
 
-	for (method = classFile->methods;method < classFile->methods+classFile->methods_count; method++) {
-		if (strcmp(method_name, (char *)classFile->constant_pool[method->name_index-1].constant_union.c_utf8.bytes) == 0) {
+	for (method = cf->methods; method < cf->methods + cf->methods_count; method++) {
+		cp = getConstantPoolElementByIndex(cf, method->name_index);
+		if (strcmp(method_name, (char *)cp.constant_union.c_utf8.bytes) == 0) {
 			return method;
+		}
+	}
+
+	return NULL;
+}
+
+class *getClass(char *class_name) {
+	method_area *method_area_element;
+	classFileFormat *cf;
+	cp_info cp;
+
+	for (method_area_element = method_area_ini; method_area_element < method_area_end; method_area_element++) {
+		cf = method_area_element->class->class_file;
+		cp = getConstantPoolElementByIndex(cf, cf->this_class);
+		if (strcmp(class_name, (char *)cp.constant_union.c_utf8.bytes) == 0) {
+			return method_area_element->class;
 		}
 	}
 	return NULL;
@@ -76,7 +94,11 @@ char *getClassName(classFileFormat *cf, u2 index) {
 	return (char *)cf->constant_pool[cf->constant_pool[index-1].constant_union.c_class.name_index-1].constant_union.c_utf8.bytes;
 }
 
-class *getClass(u2 index) {
-	/*TODO fazer método getClass da methodArea*/
-	return NULL;
+char *getMethodName(classFileFormat *cf, u2 index) {
+	cp_info method_name_type;
+	cp_info method_name_utf8;
+
+	method_name_type = getConstantPoolElementByIndex(cf, index);
+	method_name_utf8 = getConstantPoolElementByIndex(cf, method_name_type.constant_union.c_nametype.name_index);
+	return (char *)method_name_utf8.constant_union.c_utf8.bytes;
 }
