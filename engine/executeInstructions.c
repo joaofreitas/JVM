@@ -7,6 +7,8 @@
 
 #include "executeInstructions.h"
 #include "../structures/frame.h"
+#include "../structures/methodArea.h"
+#include "executeEngine.h"
 
 u2 getParameterCount(char *method_descriptor) {
 	u2 count;
@@ -441,8 +443,9 @@ void func_invokespecial(){
 	cp_info method_ref_info, class_info, method_name_type_ref_info, class_ref_info;
 	method_info *method;
 	frame_t *frame;
-	u4 *object_ref;
+	u4 object_ref;
 	u2 index, parameter_count;
+	class *resolved_class;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -457,6 +460,8 @@ void func_invokespecial(){
 	method_name_type_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.name_and_type_index);
 	method_descriptor = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
+	resolved_class = getSymbolicReferenceClass(class_name);
+
 	/*method = getMethod();*/
 	parameter_count = getParameterCount(method_descriptor);
 
@@ -464,11 +469,7 @@ void func_invokespecial(){
 	while (parameter_count > 0) {
 
 	}*/
-	*object_ref = popOperand();
-	class_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
-	/*className = (char *)getConstanPoolElement(class_ref_info.c_class.name_index).c_utf8.bytes;*/
-
-
+	object_ref = popOperand();
 
 }
 

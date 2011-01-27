@@ -8,6 +8,7 @@
 #include "executeEngine.h"
 #include "instructions.h"
 #include "../structures/mnemonics.h"
+#include <string.h>
 
 void runMethod() {
 
@@ -30,6 +31,9 @@ void runInitMethod(classFileFormat *classFile) {
 	u2 max_locals_variables;
 
 	clinit_method = getMethod(classFile, "<clinit>", "()V");
+	/*TODO Acho q deve ser colocado um .class no final do nome
+	 *     e tambem o path da class que tem a main.
+	 * */
 	super_class_name = getClassName(classFile, classFile->super_class);
 
 	if (strcmp("java/lang/Object", super_class_name) != 0) {
@@ -46,6 +50,24 @@ void runInitMethod(classFileFormat *classFile) {
 		runMethod();
 	}
 }
+
+class *getSymbolicReferenceClass(char *class_name) {
+	class *m_class;
+    char path[100];
+    classFileFormat *class_file;
+
+	m_class = getClass(class_name);
+
+	if (m_class == NULL) {
+       strcpy(path, class_name);
+       strcat(path, ".class");
+       class_file = loadClassFile(path);
+       m_class = instanceClassFromClassFile(class_file);
+       runInitMethod(class_file);
+	}
+	return m_class;
+}
+
 
 void exec(classFileFormat *classFile) {
 	method_info *main_method;

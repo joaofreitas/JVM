@@ -14,18 +14,19 @@ void initMethodArea() {
 	method_area_end = NULL;
 }
 
-void instanceClassFromClassFile(classFileFormat *classFile) {
+class *instanceClassFromClassFile(classFileFormat *classFile) {
 	class *cl;
 	field_info *field;
 	cp_info cp;
 	int count = 0;
 
-	cl = malloc(sizeof(class));
+	cl = calloc(1 ,sizeof(class));
 	field = classFile->fields;
+
 
 	for (field = classFile->fields; field < classFile->fields + classFile->fields_count; field++) {
 		if (field->access_flags & 0x0008) {
-			cl->static_vars = realloc(cl->static_vars, count+1);
+			cl->static_vars = realloc(cl->static_vars, (count+1)*sizeof(static_variables));
 			cp = getConstantPoolElementByIndex(classFile, field->name_index);
 			cl->static_vars[count].variable_name = cp.constant_union.c_utf8.bytes;
 			cp = getConstantPoolElementByIndex(classFile, field->descriptor_index);
@@ -35,6 +36,8 @@ void instanceClassFromClassFile(classFileFormat *classFile) {
 	}
 	cl->class_file = classFile;
 	addClass(cl);
+
+	return cl;
 }
 
 void addClass(class *class)
@@ -89,6 +92,9 @@ class *getClass(char *class_name) {
 	}
 	return NULL;
 }
+
+
+
 
 char *getClassName(classFileFormat *cf, u2 index) {
 	return (char *)cf->constant_pool[cf->constant_pool[index-1].constant_union.c_class.name_index-1].constant_union.c_utf8.bytes;

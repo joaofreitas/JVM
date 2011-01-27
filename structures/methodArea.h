@@ -38,7 +38,7 @@ void addClass(class *);
 
 void initMethodArea();
 
-void instanceClassFromClassFile(classFileFormat *classFile);
+class *instanceClassFromClassFile(classFileFormat *classFile);
 
 method_info *getMethod(classFileFormat *cf, char *method_name, char *class_type);
 

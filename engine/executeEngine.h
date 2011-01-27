@@ -19,4 +19,6 @@ method_area *m_area;
 
 void exec(classFileFormat *);
 
+class *getSymbolicReferenceClass(char *class_name);
+
 #endif /* EXEC_H_ */

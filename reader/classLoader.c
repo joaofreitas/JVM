@@ -17,7 +17,7 @@ classFileFormat* loadClassFile(char *arquivo) {
 		exit(1);
 	}
 
-	classFile = malloc(sizeof(classFileFormat));
+	classFile = calloc(1 ,sizeof(classFileFormat));
 	readMagicNumber(classFile, fp);
 	readVersion(classFile, fp);
 	readConstantPoolCount(classFile, fp);
