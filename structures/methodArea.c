@@ -69,6 +69,7 @@ method_info *getMethod(classFileFormat *cf, char *method_name, char *method_desc
 	cp_info cp_method_name;
 	cp_info cp_method_descriptor;
 	classFileFormat *next_cf;
+	u2 class_name_index;
 	char *cp_super_class_name;
 
 	for (method = cf->methods; method < cf->methods + cf->methods_count; method++) {
@@ -79,7 +80,8 @@ method_info *getMethod(classFileFormat *cf, char *method_name, char *method_desc
 		}
 	}
 	method = NULL;
-	cp_super_class_name = (char *)getConstantPoolElementByIndex(cf, cf->super_class).constant_union.c_utf8.bytes;
+	class_name_index = getConstantPoolElementByIndex(cf, cf->super_class).constant_union.c_class.name_index;
+	cp_super_class_name = (char *)getConstantPoolElementByIndex(cf, class_name_index).constant_union.c_utf8.bytes;
 	if (strcmp("java/lang/Object", cp_super_class_name) != 0) {
 		next_cf = getClass(cp_super_class_name)->class_file;
 		if (next_cf != NULL) {

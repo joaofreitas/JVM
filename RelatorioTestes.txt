@@ -6,6 +6,7 @@ Comando com resultados ordenados: ls -t `find . -name \*.class\* `|grep '.class$
 
 ./testes/Testes/Operacoes.class
 ./testes/Testes/Test2_a.class
+./testes/Testes/Classe1.class
 ./testes/Testes/lookupswitch_basic1.class
 ./testes/Testes/switch_basic4.class
 ./testes/Testes/Test2.class

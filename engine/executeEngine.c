@@ -56,7 +56,6 @@ void runInitMethod(classFileFormat *classFile) {
 	clinit_method = getMethod(classFile, "<clinit>", "()V");
 	/*TODO Acho q deve ser colocado um .class no final do nome
 	 *     e tambem o path da class que tem a main.
-	 *
 	 * */
 	strcpy(super_class_name,getClassName(classFile, classFile->super_class));
 
@@ -80,18 +79,17 @@ void runInitMethod(classFileFormat *classFile) {
 
 class *getSymbolicReferenceClass(char *class_name) {
 	class *m_class;
-    char path[100];
+    char *file_path;
     classFileFormat *class_file;
 
 	m_class = getClass(class_name);
 
 	if (m_class == NULL) {
-       strcpy(path, class_name);
-       strcat(path, ".class");
-       class_file = loadClassFile(path);
-       m_class = instanceClassFromClassFile(class_file);
-       /*precisa rodar o init ? */
-       runInitMethod(class_file);
+		file_path = (char *)getPath(class_name);
+		class_file = loadClassFile(file_path);
+		m_class = instanceClassFromClassFile(class_file);
+		/*precisa rodar o init ? */
+		runInitMethod(class_file);
 	}
 	return m_class;
 }
