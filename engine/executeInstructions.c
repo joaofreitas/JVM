@@ -10,6 +10,8 @@
 #include "../structures/methodArea.h"
 #include "executeEngine.h"
 
+int wide=0;
+
 u2 getParameterCount(char *method_descriptor) {
 	u2 count;
 
@@ -318,6 +320,13 @@ void func_i2s(){
 }
 
 void func_iadd(){
+	int op1 = popOperand();
+	int op2 = popOperand();
+	int result;
+
+	result = op1+op2;
+
+	pushOperand(result);
 }
 
 void func_iaload(){
@@ -410,18 +419,45 @@ void func_iinc(){
 }
 
 void func_iload(){
+	u2 index, index2;
+	int value;
+
+	frame_stack->frame->pc++;
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	if (wide){
+		frame_stack->frame->pc++;
+		index2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		index = ((index << 8)|index2);
+		wide = 0;
+	}
+
+	value = frame_stack->frame->local_variables[index];
+
+	pushOperand(value);
 }
 
 void func_iload_0(){
+	int value;
+	value = frame_stack->frame->local_variables[0];
+	pushOperand(value);
 }
 
 void func_iload_1(){
+	int value;
+	 value = frame_stack->frame->local_variables[1];
+	 pushOperand(value);
 }
 
 void func_iload_2(){
+	int value;
+	 value = frame_stack->frame->local_variables[2];
+	 pushOperand(value);
 }
 
 void func_iload_3(){
+	int value;
+	 value = frame_stack->frame->local_variables[3];
+	 pushOperand(value);
 }
 
 void func_imul(){
@@ -495,18 +531,32 @@ void func_ishr(){
 }
 
 void func_istore(){
+	int value = popOperand();
+	u2 index;
+
+	frame_stack->frame->pc++;
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->local_variables[index] = value;
 }
 
 void func_istore_0(){
+	int value = popOperand();
+	frame_stack->frame->local_variables[0] = value;
 }
 
 void func_istore_1(){
+	int value = popOperand();
+	frame_stack->frame->local_variables[1] = value;
 }
 
 void func_istore_2(){
+	int value = popOperand();
+	frame_stack->frame->local_variables[2] = value;
 }
 
 void func_istore_3(){
+	int value = popOperand();
+	frame_stack->frame->local_variables[3] = value;
 }
 
 void func_isub(){
@@ -666,9 +716,11 @@ void func_putstatic(){
 
 
 void func_ret(){
+
 }
 
 void func_return(){
+	popFrame();
 }
 
 
@@ -690,6 +742,7 @@ void func_tableswitch(){
 
 
 void func_wide(){
+	wide=1;
 }
 
 
