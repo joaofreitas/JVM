@@ -64,18 +64,33 @@ void addClass(class *class)
 	}
 }
 
-method_info *getMethod(classFileFormat *cf, char *method_name, char *class_type) {
+method_info *getMethod(classFileFormat *cf, char *method_name, char *method_descriptor) {
 	method_info *method;
-	cp_info cp;
+	cp_info cp_method_name;
+	cp_info cp_method_descriptor;
+	classFileFormat *next_cf;
+	char *cp_super_class_name;
 
 	for (method = cf->methods; method < cf->methods + cf->methods_count; method++) {
-		cp = getConstantPoolElementByIndex(cf, method->name_index);
-		if (strcmp(method_name, (char *)cp.constant_union.c_utf8.bytes) == 0) {
+		cp_method_name = getConstantPoolElementByIndex(cf, method->name_index);
+		cp_method_descriptor = getConstantPoolElementByIndex(cf, method->descriptor_index);
+		if ((strcmp(method_name, (char *)cp_method_name.constant_union.c_utf8.bytes) == 0) && (strcmp(method_descriptor, (char *)cp_method_descriptor.constant_union.c_utf8.bytes) == 0)){
 			return method;
 		}
 	}
+	method = NULL;
+	cp_super_class_name = (char *)getConstantPoolElementByIndex(cf, cf->super_class).constant_union.c_utf8.bytes;
+	if (strcmp("java/lang/Object", cp_super_class_name) != 0) {
+		next_cf = getClass(cp_super_class_name)->class_file;
+		if (next_cf != NULL) {
+			method = getMethod(next_cf, method_name, method_descriptor);
+		} else {
+			printf("ClassNotFoundException!\n");
+			exit(0);
+		}
+	}
 
-	return NULL;
+	return method;
 }
 
 class *getClass(char *class_name) {
@@ -92,9 +107,6 @@ class *getClass(char *class_name) {
 	}
 	return NULL;
 }
-
-
-
 
 char *getClassName(classFileFormat *cf, u2 index) {
 	return (char *)cf->constant_pool[cf->constant_pool[index-1].constant_union.c_class.name_index-1].constant_union.c_utf8.bytes;

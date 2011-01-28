@@ -155,7 +155,7 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 	cp_info cp_element;
 	opcode_info *op_info;
 	class_member *cm;
-	int tag, i, j;
+	int tag, i;
 
 
 	cp_element = getConstantPoolElementByIndex(classFile, attribute.attribute_name_index);

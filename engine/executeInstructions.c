@@ -15,7 +15,8 @@ int wide=0;
 u2 getParameterCount(char *method_descriptor) {
 	u2 count;
 
-	while (method_descriptor != NULL) {
+	method_descriptor++;
+	while (*method_descriptor != ')') {
 		if (*method_descriptor == '[') {
 			method_descriptor++;
 		}
@@ -23,6 +24,9 @@ u2 getParameterCount(char *method_descriptor) {
 			while (*method_descriptor != ';') {
 				method_descriptor++;
 			}
+		}
+		/*Double e long precisam ter 2 espaços*/
+		if ((*method_descriptor == 'J') || (*method_descriptor == 'D')) {
 			count++;
 		}
 		count++;
@@ -30,6 +34,7 @@ u2 getParameterCount(char *method_descriptor) {
 	}
 	return count;
 }
+
 
 void func_aaload(){
 
@@ -473,13 +478,17 @@ void func_invokeinterface(){
 }
 
 void func_invokespecial(){
+	func_invokevirtual();
+}
+
+void func_invokestatic(){
 	unsigned char indexbyte1;
 	unsigned char indexbyte2;
-	char *class_name, *method_descriptor;
-	cp_info method_ref_info, class_info, method_name_type_ref_info, class_ref_info;
-	method_info *method;
+	char *class_name, *method_name, *method_descriptor;
+	cp_info method_ref_info, class_info, method_name_type_ref_info;
+	method_info *invoke_method;
 	frame_t *frame;
-	u4 object_ref;
+	u4 operand,i;
 	u2 index, parameter_count;
 	class *resolved_class;
 
@@ -488,31 +497,100 @@ void func_invokespecial(){
 	frame_stack->frame->pc++;
 	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	index = indexbyte1 << 8 | indexbyte2;
+
 	method_ref_info = getConstanPoolElement(index);
 
+	/*Pegando o nome da classe*/
 	class_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
 	class_name = (char *)getConstanPoolElement(class_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
 
+	/*Pegando o nome e o descritor do método*/
 	method_name_type_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.name_and_type_index);
+	method_name = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
 	method_descriptor = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
 	resolved_class = getSymbolicReferenceClass(class_name);
+	if (resolved_class == NULL) {
+		printf("ClassNotFoundException!\n");
+		exit(0);
+	}
 
-	/*method = getMethod();*/
+	/*Metodo a ser invocado*/
+	invoke_method = getMethod(resolved_class->class_file, method_name, method_descriptor);
+	if (invoke_method == NULL) {
+		printf("MethodNotFoundException!\n");
+		exit(0);
+	}
+
 	parameter_count = getParameterCount(method_descriptor);
 
-	/*frame = createFrame()
-	while (parameter_count > 0) {
+	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, 0);
 
-	}*/
-	object_ref = popOperand();
+	/*Devo empilhar ao contrário, pois a pilha vai conter a object reference por ultimo.
+	Comeca com 1 por causa do indice do vetor*/
+	for (i=1; i <= parameter_count; i++) {
+		operand = popOperand();
+		frame->local_variables[parameter_count-i] = operand;
+	}
 
-}
-
-void func_invokestatic(){
+	pushFrame(frame);
 }
 
 void func_invokevirtual(){
+
+	unsigned char indexbyte1;
+	unsigned char indexbyte2;
+	char *class_name, *method_name, *method_descriptor;
+	cp_info method_ref_info, class_info, method_name_type_ref_info;
+	method_info *invoke_method;
+	frame_t *frame;
+	u4 operand,i;
+	u2 index, parameter_count;
+	class *resolved_class;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	index = indexbyte1 << 8 | indexbyte2;
+
+	method_ref_info = getConstanPoolElement(index);
+
+	/*Pegando o nome da classe*/
+	class_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
+	class_name = (char *)getConstanPoolElement(class_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+
+	/*Pegando o nome e o descritor do método*/
+	method_name_type_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.name_and_type_index);
+	method_name = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
+	method_descriptor = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
+
+	resolved_class = getSymbolicReferenceClass(class_name);
+	if (resolved_class == NULL) {
+		printf("ClassNotFoundException!\n");
+		exit(0);
+	}
+
+	/*Metodo a ser invocado*/
+	invoke_method = getMethod(resolved_class->class_file, method_name, method_descriptor);
+	if (invoke_method == NULL) {
+		printf("MethodNotFoundException!\n");
+		exit(0);
+	}
+
+	parameter_count = getParameterCount(method_descriptor);
+
+	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, 0);
+
+	/*Devo empilhar ao contrário, pois a pilha vai conter a object reference por ultimo.
+	Comeca com 1 por causa do indice do vetor*/
+	for (i=1; i <= parameter_count; i++) {
+		operand = popOperand();
+		frame->local_variables[parameter_count-i] = operand;
+	}
+
+	pushFrame(frame);
+
 }
 
 void func_ior(){

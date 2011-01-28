@@ -27,7 +27,6 @@ void saveFilePath(char *classPath) {
 void runMethod() {
 
 	while (frame_stack->frame->pc < frame_stack->frame->code_length) {
-		/*TODO executar instrucoes*/
 		op_info[frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]].func();
 		if (frame_stack == NULL) {
 			break;
