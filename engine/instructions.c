@@ -8,9 +8,9 @@
 #include "executeInstructions.h"
 #include "../structures/mnemonics.h"
 
-
-
 void initOperands() {
+
+	get_opcode_info();
 
 	op_info[0x32].func = func_aaload;
 	op_info[0x53].func = func_aastore;

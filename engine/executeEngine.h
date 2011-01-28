@@ -17,7 +17,9 @@
 
 method_area *m_area;
 
-void exec(classFileFormat *);
+void exec(classFileFormat *, char *path);
+
+void saveFilePath(char *classPath);
 
 class *getSymbolicReferenceClass(char *class_name);
 

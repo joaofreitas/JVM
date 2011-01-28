@@ -10,6 +10,20 @@
 #include "../structures/mnemonics.h"
 #include <string.h>
 
+char path[100];
+
+void saveFilePath(char *classPath) {
+	int i;
+
+	i = strlen(classPath);
+	while ((classPath[i] != '/') && (i >= 0)){
+		i--;
+	}
+	strncpy(path, classPath, i);
+	path[i]='/';
+	fflush(stdout);
+}
+
 void runMethod() {
 
 	while (frame_stack->frame->pc < frame_stack->frame->code_length) {
@@ -23,21 +37,35 @@ void runMethod() {
 
 }
 
+char *getPath(char *className){
+	char path_aux[100];
+
+	strcpy(path_aux,path);
+	strcat(path_aux, className);
+	strcat(path_aux, ".class");
+
+	return path_aux;
+}
+
 void runInitMethod(classFileFormat *classFile) {
 	method_info *clinit_method;
 	classFileFormat *super_class_file;
 	frame_t *frame;
-	char *super_class_name;
+	char super_class_name[100];
 	u2 max_locals_variables;
 
 	clinit_method = getMethod(classFile, "<clinit>", "()V");
 	/*TODO Acho q deve ser colocado um .class no final do nome
 	 *     e tambem o path da class que tem a main.
+	 *
 	 * */
-	super_class_name = getClassName(classFile, classFile->super_class);
+	strcpy(super_class_name,getClassName(classFile, classFile->super_class));
 
 	if (strcmp("java/lang/Object", super_class_name) != 0) {
-		/*TODO Fazer alguma coisa pra pegar o path do arquivo do classFile */
+
+		strcpy(super_class_name, getPath(super_class_name));
+		printf("%s", super_class_name);
+
 		super_class_file = loadClassFile(super_class_name);
 		instanceClassFromClassFile(super_class_file);
 		runInitMethod(super_class_file);
@@ -63,15 +91,19 @@ class *getSymbolicReferenceClass(char *class_name) {
        strcat(path, ".class");
        class_file = loadClassFile(path);
        m_class = instanceClassFromClassFile(class_file);
+       /*precisa rodar o init ? */
        runInitMethod(class_file);
 	}
 	return m_class;
 }
 
 
-void exec(classFileFormat *classFile) {
+void exec(classFileFormat *classFile, char *classPath) {
 	method_info *main_method;
 	frame_t *frame;
+
+	saveFilePath(classPath);
+
 
 	initMethodArea();
 	initHeap();
