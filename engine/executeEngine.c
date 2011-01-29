@@ -94,6 +94,33 @@ class *getSymbolicReferenceClass(char *class_name) {
 	return m_class;
 }
 
+field_info *getResolvedFieldReference(class *cl, cp_info fieldref) {
+	field_info *field;
+	u1 *field_name, *field_descriptor;
+	u1 *field_name_aux, *field_descriptor_aux;
+
+	if (cl == NULL) {
+		return NULL;
+	}
+
+	field_name = getConstantPoolElementByIndexFromCurrentFrame(fieldref.constant_union.c_fieldref.name_and_type_index).constant_union.c_utf8.bytes;
+	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(fieldref.constant_union.c_fieldref.class_index).constant_union.c_utf8.bytes;
+
+	for (field = cl->class_file->fields; field < cl->class_file->fields + cl->class_file->fields_count; field++) {
+		field_name_aux = getConstantPoolElementByIndexFromCurrentFrame(field->name_index).constant_union.c_utf8.bytes;
+		field_descriptor_aux = getConstantPoolElementByIndexFromCurrentFrame(field->descriptor_index).constant_union.c_utf8.bytes;
+
+		if ((strcmp((char*)field_name, (char*)field_name_aux) == 0) && (strcmp((char*)field_descriptor, (char*)field_descriptor_aux)==0)) {
+			return field;
+		}
+	}
+
+	/*TODO colocar super_class = NULL caso ela seja Object */
+	field = getResolvedFieldReference(cl->super_class, fieldref);
+
+	return field;
+}
+
 
 void exec(classFileFormat *classFile, char *classPath) {
 	method_info *main_method;
