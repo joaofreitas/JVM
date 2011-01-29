@@ -48,24 +48,44 @@ double getDouble(u4 low_bytes, u4 high_bytes) {
 
 u4 getDoubleHighBytes(double value) {
 	u4 high_bytes;
+	u8 aux;
 
-
+	memcpy(&aux, &value, sizeof(double));
+	high_bytes = (aux >> 32) & 0xffffffff;
+	return high_bytes;
 }
 
 u4 getDoubleLowBytes(double value) {
+	u4 low_bytes;
+	u8 aux;
+
+	memcpy(&aux, &value, sizeof(double));
+	low_bytes = aux & 0xffffffff;
+	return low_bytes;
 
 }
 
 u8 getLong(u4 low_bytes, u4 high_bytes) {
+	u8 l_value;
 
+	l_value = high_bytes;
+	l_value = (l_value << 32) | low_bytes;
+
+	return l_value;
 }
 
 u4 getLongHighBytes(u8 value) {
+	u4 high_bytes;
 
+	high_bytes = (value >> 32) & 0xffffffff;
+	return high_bytes;
 }
 
 u4 getLongLowBytes(u8 value) {
+	u4 low_bytes;
 
+	low_bytes = value & 0xffffffff;
+	return low_bytes;
 }
 
 
