@@ -60,7 +60,17 @@ void func_aconst_null(){
 }
 
 void func_aload(){
+	u1 index;
+	u4 objectref;
 
+	frame_stack->frame->pc++;
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	if (wide) {
+		frame_stack->frame->pc++;
+		index = ((index << 8) | frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]);
+	}
+	objectref = frame_stack->frame->local_variables[index];
+	pushOperand(objectref);
 }
 
 void func_aload_0(){
@@ -93,6 +103,22 @@ void func_arraylength(){
 }
 
 void func_astore(){
+	u1 index;
+	u4 objectref;
+
+	frame_stack->frame->pc++;
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	if (wide) {
+		frame_stack->frame->pc++;
+		index = ((index << 8) | frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]);
+	}
+	objectref = popOperand();
+	frame_stack->frame->local_variables[index] = objectref;
+
+	/*TODO The aload instruction cannot be used to load a value
+	 * of type returnAddress from a local variable onto the
+	 * operand stack. This asymmetry with the astore instruction
+	 * is intentional.*/
 }
 
 void func_astore_0(){
@@ -108,6 +134,10 @@ void func_astore_2(){
 }
 
 void func_astore_3(){
+	u4 objectref;
+
+	objectref = popOperand();
+	frame_stack->frame->local_variables[3] = objectref;
 }
 
 void func_athrow(){
@@ -135,6 +165,17 @@ void func_bastore(){
 }
 
 void func_bipush(){
+	int value;
+
+	frame_stack->frame->pc++;
+	value = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	if(value & 0x00000080) {
+		value |= 0xffffff00;
+	}
+	else {
+		value &= 0x000000ff;
+	}
+	pushOperand(value);
 }
 
 
@@ -164,6 +205,17 @@ void func_checkcast(){
 
 
 void func_d2f(){
+	double d_value;
+	float f_value;
+
+	u4 value1, value2;
+	value1 = popOperand();
+	value2 = popOperand();
+
+	d_value = value1;
+	d_value = ((d_value << 32) | value2);
+	f_value = (float)d_value;
+	pushOperand(f_value);
 }
 
 void func_d2i(){
@@ -189,6 +241,7 @@ void func_dadd(){
 }
 
 void func_daload(){
+
 }
 
 void func_dastore(){
