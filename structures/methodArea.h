@@ -48,6 +48,6 @@ char *getClassName(classFileFormat *cf, u2 index);
 
 char *getMethodName(classFileFormat *cf, u2 index);
 
-
+cp_info getConstantPoolElementByIndexFromCurrentFrame(int index);
 
 #endif /* METHODAREA_H_ */
