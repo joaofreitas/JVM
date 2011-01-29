@@ -9,13 +9,21 @@
 #define HEAP_H_
 
 #include "classFileStructures.h"
-#include "stdlib.h"
+#include <stdlib.h>
 
 typedef struct object_instance {
 	u1 *class_name;
 	u4 id;
 	struct object_instance *super;
 } instance_structure;
+
+typedef struct arrays_struct
+{
+	void *reference;
+	u4 size;
+	char *tipo;
+	struct arrays_struct *next;
+} arrays_t;
 
 typedef struct heap_instance {
 	u2 index;
