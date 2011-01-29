@@ -37,10 +37,23 @@ u2 getParameterCount(char *method_descriptor) {
 
 
 void func_aaload(){
+	int index = popOperand();
+	u4 array_aux = popOperand();
+	u4 *arrayref;
 
+	arrayref = malloc(sizeof(int));
+	memcpy(&arrayref, &array_aux, sizeof(u4));
+
+	if (arrayref == NULL){
+		printf("\nNullPointerException at aaload.\n");
+		return;
+	}
+	/*TODO como saber se index nao vai estourar arrayref?*/
+	pushOperand(arrayref[index]);
 }
 
 void func_aastore(){
+
 }
 
 void func_aconst_null(){
@@ -70,6 +83,10 @@ void func_anewarray(){
 }
 
 void func_areturn(){
+	u4 objectref = popOperand();
+
+	popFrame(frame_stack->frame);
+	pushOperand(objectref);
 }
 
 void func_arraylength(){
@@ -82,6 +99,9 @@ void func_astore_0(){
 }
 
 void func_astore_1(){
+	u4 objectref = popOperand();
+
+	frame_stack->frame->local_variables[1] = objectref;
 }
 
 void func_astore_2(){
@@ -95,6 +115,20 @@ void func_athrow(){
 
 
 void func_baload(){
+	int index = popOperand();
+	int value;
+	u4 array_aux = popOperand();
+	char *arrayref;
+
+	arrayref = malloc(sizeof(u1));
+	memcpy(&arrayref, &array_aux, sizeof(u4));
+
+	if (arrayref == NULL){
+		printf("\nNullPointerException at baload.\n");
+		return;
+	}
+	/*TODO como saber se index nao vai estourar arrayref?*/
+	pushOperand((signed) arrayref[index]);
 }
 
 void func_bastore(){
@@ -108,6 +142,21 @@ void func_caload(){
 }
 
 void func_castore(){
+	int value = popOperand();
+	int index = popOperand();
+	char *arrayref;
+	u4 arrayaux;
+
+	arrayref = malloc(sizeof(char));
+	memcpy(&arrayref, &array_aux, sizeof(u4));
+
+	if (arrayref == NULL){
+		printf("\nNullPointerException at caload.\n");
+		return;
+	}
+	/*TODO como saber se index nao vai estourar arrayref?*/
+	arrayref[index]=(char *)value;
+
 }
 
 void func_checkcast(){
@@ -121,6 +170,19 @@ void func_d2i(){
 }
 
 void func_d2l(){
+	u4 high = popOperand();
+	u4 low = popOperand();
+	double value;
+	long result;
+
+	result |= high;
+	result = result << 32;
+	result |= low;
+
+	result = (long *)value;
+	/*TODO verificar NaN e se esse cast resolve*/
+
+	pushOperand(result);
 }
 
 void func_dadd(){
