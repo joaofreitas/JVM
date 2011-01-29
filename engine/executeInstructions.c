@@ -57,6 +57,7 @@ void func_aastore(){
 }
 
 void func_aconst_null(){
+	pushOperand(NULL);
 }
 
 void func_aload(){
@@ -100,6 +101,9 @@ void func_areturn(){
 }
 
 void func_arraylength(){
+
+
+
 }
 
 void func_astore(){
@@ -131,6 +135,9 @@ void func_astore_1(){
 }
 
 void func_astore_2(){
+	u4 objectref = popOperand();
+
+	frame_stack->frame->local_variables[2] = objectref;
 }
 
 void func_astore_3(){
@@ -162,6 +169,9 @@ void func_baload(){
 }
 
 void func_bastore(){
+
+
+
 }
 
 void func_bipush(){
@@ -201,6 +211,21 @@ void func_castore(){
 }
 
 void func_checkcast(){
+	u4 objectref = popOperand();
+	u1 indexbyte1, indexbyte2;
+	u2 index;
+	cp_info resolved_class_type;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	index = ((indexbyte1 << 8) | indexbyte2);
+
+	resolved_class_type = getConstantPoolElementByIndex(index);
+	/*TODO se der tempo*/
+
+
 }
 
 
@@ -238,6 +263,32 @@ void func_d2l(){
 }
 
 void func_dadd(){
+	u4 op1_hi = popOperand();
+	u4 op1_low = popOperand();
+	u4 op2_hi = popOperand();
+	u4 op2_low = popOperand();
+	u4, result_low, result_high;
+	double op1, op2, result;
+	u8 op_aux, result_aux;
+
+	op_aux |= op1_hi;
+	op_aux = op_aux << 32;
+	op_aux |= op1_low;
+	memcpy(&op1, &op_aux, sizeof(u8));
+
+	op_aux |= op2_hi;
+	op_aux = op_aux << 32;
+	op_aux |= op2_low;
+	memcpy(&op2, &op_aux, sizeof(u8));
+
+	result = op1+op2;
+	memcpy(&result_aux, &result, sizeof(u8));
+	result_low |= result_aux;
+	result_aux = result_aux >> 32;
+	result_high |= result_aux;
+
+	pushOperand(result_low);
+	pushOperand(result_high);
 }
 
 void func_daload(){
@@ -251,7 +302,37 @@ void func_dcmpg(){
 }
 
 void func_dcmpl(){
+	u4 op1_hi = popOperand();
+	u4 op1_low = popOperand();
+	u4 op2_hi = popOperand();
+	u4 op2_low = popOperand();
+	int result;
+	u8 op_aux;
+	double op1, op2;
+
+	op_aux |= op1_hi;
+	op_aux = op_aux << 32;
+	op_aux |= op1_low;
+	memcpy(&op1, &op_aux, sizeof(u8));
+
+	op_aux |= op2_hi;
+	op_aux = op_aux << 32;
+	op_aux |= op2_low;
+	memcpy(&op2, &op_aux, sizeof(u8));
+
+	if (op2 > op1){
+		result = 1;
+	}
+	else if (op2 == op1){
+		result = 0;
+	}
+	else
+		result = -1;
+
+	pushOperand(result);
+
 }
+
 
 void func_dconst_0(){
 }
@@ -263,9 +344,31 @@ void func_ddiv(){
 }
 
 void func_dload(){
+	short index, index2;
+	u4 value_hi, value_low;
+
+	frame_stack->frame->pc++;
+
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (wide){
+		frame_stack->frame->pc++;
+		index2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		index = ((index << 8)|index2);
+		wide = 0;
+	}
+
+	value_hi = frame_stack->frame->local_variables[index];
+	value_low = frame_stack->frame->local_variables[index+1];
+
+	pushOperand(value_low);
+	pushOperand(value_hi);
 }
 
 void func_dload_0(){
+
+
+
 }
 
 void func_dload_1(){
@@ -287,21 +390,35 @@ void func_drem(){
 }
 
 void func_dreturn(){
+	u4 value_hi = popOperand();
+	u4 value_low = popOperand();
+
+	popFrame();
+
+	pushOperand(value_low);
+	pushOperand(value_hi);
 }
 
 void func_dstore(){
+
 }
 
 void func_dstore_0(){
+	frame_stack->frame->local_variables[0] = popOperand();
+	frame_stack->frame->local_variables[1] = popOperand();
 }
 
 void func_dstore_1(){
 }
 
 void func_dstore_2(){
+	frame_stack->frame->local_variables[2] = popOperand();
+	frame_stack->frame->local_variables[3] = popOperand();
 }
 
 void func_dstore_3(){
+	frame_stack->frame->local_variables[3] = popOperand();
+	frame_stack->frame->local_variables[4] = popOperand();
 }
 
 void func_dsub(){
@@ -311,6 +428,12 @@ void func_dup(){
 }
 
 void func_dup_x1(){
+	u4 value1 = popFrame();
+	u4 value2 = popFrame();
+
+	pushOperand(value1);
+	pushOperand(value2);
+	pushOperand(value1);
 }
 
 void func_dup_x2(){
@@ -323,6 +446,17 @@ void func_dup2_x1(){
 }
 
 void func_dup2_x2(){
+	u4 value1 = popFrame();
+	u4 value2 = popFrame();
+	u4 value3 = popFrame();
+	u4 value4 = popFrame();
+
+	pushOperand(value2);
+	pushOperand(value1);
+	pushOperand(value4);
+	pushOperand(value3);
+	pushOperand(value2);
+	pushOperand(value1);
 }
 
 
@@ -336,6 +470,17 @@ void func_f2l(){
 }
 
 void func_fadd(){
+	u4 value1_aux = popOperand();
+	u4 value2_aux = popOperand();
+	u4 result_aux;
+	float value1, value2, result;
+
+	memcpy(&value1, &value1_aux, sizeof(u4));
+	memcpy(&value2, &value2_aux, sizeof(u4));
+
+	result = value1+value2;
+
+	memcpy(&result,&result,sizeof(u4));
 }
 
 void func_faload(){
@@ -348,6 +493,22 @@ void func_fcmpg(){
 }
 
 void func_fcmpl(){
+	u4 value1_aux = popOperand();
+	u4 value2_aux = popOperand();
+	u4 result;
+	float value1, value2;
+
+	memcpy(&value1, &value1_aux, sizeof(u4));
+	memcpy(&value2, &value2_aux, sizeof(u4));
+
+	if (value2>value){
+		result = 1;
+	}
+	else if(value2==value1){
+		result = 0;
+	}
+	else
+		result = -1;
 }
 
 void func_fconst_0(){
@@ -360,6 +521,24 @@ void func_fconst_2(){
 }
 
 void func_fdiv(){
+	u4 value1_aux = popOperand();
+	u4 value2_aux = popOperand();
+	u4 result_aux;
+	float value1, value2, result;
+
+
+	memcpy(&value1, &value1_aux, sizeof(u4));
+	memcpy(&value2, &value2_aux, sizeof(u4));
+
+	if (value1 == 0){
+		printf("Cannot divide by zero at fdiv");
+		return;
+	}
+
+	result = value2/value1;
+	memcpy(&result_aux, &result, sizeof(u4));
+
+	pushOperand(result_aux);
 }
 
 void func_fload(){
@@ -384,7 +563,26 @@ void func_fneg(){
 }
 
 void func_frem(){
+	u4 value1_aux = popOperand();
+	u4 value2_aux = popOperand();
+	u4 result_aux;
+	int q;
+	float value1, value2, result;
+
+	memcpy(&value1, &value1_aux, sizeof(u4));
+	memcpy(&value2, &value2_aux, sizeof(u4));
+
+	if (value2/value1 < 0){
+		q = -1;
+	}
+	else
+		q = 1;
+	result = value2-((int)(value2/value1)*value1);
+	memcpy(&result_aux, &result, sizeof(u4));
+
+	pushOperand(result_aux);
 }
+
 
 void func_freturn(){
 }
@@ -409,6 +607,7 @@ void func_fsub(){
 
 
 void func_getfield(){
+	u4 objectref;
 }
 
 void func_getstatic(){
@@ -422,6 +621,11 @@ void func_goto_w(){
 
 
 void func_i2b(){
+	u1 value;
+
+	value = (char)popOperand();
+	pushOperand((u4) value);
+
 }
 
 void func_i2c(){
@@ -434,6 +638,17 @@ void func_i2f(){
 }
 
 void func_i2l(){
+	u4 value;
+	u4 aux;
+	long result;
+
+	value = (int)popOperand();
+	result = value;
+	aux = result >> 32;
+	pushOperand(aux);
+	aux = result & 0x0000FFFF;
+	pushOperand(aux);
+
 }
 
 void func_i2s(){
@@ -453,6 +668,12 @@ void func_iaload(){
 }
 
 void func_iand(){
+	u4 value1 = popOperand();
+	u4 value2 = popOperand();
+	u4 result;
+
+	result = value1 & value2;
+	pushOperand(result);
 }
 
 void func_iastore(){
@@ -494,6 +715,19 @@ void func_if_acmpne(){
 }
 
 void func_if_icmpeq(){
+	u4 value1 = popOperand();
+	u4 value2 = popOperand();
+	u2 branchbyte1, branchbyte2;
+	short offset;
+
+	if (value1 == value2){
+		frame_stack->frame->pc++;
+		bytebranch1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		bytebranch2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (bytebranch << 8)|branchbyte2;
+		frame_stack->frame->pc += offset-1;
+	}
 }
 
 void func_if_icmpne(){
@@ -506,7 +740,21 @@ void func_if_icmpge(){
 }
 
 void func_if_icmpgt(){
+	u4 value1 = popOperand();
+	u4 value2 = popOperand();
+	u2 branchbyte1, branchbyte2;
+	short offset;
+
+	if (value1 < value2){
+		frame_stack->frame->pc++;
+		bytebranch1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		bytebranch2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (bytebranch << 8)|branchbyte2;
+		frame_stack->frame->pc += offset-1;
+	}
 }
+
 
 void func_if_icmple(){
 }
@@ -518,7 +766,20 @@ void func_ifne(){
 }
 
 void func_iflt(){
+	u4 value1 = popOperand();
+	u2 branchbyte1, branchbyte2;
+	short offset;
+
+	if (value1 > 0){
+		frame_stack->frame->pc++;
+		bytebranch1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		bytebranch2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (bytebranch << 8)|branchbyte2;
+		frame_stack->frame->pc += offset-1;
+	}
 }
+
 
 void func_ifge(){
 }
@@ -530,6 +791,18 @@ void func_ifle(){
 }
 
 void func_ifnonnull(){
+	u4 value1 = popOperand();
+	u2 branchbyte1, branchbyte2;
+	short offset;
+
+	if (value1 != NULL){
+		frame_stack->frame->pc++;
+		bytebranch1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		bytebranch2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (bytebranch << 8)|branchbyte2;
+		frame_stack->frame->pc += offset-1;
+	}
 }
 
 void func_ifnull(){
@@ -581,6 +854,12 @@ void func_iload_3(){
 }
 
 void func_imul(){
+	int value1 = (int)popOperand();
+	int value2 = (int)popOperand();
+	int result;
+
+	result = value1*value2;
+	pushOperand(result);
 }
 
 void func_ineg(){
@@ -712,6 +991,17 @@ void func_ior(){
 }
 
 void func_irem(){
+	int value1 = (int)popOperand();
+	int value2 = (int)popOperand();
+	int result;
+
+	if (value1 == 0){
+		printf("Cannot divide by zero at irem");
+		return;
+	}
+
+	result = value2-((value2/value1)*value1);
+	pushOperand(result);
 }
 
 void func_ireturn(){
@@ -763,6 +1053,19 @@ void func_ixor(){
 
 
 void func_jsr(){
+	u2 branchbyte1, branchbyte2;
+	short offset;
+
+	frame_stack->frame->pc++;
+	bytebranch1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+    frame_stack->frame->pc++;
+	bytebranch2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	offset = (bytebranch << 8)|branchbyte2;
+	frame_stack->frame->pc++;
+	pushOperand(frame_stack->frame->pc);
+
+	frame_stack->frame->pc += offset - 1;
 }
 
 void func_jsr_w(){
@@ -776,6 +1079,10 @@ void func_l2f(){
 }
 
 void func_l2i(){
+	u4 value = popOperand();
+
+	popOperand();
+	pushOperand(value);
 }
 
 void func_ladd(){
@@ -788,6 +1095,25 @@ void func_land(){
 }
 
 void func_lastore(){
+	arrays_t *arrayref;
+	u8 *array, value = 0;
+	u4 value_hi = popOperand();
+	u4 value_low = popOperand();
+	int index = popOperand();
+
+	arrayref = (array_t *)popOperand();
+
+	value |= value_hi;
+	value = value << 32;
+	value |= value_low;
+	if ((index >= arrayref->size) || (index < 0)){
+		printf("\nNullPointerException at lasotre\n");
+		return;
+	}
+	array = (u8 *)arrayref->reference;
+
+	array[index]=value;
+
 }
 
 void func_lcmp(){
@@ -800,6 +1126,24 @@ void func_lconst_1(){
 }
 
 void func_ldc(){
+	u1 index;
+
+	frame_stack->frame->pc++;
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (frame_stack->frame->cp->tag == CONSTANT_Integer){
+		pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
+	}
+	else if ((frame_stack->frame->cp->tag == CONSTANT_Float)){
+		pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
+	}
+	else if ((frame_stack->frame->cp->tag == CONSTANT_String)){
+		pushOperand(getConstantPoolElementByIndex(frame_stack->frame->cp[index].constant_union.c_string.string_index));
+	}
+	else{
+		printf("\n\ldc Error\n");
+		return;
+	}
 }
 
 void func_ldc_w(){
@@ -812,6 +1156,26 @@ void func_ldiv(){
 }
 
 void func_lload(){
+	short index, index2;
+	u4 value_hi, value_low;
+
+	frame_stack->frame->pc++;
+
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (wide){
+		frame_stack->frame->pc++;
+		index2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		index = ((index << 8)|index2);
+		wide = 0;
+	}
+
+	value_hi = frame_stack->frame->local_variables[index];
+	value_low = frame_stack->frame->local_variables[index+1];
+
+	pushOperand(value_low);
+	pushOperand(value_hi);
+
 }
 
 void func_lload_0(){
@@ -824,6 +1188,7 @@ void func_lload_2(){
 }
 
 void func_lload_3(){
+
 }
 
 void func_lmul(){
@@ -836,6 +1201,27 @@ void func_lookupswitch(){
 }
 
 void func_lor(){
+	u4 valor1_hi = popOperand();
+	u4 valor1_low = popOperand();
+	u4 valor2_hi = popOperand();
+	u4 valor2_low = popOperand();
+	u4 result_aux;
+	u8 valor1, valor2, result;
+
+	valor1 |= valor1_hi;
+	valor1 = valor1 << 32;
+	valor1 |= valor1_low;
+
+	valor2 |= valor2_hi;
+	valor2 = valor2 << 32;
+	valor2 |= valor2_low;
+
+	result = valor1 | valor2;
+
+	result_aux = result & 0xFFFFFFFF;
+	pushOperand(result_aux);
+    result_aux = result >> 32;
+    pushOperand(result_aux);
 }
 
 void func_lrem(){
@@ -848,6 +1234,23 @@ void func_lshl(){
 }
 
 void func_lshr(){
+	u4 value2, aux_value1, aux_value2;
+	u8 value1, result;
+
+	value2 = popOperand();
+	aux_value1 = popOperand();
+	aux_value2 = popOperand();
+	value1 = (aux_value1 << 32) | aux_value2;
+
+	result = value1 >> value2;
+
+	aux_value1 = (result >> 32);
+	aux_value2 = result & 0xFFFFFFFF;
+
+	pushOperand(aux_value2);
+	pushOperand(aux_value1);
+
+
 }
 
 void func_lstore(){
@@ -872,6 +1275,21 @@ void func_lushr(){
 }
 
 void func_lxor(){
+	u4 value2, aux_value1, aux_value2;
+	u8 value1, result;
+
+	value2 = popOperand();
+	aux_value1 = popOperand();
+	aux_value2 = popOperand();
+	value1 = (aux_value1 << 32) | aux_value2;
+
+	result = value1 ^ value2;
+
+	aux_value1 = (result >> 32);
+	aux_value2 = result & 0xFFFFFFFF;
+
+	pushOperand(aux_value2);
+	pushOperand(aux_value1);
 }
 
 
@@ -899,6 +1317,8 @@ void func_pop(){
 }
 
 void func_pop2(){
+	popOperand();
+	popOperand();
 }
 
 void func_putfield(){
@@ -927,6 +1347,11 @@ void func_sipush(){
 }
 
 void func_swap(){
+	u4 value1 = popOperand();
+	u4 value2 = popOperand();
+
+	pushOperand(value2);
+	pushOperand(value1);
 }
 
 
