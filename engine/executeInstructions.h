@@ -9,13 +9,24 @@
 #define EXECUTEINSTRUCTIONS_H_
 
 #include <inttypes.h>
+#include "../structures/classFileStructures.h"
 
+typedef struct npair_struct
+{
+	int32_t match;
+	int32_t offset;
+}pair_item;
 
 void func_execInstruction();
 
 double getDouble(u4 low_bytes, u4 high_bytes);
 u4 getDoubleHighBytes(double value);
 u4 getDoubleLowBytes(double value);
+
+double getLong(u4 low_bytes, u4 high_bytes);
+u4 getLongHighBytes(long value);
+u4 getLongLowBytes(long value);
+
 
 void func_aaload();
 void func_aastore();/*boi*/
