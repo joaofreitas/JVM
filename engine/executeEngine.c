@@ -4,7 +4,7 @@
  *  Created on: 22/01/2011
  *      Author: joaofreitas
  */
-/*TODO Resolver as dependências de includes */
+
 #include "executeEngine.h"
 #include "instructions.h"
 #include "../structures/mnemonics.h"
@@ -37,8 +37,9 @@ void runMethod() {
 }
 
 char *getPath(char *className){
-	char path_aux[100];
+	char *path_aux;
 
+	path_aux = malloc(sizeof(char)*100);
 	strcpy(path_aux,path);
 	strcat(path_aux, className);
 	strcat(path_aux, ".class");
@@ -103,6 +104,7 @@ field_info *getResolvedFieldReference(class *cl, cp_info fieldref) {
 		return NULL;
 	}
 
+	field = NULL;
 	field_name = getConstantPoolElementByIndexFromCurrentFrame(fieldref.constant_union.c_fieldref.name_and_type_index).constant_union.c_utf8.bytes;
 	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(fieldref.constant_union.c_fieldref.class_index).constant_union.c_utf8.bytes;
 

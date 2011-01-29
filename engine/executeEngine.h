@@ -23,4 +23,6 @@ void saveFilePath(char *classPath);
 
 class *getSymbolicReferenceClass(char *class_name);
 
+field_info *getResolvedFieldReference(class *cl, cp_info fieldref);
+
 #endif /* EXEC_H_ */
