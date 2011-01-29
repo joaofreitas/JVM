@@ -8,6 +8,7 @@
 #include "methodArea.h"
 #include "stdlib.h"
 #include "string.h"
+#include "frame.h"
 
 void initMethodArea() {
 	method_area_ini = NULL;
@@ -122,3 +123,11 @@ char *getMethodName(classFileFormat *cf, u2 index) {
 	method_name_utf8 = getConstantPoolElementByIndex(cf, method_name_type.constant_union.c_nametype.name_index);
 	return (char *)method_name_utf8.constant_union.c_utf8.bytes;
 }
+
+cp_info getConstantPoolElementByIndexFromCurrentFrame(int index) {
+	cp_info cp;
+
+	cp = frame_stack->frame->cp[index - 1];
+	return cp; /*Constant Pool começa do 0, logo o elemento atual é sempre o anterior*/
+}
+
