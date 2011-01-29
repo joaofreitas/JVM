@@ -23,9 +23,9 @@ double getDouble(u4 low_bytes, u4 high_bytes);
 u4 getDoubleHighBytes(double value);
 u4 getDoubleLowBytes(double value);
 
-double getLong(u4 low_bytes, u4 high_bytes);
-u4 getLongHighBytes(long value);
-u4 getLongLowBytes(long value);
+u8 getLong(u4 low_bytes, u4 high_bytes);
+u4 getLongHighBytes(u8 value);
+u4 getLongLowBytes(u8 value);
 
 
 void func_aaload();
