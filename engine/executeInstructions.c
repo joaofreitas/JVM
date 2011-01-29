@@ -37,41 +37,35 @@ u2 getParameterCount(char *method_descriptor) {
 
 
 void func_aaload(){
-	int index = popOperand();
-	u4 array_aux = popOperand();
-	u4 *arrayref;
 
-	arrayref = malloc(sizeof(int));
-	memcpy(&arrayref, &array_aux, sizeof(u4));
-
-	if (arrayref == NULL){
-		printf("\nNullPointerException at aaload.\n");
-		return;
-	}
-	/*TODO como saber se index nao vai estourar arrayref?*/
-	pushOperand(arrayref[index]);
 }
 
 void func_aastore(){
+	u4 index, value;
+    arrays_t  *arrey;
 
+	value = popOperand();
+	index = popOperand();
+	array = (arrays_t*)popOperand();
+
+	if (array == NULL) {
+		printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+	if (index >= array->size)
+	{
+	    printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+
+	arrey_ref->reference[index] = value;
 }
 
 void func_aconst_null(){
 }
 
 void func_aload(){
-	u1 index;
-	u4 objectref;
 
-	frame_stack->frame->pc++;
-	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	if (wide) {
-		frame_stack->frame->pc++;
-		index = ((index << 8) | frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]);
-		wide = 0;
-	}
-	objectref = frame_stack->frame->local_variables[index];
-	pushOperand(objectref);
 }
 
 void func_aload_0(){
@@ -91,100 +85,93 @@ void func_aload_3(){
 }
 
 void func_anewarray(){
+	unsigned char indexbyte1;
+	unsigned char indexbyte2;
+    arrays_t *array;
+	u2 index;
+	u4 count;
+	cp_info type;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	index = indexbyte1 << 8 | indexbyte2;
+
+    type = getConstantPoolElementByIndex(frame_stack->frame->cp,index);
+
+	array = calloc(1, sizeof(arrays_t));
+	count = (u4)popOperand();
+	array->size = count;
+	array->reference = calloc(count, sizeof(void *));
+
+	push(array);
 }
 
 void func_areturn(){
-	u4 objectref = popOperand();
-
-	popFrame(frame_stack->frame);
-	pushOperand(objectref);
 }
 
 void func_arraylength(){
 }
 
 void func_astore(){
-	u1 index;
-	u4 objectref;
-
-	frame_stack->frame->pc++;
-	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	if (wide) {
-		frame_stack->frame->pc++;
-		index = ((index << 8) | frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]);
-		wide = 0;
-	}
-	objectref = popOperand();
-	frame_stack->frame->local_variables[index] = objectref;
-
-	/*TODO The aload instruction cannot be used to load a value
-	 * of type returnAddress from a local variable onto the
-	 * operand stack. This asymmetry with the astore instruction
-	 * is intentional.*/
 }
 
 void func_astore_0(){
+    frame_stack->frame->local_variables[0] = pushOperand();
 }
 
 void func_astore_1(){
-	u4 objectref = popOperand();
-
-	frame_stack->frame->local_variables[1] = objectref;
 }
 
 void func_astore_2(){
 }
 
 void func_astore_3(){
-	u4 objectref;
-
-	objectref = popOperand();
-	frame_stack->frame->local_variables[3] = objectref;
 }
 
 void func_athrow(){
+	// faz nada
+	popOperand();
+	pushOperand(0);
 }
 
 
 void func_baload(){
-	int index = popOperand();
-	u4 array_aux = popOperand();
-	char *arrayref;
-
-	arrayref = malloc(sizeof(u1));
-	memcpy(&arrayref, &array_aux, sizeof(u4));
-
-	if (arrayref == NULL){
-		printf("\nNullPointerException at baload.\n");
-		return;
-	}
-	/*TODO como saber se index nao vai estourar arrayref?*/
-	pushOperand((signed) arrayref[index]);
 }
 
 void func_bastore(){
 }
 
 void func_bipush(){
-	int value;
-
-	frame_stack->frame->pc++;
-	value = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	if(value & 0x00000080) {
-		value |= 0xffffff00;
-	}
-	else {
-		value &= 0x000000ff;
-	}
-	pushOperand(value);
 }
 
 
 void func_caload(){
+	arrays_t *arrey_ref;
+	u4 index;
+    u1 *array;
+
+	index = popOperand();
+	arrey_ref = (arrays_t *)popOperand();
+
+	if (array == NULL) {
+		printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+	if (index >= array->size)
+	{
+	    printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+
+	array = (u1 *)arrey_ref->reference;
+
+	pushOperand(array[index]);
+
 }
 
 void func_castore(){
-
 }
 
 void func_checkcast(){
@@ -192,68 +179,59 @@ void func_checkcast(){
 
 
 void func_d2f(){
-	double d_value;
-	float f_value;
-	u4 high_bytes, low_bytes;
-	u4 stackValue;
-
-	high_bytes = popOperand();
-	low_bytes = popOperand();
-	d_value = getDouble(low_bytes, high_bytes);
-	f_value = (float)d_value;
-	memcpy(&stackValue, &f_value, sizeof(float));
-
-	pushOperand(stackValue);
 }
 
 void func_d2i(){
+	u8 aux1;
+	double aux2=0;
+	u4 aux3, aux4;
+
+	aux1 = (u8)popOperand();
+	aux4 = popOperand();
+	aux1 = aux1 << 32;
+	aux1 |= aux4;
+	memcpy(&aux2, &aux1, sizeof(double));
+
+
+	aux3 = (u4)(aux2);
+	push(aux3);
+	frame_stack->frame->pc++;
 }
 
 void func_d2l(){
-	double d_value;
-	long long l_value;
-	u4 high_bytes, low_bytes;
-
-	high_bytes = popOperand();
-	low_bytes = popOperand();
-	d_value = getDouble(low_bytes, high_bytes);
-
-	l_value = (long long)d_value;
-
-	pushOperand(getLongLowBytes(l_value));
-	pushOperand(getLongHighBytes(l_value));
 }
 
 void func_dadd(){
 }
 
 void func_daload(){
-	u4 index;
-	arrays_t *arrayref;
-	double *ref;
-	u4 low_bytes, high_bytes;
-
-	index = popOperand();
-	arrayref = popOperand();
-	if (arrayref == NULL){
-		printf("\nNullPointerException at faload.\n");
-		return;
-	}
-	if (index >= arrayref->size || index < 0){
-		printf("\nArrayIndexOutOfBoundsException at faload.\n");
-		return;
-	}
-
-	ref = (double *) arrayref->reference;
-
-	low_bytes = getDoubleLowBytes(ref[index]);
-	high_bytes = getDoubleHighBytes(ref[index]);
-
-	pushOperand(low_bytes);
-	pushOperand(high_bytes);
 }
 
 void func_dastore(){
+	u4 index, hi, low;
+    arrays_t  *array;
+    u1 *c_array;
+    double d;
+
+	hi = popOperand();
+	low = popOperand();
+	index = popOperand();
+	array = (arrays_t *)popOperand();
+
+	d = getDouble(low, hi);
+
+	if (array == NULL) {
+		printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+	if (index >= array->size || index < 0)
+	{
+	    printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+
+	c_array = (double *)arrey_ref->reference;
+	c_array[index] = d;
 }
 
 void func_dcmpg(){
@@ -263,13 +241,16 @@ void func_dcmpl(){
 }
 
 void func_dconst_0(){
-	u4 low_bytes = 0;
-	u4 high_bytes = 0;
-	popOperand(low_bytes);
-	popOperand(high_bytes);
 }
 
 void func_dconst_1(){
+	u4 a1,a2;
+	double d;
+
+	a1 = 0x3FF00000;
+	a2 = 0x00000000;
+	pushOperand(a2);
+	pushOperand(a1);
 }
 
 void func_ddiv(){
@@ -279,54 +260,35 @@ void func_dload(){
 }
 
 void func_dload_0(){
-	u4 low_bytes, high_bytes;
-
-	high_bytes = frame_stack->frame->local_variables[0];
-	low_bytes = frame_stack->frame->local_variables[1];
-
-	pushOperand(low_bytes);
-	pushOperand(high_bytes);
 }
 
 void func_dload_1(){
+  u4 a1 = frame_stack->frame->local_variables[2];
+  pushOperand(a1);
+  a1 = frame_stack->frame->local_variables[1];
+  pushOperand(a1);
 }
 
 void func_dload_2(){
 }
 
 void func_dload_3(){
-	u4 low_bytes, high_bytes;
-
-	high_bytes = frame_stack->frame->local_variables[3];
-	low_bytes = frame_stack->frame->local_variables[4];
-
-	pushOperand(low_bytes);
-	pushOperand(high_bytes);
 }
 
 void func_dmul(){
-	u4 low_bytes1, high_bytes1;
-	u4 low_bytes2, high_bytes2;
-	u4 result_low_bytes, result_high_bytes;
-	double value1, value2, result;
-
-	high_bytes1 = popOperand();
-	low_bytes1 = popOperand();
-	high_bytes2 = popOperand();
-	low_bytes2 = popOperand();
-
-	value1 = getDouble(low_bytes1, high_bytes1);
-	value2 = getDouble(low_bytes2, high_bytes2);
-
-	result = value1*value2;
-	result_high_bytes = getDoubleHighBytes(result);
-	result_low_bytes = getDoubleLowBytes(result);
-
-	pushOperand(result_low_bytes);
-	pushOperand(result_high_bytes);
 }
 
 void func_dneg(){
+	u4 hi,low;
+	u4 a1 = 0xf;
+
+	hi = popOperand();
+	low = popOperand();
+
+	hi ^= a1;
+
+	pushOperand(low);
+	pushOperand(hi);
 }
 
 void func_drem(){
@@ -336,25 +298,17 @@ void func_dreturn(){
 }
 
 void func_dstore(){
-	u4 index;
-	u4 low_bytes, high_bytes;
-
-	high_bytes = popOperand();
-	low_bytes = popOperand();
-
-	frame_stack->frame->pc++;
-	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	if (wide) {
-		frame_stack->frame->pc++;
-		index = ((index << 8) | frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]);
-		wide = 0;
-	}
-
-	frame_stack->frame->local_variables[index] = high_bytes;
-	frame_stack->frame->local_variables[index+1] = low_bytes;
 }
 
 void func_dstore_0(){
+	u4 hi,low;
+	u4 a1 = 0xf;
+
+	hi = popOperand();
+	low = popOperand();
+
+	frame_stack->frame->local_variables[0] = hi;
+	frame_stack->frame->local_variables[1] = low;
 }
 
 void func_dstore_1(){
@@ -364,15 +318,25 @@ void func_dstore_2(){
 }
 
 void func_dstore_3(){
-	u4 low_bytes, high_bytes;
-
-	high_bytes = popOperand();
-	low_bytes = popOperand();
-	frame_stack->frame->local_variables[3] = high_bytes;
-	frame_stack->frame->local_variables[4] = low_bytes;
 }
 
 void func_dsub(){
+	u4 hi,low;
+	u4 a1 = 0xf;
+	double d1,d2;
+
+	hi  = popOperand();
+	low = popOperand();
+	d1  = getDouble(low,hi);
+
+	hi  = popOperand();
+	low = popOperand();
+	d2  = getDouble(low,hi);
+
+    d1 = d2 - d1;
+
+    pushOperand(getDoubleHighBytes(d1));
+    pushOperand(getDoubleLowBytes(d1));
 }
 
 void func_dup(){
@@ -382,19 +346,18 @@ void func_dup_x1(){
 }
 
 void func_dup_x2(){
-	u4 value1, value2, value3;
-
-	value1 = popOperand();
-	value2 = popOperand();
-	value3 = popOperand();
-
-	pushOperand(value1);
-	pushOperand(value3);
-	pushOperand(value2);
-	pushOperand(value1);
 }
 
 void func_dup2(){
+	u4 a1 , a2;
+
+	a1 = popOperand();
+	a2 = popOperand();
+
+	pushOperand(a2);
+	pushOperand(a1);
+	pushOperand(a2);
+	pushOperand(a1);
 }
 
 void func_dup2_x1(){
@@ -405,22 +368,16 @@ void func_dup2_x2(){
 
 
 void func_f2d(){
-	float value;
-	double result;
-	u4 operand;
-	u4 low_bytes, high_bytes;
-
-	operand = popOperand();
-	memcpy(&value, &operand, sizeof(float));
-	result = (double)value;
-	low_bytes = getDoubleLowBytes(result);
-	high_bytes = getDoubleHighBytes(result);
-
-	pushOperand(low_bytes);
-	pushOperand(high_bytes);
 }
 
 void func_f2i(){
+    float f;
+    u4 a1;
+
+    a1 = popOperanda();
+	memcpy(&f, &a1, sizeof(float));
+	a1 = (int)f;
+	pushOperand(a1);
 }
 
 void func_f2l(){
@@ -430,29 +387,32 @@ void func_fadd(){
 }
 
 void func_faload(){
-	u4 index;
-	arrays_t *arrayref;
-	float *ref;
-	u4 stackValue;
-
-	index = popOperand();
-	*arrayref = popOperand();
-	if (arrayref == NULL){
-		printf("\nNullPointerException at faload.\n");
-		return;
-	}
-	if (index >= arrayref->size || index < 0){
-		printf("\ArrayIndexOutOfBoundsException at faload.\n");
-		return;
-	}
-
-	ref = (float *) arrayref->reference;
-	memcpy(&stackValue, &ref[index], sizeof(u4));
-
-	pushOperand(stackValue);
 }
 
 void func_fastore(){
+	u4 index, value;
+    arrays_t  *array;
+    float *c_array;
+    float f;
+
+	value = popOperand();
+	index = popOperand();
+	array = (arrays_t *)popOperand();
+    memcpy(&f, &value, sizeof(float));
+
+	if (array == NULL) {
+		printf("\n\nNull Pointer Exception (func_fastore)\n");
+		return;
+	}
+	if (index >= array->size || index < 0)
+	{
+	    printf("\n\nNull Pointer Exception (func_fastore)\n");
+		return;
+	}
+
+	c_array = (float *)arrey_ref->reference;
+	c_array[index] = f;
+
 }
 
 void func_fcmpg(){
@@ -462,7 +422,6 @@ void func_fcmpl(){
 }
 
 void func_fconst_0(){
-
 }
 
 void func_fconst_1(){
@@ -472,21 +431,9 @@ void func_fconst_2(){
 }
 
 void func_fdiv(){
-
 }
 
 void func_fload(){
-	u4 index, localValue;
-
-	frame_stack->frame->pc++;
-	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	if (wide) {
-		frame_stack->frame->pc++;
-		index = ((index << 8) | frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]);
-		wide = 0;
-	}
-	localValue = frame_stack->frame->local_variables[index];
-	pushOperand(localValue);
 }
 
 void func_fload_0(){
@@ -502,6 +449,18 @@ void func_fload_3(){
 }
 
 void func_fmul(){
+	u4 a1, a2;
+    float f1, f2;
+
+   a1 = popOperand();
+   a2 = popOperand();
+   memcpy(&f1, &a1, sizeof(float));
+   memcpy(&f2, &a2, sizeof(float));
+
+   f1 *= f2;
+   memcpy(&a1, &f1, sizeof(u4));
+
+   pushOperand(a1);
 }
 
 void func_fneg(){
@@ -511,14 +470,17 @@ void func_frem(){
 }
 
 void func_freturn(){
-	u4 value;
-
-	value = popOperand();
-	popFrame();
-	pushOperand(value);
 }
 
 void func_fstore(){
+	u4 a1;
+	u2 index;
+
+    frame_stack->frame->pc++;
+    index = frame_stack->frame->method->attributes->attribute_union->code[frame_stack->frame->pc];
+
+	a1 = popOperand();
+	frame_stack->frame->local_variables[index] = a1;
 }
 
 void func_fstore_0(){
@@ -528,7 +490,6 @@ void func_fstore_1(){
 }
 
 void func_fstore_2(){
-
 }
 
 void func_fstore_3(){
@@ -537,41 +498,25 @@ void func_fstore_3(){
 void func_fsub(){
 }
 
-
 void func_getfield(){
 }
 
 void func_getstatic(){
-	u4 indexbyte1, indexbyte2;
-	u4 index;
-	u2 value;
-	class *cl;
-	cp_info field;
-	field_info *fieldref;
-	char *class_name;
-
-	frame_stack->frame->pc++;
-	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	frame_stack->frame->pc++;
-	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-	index = (indexbyte1 << 8) | indexbyte2;
-
-	field = getConstantPoolElementByIndexFromCurrentFrame(index);
-	class_name = getConstanPoolElement(field.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
-	cl = getSymbolicReferenceClass(class_name);
-
-	fieldref = getResolvedFieldReference(cl, field);
-
-	if(fieldref == NULL) {
-		return;
-	}
-
-	/*value = getConstantPoolElementByIndexFromCurrentFrame(fieldref->attributes.attribute_union.constant_value.constant_value_index);
-	pushOperand();*/
 }
 
 void func_goto(){
+	unsigned char indexbyte1;
+	unsigned char indexbyte2;
+	u2 index;
+
+	frame_stack->frame->pc++;
+    indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	index = indexbyte1 << 8 | indexbyte2;
+
+	frame_stack->frame->pc += index;
+	frame_stack->frame->pc--;
 }
 
 void func_goto_w(){
@@ -582,14 +527,20 @@ void func_i2b(){
 }
 
 void func_i2c(){
-	u4 value;
-
-	value = (u1)popOperand();
-	value &= 0x000000ff;
-	pushOperand(value);
 }
 
 void func_i2d(){
+	u4 a1, hi,low;
+	double d;
+
+	a1 = popOperand();
+    d = (double)a1;
+
+    hi = getDoubleHighBytes(d);
+    low = getDoubleLowBytes(d);
+
+    pushOperand(low);
+    pushOperand(hi);
 }
 
 void func_i2f(){
@@ -599,11 +550,6 @@ void func_i2l(){
 }
 
 void func_i2s(){
-	u4 value;
-
-	value = (u2)popOperand();
-	value &= 0x0000ffff;
-	pushOperand(value);
 }
 
 void func_iadd(){
@@ -623,30 +569,14 @@ void func_iand(){
 }
 
 void func_iastore(){
-	u4 index;
-	arrays_t *arrayref;
-	int *ref;
-	u4 stackValue;
-
-	stackValue = popOperand();
-	index = popOperand();
-	*arrayref = popOperand();
-
-	if (arrayref == NULL){
-		printf("\nNullPointerException at iastore.\n");
-		return;
-	}
-	if (index >= arrayref->size || index < 0){
-		printf("\ArrayIndexOutOfBoundsException at iastore.\n");
-		return;
-	}
-	arrayref->reference[index] = stackValue;
 }
 
 void func_iconst_m1(){
+	pushOperand(-1);
 }
 
 void func_iconst_0(){
+	pushOperand(0);
 }
 
 void func_iconst_1(){
@@ -670,47 +600,20 @@ void func_iconst_5(){
 }
 
 void func_idiv(){
-	int value1, value2;
-
-	value2 = popOperand();
-	value1 = popOperand();
-
-	if (value2 == 0) {
-		printf("\ArithmeticException at idiv.\n");
-	}
-
-	pushOperand((u4)value1/value2);
 }
 
 void func_if_acmpeq(){
+
 }
 
 void func_if_acmpne(){
+
 }
 
 void func_if_icmpeq(){
 }
 
 void func_if_icmpne(){
-	int value1, value2;
-	u4 brenchbyte1, brenchbyte2;
-	short offset;
-
-	value2 = popOperand();
-	value1 = popOperand();
-
-	if(value1 != value2) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-		offset = (brenchbyte1 << 8) | brenchbyte2;
-		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
-			/*TODO offset -1? */
-		}
-	}
 }
 
 void func_if_icmplt(){
@@ -723,25 +626,6 @@ void func_if_icmpgt(){
 }
 
 void func_if_icmple(){
-	int value1, value2;
-	u4 brenchbyte1, brenchbyte2;
-	short offset;
-
-	value2 = popOperand();
-	value1 = popOperand();
-
-	if(value1 <= value2) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-		offset = (brenchbyte1 << 8) | brenchbyte2;
-		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
-			/*TODO offset -1? */
-		}
-	}
 }
 
 void func_ifeq(){
@@ -754,23 +638,6 @@ void func_iflt(){
 }
 
 void func_ifge(){
-	int value;
-	u4 brenchbyte1, brenchbyte2;
-	short offset;
-
-	value = popOperand();
-
-	if(value >= 0) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-		offset = (brenchbyte1 << 8) | brenchbyte2;
-		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
-		}
-	}
 }
 
 void func_ifgt(){
@@ -783,23 +650,6 @@ void func_ifnonnull(){
 }
 
 void func_ifnull(){
-	u4 *value;
-	u4 brenchbyte1, brenchbyte2;
-	short offset;
-
-	*value = popOperand();
-
-	if(value == NULL) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-		offset = (brenchbyte1 << 8) | brenchbyte2;
-		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
-		}
-	}
 }
 
 void func_iinc(){
@@ -851,10 +701,6 @@ void func_imul(){
 }
 
 void func_ineg(){
-	int value;
-
-	value = popOperand();
-	pushOperand((~value)+1);
 }
 
 void func_instanceof(){
@@ -983,17 +829,25 @@ void func_ior(){
 }
 
 void func_irem(){
+	u4 a1,a2;
+
+	a2 = popOperand();
+	a1 = popOperand();
+
+	a1 = a1 - (a1/a2)*a2;
+	pushOperand(a1);
 }
 
 void func_ireturn(){
-	u4 value;
-
-	value = popOperand();
-	popFrame();
-	pushOperand(value);
 }
 
 void func_ishl(){
+	int aux1, aux2;
+
+	aux2 = (int)pop();
+	aux1 = (int)pop();
+	aux2 = aux2 & 0x1f;
+	pushOperand(aux1 << aux2);
 }
 
 void func_ishr(){
@@ -1029,15 +883,15 @@ void func_istore_3(){
 }
 
 void func_isub(){
-	int value1, value2;
-
-	value2 = popOperand();
-	value1 = popOperand();
-
-	pushOperand((u4)value1-value2);
 }
 
 void func_iushr(){
+	u4 aux1, aux2;
+
+	aux2 = pop();
+	aux1 = pop();
+	aux2 = aux2 & 0x1f;
+	pushOperand(aux1 >> aux2);
 }
 
 void func_ixor(){
@@ -1045,28 +899,28 @@ void func_ixor(){
 
 
 void func_jsr(){
+
 }
 
 void func_jsr_w(){
-	u4 branchbyte1, branchbyte2, branchbyte3, branchbyte4;
-	u4 offset;
-
-	frame_stack->frame->pc++;
-	branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	frame_stack->frame->pc++;
-	branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	frame_stack->frame->pc++;
-	branchbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	frame_stack->frame->pc++;
-	branchbyte4 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-	pushOperand((u4)frame_stack->frame->pc+1);
-	offset = (branchbyte1 << 24) | (branchbyte2 << 16) | (branchbyte3 << 8) | branchbyte4;
-	frame_stack->frame->pc += offset-1;
 }
 
 
 void func_l2d(){
+	long long aux1, aux3, aux4;
+	double aux2;
+	u4 u4aux;
+
+	aux4 = pop();
+	aux1 = pop();
+	aux1 = aux1 << 32;
+	aux1 |= aux4;
+	aux2 = (double)aux1;
+	memcpy(&aux3, &aux2, sizeof(int64_t));
+	u4aux = aux3 >> 32;
+	pushOperand(u4aux);
+	u4aux = aux3 & 0xffffffff;
+	pushOperand(u4aux);
 }
 
 void func_l2f(){
@@ -1076,22 +930,34 @@ void func_l2i(){
 }
 
 void func_ladd(){
-	u8 value1, value2, result;
-	u4 high_bytes1, low_bytes1;
-	u4 high_bytes2, low_bytes2;
-	u4 result_high_bytes, result_low_bytes;
-
-	value1 = getLong(low_bytes1, high_bytes1);
-	value2 = getLong(low_bytes2, high_bytes2);
-	result = value1+value2;
-	result_high_bytes = getLongHighBytes(result);
-	result_low_bytes = getLongLowBytes(result);
-
-	pushOperand(result_low_bytes);
-	pushOperand(result_high_bytes);
 }
 
 void func_laload(){
+	arrays_t *arrey_ref;
+	u4 index;
+    u8 *array;
+    u4 hi, low;
+
+	index = popOperand();
+	arrey_ref = (arrays_t *)popOperand();
+
+	if (array == NULL) {
+		printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+	if (index >= array->size)
+	{
+	    printf("\n\nNull Pointer Exception (op_aastore)\n");
+		return;
+	}
+
+	array = (u8 *)arrey_ref->reference;
+
+	hi = (array[index]>>32);
+	low = (array[index] & 0xffffffff);
+
+	pushOperand(low);
+	pushOperand(hi);
 }
 
 void func_land(){
@@ -1101,26 +967,22 @@ void func_lastore(){
 }
 
 void func_lcmp(){
-	u8 value1, value2, result;
-	u4 high_bytes1, low_bytes1;
-	u4 high_bytes2, low_bytes2;
-	u4 result_high_bytes, result_low_bytes;
-
-	value1 = getLong(low_bytes1, high_bytes1);
-	value2 = getLong(low_bytes2, high_bytes2);
-
-	if (value1 > value2) {
-		pushOperand(1);
-	}
-	else if(value1 == value2) {
-		pushOperand(0);
-	}
-	else {
-		pushOperand(-1);
-	}
 }
 
 void func_lconst_0(){
+	arrays_t *arrey_ref;
+	u4 index;
+    u8 *array;
+    u4 hi, low;
+
+	index = popOperand();
+	arrey_ref = (arrays_t *)popOperand();
+
+	hi = (array[index]>>32);
+	low = (array[index] & 0xffffffff);
+
+	pushOperand(low);
+	pushOperand(hi);
 }
 
 void func_lconst_1(){
@@ -1130,73 +992,9 @@ void func_ldc(){
 }
 
 void func_ldc_w(){
-	u4 indexbyte1, indexbyte2;
-	u4 index;
-
-	frame_stack->frame->pc++;
-	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	frame_stack->frame->pc++;
-	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-	index = (indexbyte1 << 8) | indexbyte2;
-
-
-	switch(frame_stack->frame->cp[index].tag)
-	{
-		case 3:/*CONSTANT_Integer:*/
-		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
-		}
-		break;
-		case 4:/*CONSTANT_Float:*/
-		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
-		}
-		break;
-		case 8:/*CONSTANT_String:*/
-		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
-		}
-		break;
-		default:
-			printf("\n\ldc_w ERROR\n");
-		break;
-	}
 }
 
 void func_ldc2_w(){
-	u4 indexbyte1, indexbyte2;
-		u4 index;
-
-		frame_stack->frame->pc++;
-		indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-		index = (indexbyte1 << 8) | indexbyte2;
-
-
-		switch(frame_stack->frame->cp[index].tag)
-		{
-			case 3:/*CONSTANT_Integer:*/
-			{
-				pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
-			}
-			break;
-			case 4:/*CONSTANT_Float:*/
-			{
-				pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
-			}
-			break;
-			case 8:/*CONSTANT_String:*/
-			{
-				pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
-			}
-			break;
-			default:
-				printf("\n\ldc_w ERROR\n");
-			break;
-		}
 }
 
 void func_ldiv(){
@@ -1206,7 +1004,6 @@ void func_lload(){
 }
 
 void func_lload_0(){
-
 }
 
 void func_lload_1(){
@@ -1219,22 +1016,22 @@ void func_lload_3(){
 }
 
 void func_lmul(){
-	u8 value1, value2, result;
-	u4 high_bytes1, low_bytes1;
-	u4 high_bytes2, low_bytes2;
-	u4 result_high_bytes, result_low_bytes;
-
-	value1 = getLong(low_bytes1, high_bytes1);
-	value2 = getLong(low_bytes2, high_bytes2);
-	result = value1*value2;
-	result_high_bytes = getLongHighBytes(result);
-	result_low_bytes = getLongLowBytes(result);
-
-	pushOperand(result_low_bytes);
-	pushOperand(result_high_bytes);
 }
 
 void func_lneg(){
+	u4 a2, a1;
+	int64_t d;
+
+	a1 = pop();
+	d = (signed)pop();
+	d = d << 32;
+	d |= a1;
+	d = -d;
+	a2 = d >> 32;
+	push(a2);
+	a2 = d & 0xffffffff;
+	push(a2);
+	frame_stack->pc++;
 }
 
 void func_lookupswitch(){
@@ -1244,35 +1041,9 @@ void func_lor(){
 }
 
 void func_lrem(){
-	u8 value1, value2, result;
-	u4 high_bytes1, low_bytes1;
-	u4 high_bytes2, low_bytes2;
-	u4 result_high_bytes, result_low_bytes;
-
-	value1 = getLong(low_bytes1, high_bytes1);
-	value2 = getLong(low_bytes2, high_bytes2);
-	if (value2 == 0) {
-		printf("\ArithmeticException at idiv.\n");
-	}
-
-	result = value1 - (value1 / value2) * value2;
-
-	result_high_bytes = getLongHighBytes(result);
-	result_low_bytes = getLongLowBytes(result);
-
-	pushOperand(result_low_bytes);
-	pushOperand(result_high_bytes);
 }
 
 void func_lreturn(){
-	u4 low_bytes, high_bytes;
-
-	high_bytes = popOperand();
-	low_bytes = popOperand();
-
-	popFrame();
-	pushOperand(low_bytes);
-	pushOperand(high_bytes);
 }
 
 void func_lshl(){
@@ -1282,18 +1053,6 @@ void func_lshr(){
 }
 
 void func_lstore(){
-	u8 value, result;
-	u4 high_bytes, low_bytes;
-	u4 index;
-
-	frame_stack->frame->pc++;
-	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-	high_bytes = popOperand();
-	low_bytes = popOperand();
-
-	frame_stack->frame->local_variables[index] = high_bytes;
-	frame_stack->frame->local_variables[index+1] = low_bytes;
 }
 
 void func_lstore_0(){
@@ -1309,6 +1068,19 @@ void func_lstore_3(){
 }
 
 void func_lsub(){
+	u4 a2, a1;
+	int64_t d, d2;
+
+	a1 = pop();
+	d = (signed)pop();
+	d = d << 32;
+	d |= a1;
+	d = -d;
+	a2 = d >> 32;
+	push(a2);
+	a2 = d & 0xffffffff;
+	push(a2);
+	frame_stack->pc++;
 }
 
 void func_lushr(){
@@ -1319,7 +1091,6 @@ void func_lxor(){
 
 
 void func_monitorenter(){
-	/*TODO chapolin*/
 }
 
 void func_monitorexit(){
@@ -1333,7 +1104,42 @@ void func_new(){
 }
 
 void func_newarray(){
-	/*TODO chapolin*/
+	unsigned char indexbyte1;
+	unsigned char indexbyte2;
+    arrays_t *array;
+	u2 index;
+	u4 count;
+	u1 type;
+
+	frame_stack->frame->pc++;
+	type = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	count = (u4)popOperand();
+
+	array = calloc(1, sizeof(arrays_t));
+	array->size = count;
+	array->type = type;
+	switch (type)
+	{
+		case 4:
+			array->reference = calloc(count, sizeof(char));
+		case 5:
+			array->reference = calloc(count, sizeof(char));
+		case 6:
+			array->reference = calloc(count, sizeof(float));
+		case 7:
+			array->reference = calloc(count, sizeof(double));
+		case 8:
+			array->reference = calloc(count, sizeof(unsigned char));
+		case 9:
+			array->reference = calloc(count, sizeof(short int));
+		case 10:
+			array->reference = calloc(count, sizeof(int));
+		case 11:
+			array->reference = calloc(count, sizeof(long long));
+	}
+
+
+	push(array);
 }
 
 void func_nop(){
@@ -1347,17 +1153,6 @@ void func_pop2(){
 }
 
 void func_putfield(){
-	u4 indexbyte1, indexbyte2;
-	u4 index;
-	u4 *objectref;
-
-	frame_stack->frame->pc++;
-	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-	frame_stack->frame->pc++;
-	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-
-	index = (indexbyte1 << 8) | indexbyte2;
-	/*TODO chapolin*/
 }
 
 void func_putstatic(){
@@ -1374,26 +1169,6 @@ void func_return(){
 
 
 void func_saload(){
-	u4 index;
-	arrays_t *arrayref;
-	short *ref;
-	u4 stackValue;
-
-	index = popOperand();
-	arrayref = (arrays_t*)popOperand();
-	if (arrayref == NULL){
-		printf("\nNullPointerException at faload.\n");
-		return;
-	}
-	if (index >= arrayref->size || index < 0){
-		printf("\ArrayIndexOutOfBoundsException at faload.\n");
-		return;
-	}
-
-	ref = (short *) arrayref->reference;
-	memcpy(&stackValue, &ref[index], sizeof(short));
-
-	pushOperand(stackValue);
 }
 
 void func_sastore(){
@@ -1407,7 +1182,6 @@ void func_swap(){
 
 
 void func_tableswitch(){
-	/*TODO chapolin*/
 }
 
 

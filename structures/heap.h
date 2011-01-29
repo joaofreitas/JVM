@@ -13,6 +13,7 @@
 
 typedef struct object_instance {
 	u1 *class_name;
+	u2 fields_count;
 	u4 id;
 	struct object_instance *super;
 } instance_structure;
@@ -21,7 +22,7 @@ typedef struct arrays_struct
 {
 	void *reference;
 	u4 size;
-	char *tipo;
+	char type;
 	struct arrays_struct *next;
 } arrays_t;
 
