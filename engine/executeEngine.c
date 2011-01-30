@@ -21,7 +21,7 @@ void saveFilePath(char *classPath) {
 	}
 	strncpy(path, classPath, i);
 	path[i]='/';
-	fflush(stdout);
+	path[i+1] = '\0';
 }
 
 void runMethod() {
@@ -39,7 +39,7 @@ void runMethod() {
 char *getPath(char *className){
 	char *path_aux;
 
-	path_aux = malloc(sizeof(char)*100);
+	path_aux = malloc(sizeof(char)*200);
 	strcpy(path_aux,path);
 	strcat(path_aux, className);
 	strcat(path_aux, ".class");
@@ -51,17 +51,15 @@ void runInitMethod(classFileFormat *classFile) {
 	method_info *clinit_method;
 	classFileFormat *super_class_file;
 	frame_t *frame;
-	char super_class_name[100];
+	char *super_class_name;
 	u2 max_locals_variables;
 
 	clinit_method = getMethod(classFile, "<clinit>", "()V");
-	/*TODO Acho q deve ser colocado um .class no final do nome
-	 *     e tambem o path da class que tem a main.
-	 * */
+	super_class_name = malloc(sizeof(char)*200);
+
 	strcpy(super_class_name,getClassName(classFile, classFile->super_class));
 
 	if (strcmp("java/lang/Object", super_class_name) != 0) {
-
 		strcpy(super_class_name, getPath(super_class_name));
 		printf("%s", super_class_name);
 
@@ -86,7 +84,7 @@ class *getSymbolicReferenceClass(char *class_name) {
 	m_class = getClass(class_name);
 
 	if (m_class == NULL) {
-		file_path = (char *)getPath(class_name);
+		file_path = getPath(class_name);
 		class_file = loadClassFile(file_path);
 		m_class = instanceClassFromClassFile(class_file);
 		/*precisa rodar o init ? */

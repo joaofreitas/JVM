@@ -99,11 +99,12 @@ method_info *getMethod(classFileFormat *cf, char *method_name, char *method_desc
 class *getClass(char *class_name) {
 	method_area *method_area_element;
 	classFileFormat *cf;
-	cp_info cp;
+	cp_info class_info, cp;
 
-	for (method_area_element = method_area_ini; method_area_element < method_area_end; method_area_element++) {
+	for (method_area_element = method_area_ini; method_area_element <= method_area_end; method_area_element++) {
 		cf = method_area_element->class->class_file;
-		cp = getConstantPoolElementByIndex(cf, cf->this_class);
+		class_info = getConstantPoolElementByIndex(cf, cf->this_class);
+		cp = getConstantPoolElementByIndex(cf, class_info.constant_union.c_class.name_index);
 		if (strcmp(class_name, (char *)cp.constant_union.c_utf8.bytes) == 0) {
 			return method_area_element->class;
 		}
@@ -127,7 +128,7 @@ char *getMethodName(classFileFormat *cf, u2 index) {
 cp_info getConstantPoolElementByIndexFromCurrentFrame(int index) {
 	cp_info cp;
 
-	cp = frame_stack->frame->cp[index - 1];
+	cp = frame_stack->frame->cp[index-1];
 	return cp; /*Constant Pool começa do 0, logo o elemento atual é sempre o anterior*/
 }
 

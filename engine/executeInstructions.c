@@ -1193,7 +1193,7 @@ void func_getstatic(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
 	class *cl;
-	cp_info field;
+	cp_info field, class_name_info;
 	field_info *fieldref;
 	char *class_name;
 
@@ -1205,7 +1205,8 @@ void func_getstatic(){
 	index = (indexbyte1 << 8) | indexbyte2;
 
 	field = getConstantPoolElementByIndexFromCurrentFrame(index);
-	class_name = (char *)getConstanPoolElement(field.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+	class_name_info = getConstanPoolElement(field.constant_union.c_fieldref.class_index);
+	class_name = (char *) getConstanPoolElement(class_name_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
 
 	if(strcmp((char *)class_name, "java/lang/System") == 0) {
 		return;
@@ -1752,8 +1753,8 @@ void func_iload_0(){
 
 void func_iload_1(){
 	int value;
-	 value = frame_stack->frame->local_variables[1];
-	 pushOperand(value);
+	value = frame_stack->frame->local_variables[1];
+	pushOperand(value);
 }
 
 void func_iload_2(){
@@ -1855,6 +1856,7 @@ void println(char *descriptor) {
 	u4 value;
 	u4 long_value_high, long_value_low;
 	int64_t long_value;
+	cp_info cp;
 	float float_value;
 	double double_value;
 
@@ -1893,7 +1895,8 @@ void println(char *descriptor) {
 		printf("%f\n", double_value);
 	}
 	else if (strcmp((char *) descriptor, "(Ljava/lang/String;)V") == 0) {
-		printf("%s\n", (char *)frame_stack->frame->cp[popOperand()].constant_union.c_utf8.bytes);
+		cp = getConstantPoolElementByIndexFromCurrentFrame(popOperand());
+		printf("%s\n", (char *)cp.constant_union.c_utf8.bytes);
 	}
 
 }
@@ -2272,20 +2275,21 @@ void func_lconst_1(){
 
 void func_ldc(){
 	u1 index;
-	/*cp_info cp_string;*/
+	cp_info cp;
 
 	frame_stack->frame->pc++;
 	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	cp = getConstantPoolElementByIndexFromCurrentFrame(index);
 
-	if (frame_stack->frame->cp->tag == 3){
-		pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
+	if (cp.tag == 3){
+		pushOperand(cp.constant_union.c_integer.bytes);
 	}
-	else if ((frame_stack->frame->cp->tag == 4)){
-		pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
+	else if ((cp.tag == 4)){
+		pushOperand(cp.constant_union.c_float.bytes);
 	}
-	else if ((frame_stack->frame->cp->tag == 8)){
+	else if ((cp.tag == 8)){
 		/*cp_string = getConstantPoolElementByIndexFromCurrentFrame();*/
-		pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
+		pushOperand(cp.constant_union.c_string.string_index);
 	}
 	else{
 		printf("\n\t Error\n");
@@ -2834,7 +2838,7 @@ void func_new(){
 	u4 index;
 	cp_info simbolicRef;
 	class *cl;
-	u1 *refName;
+	char *refName;
 	instance_structure *obj;
 	u4 stackValue;
 
@@ -2845,8 +2849,8 @@ void func_new(){
 	index = (indexbyte1 << 8) | indexbyte2;
 
 	simbolicRef = getConstantPoolElementByIndexFromCurrentFrame(index);
-	refName = getConstantPoolElementByIndexFromCurrentFrame(simbolicRef.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
-	cl = getSymbolicReferenceClass((char *)refName);
+	refName = (char *)getConstantPoolElementByIndexFromCurrentFrame(simbolicRef.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+	cl = getSymbolicReferenceClass(refName);
 	obj = instanceClass(cl);
 
 	memcpy(&stackValue, &obj, sizeof(u4));
@@ -2870,20 +2874,28 @@ void func_newarray(){
 	{
 		case 4:
 			array->reference = calloc(count, sizeof(char));
+			break;
 		case 5:
 			array->reference = calloc(count, sizeof(char));
+			break;
 		case 6:
 			array->reference = calloc(count, sizeof(float));
+			break;
 		case 7:
 			array->reference = calloc(count, sizeof(double));
+			break;
 		case 8:
 			array->reference = calloc(count, sizeof(unsigned char));
+			break;
 		case 9:
 			array->reference = calloc(count, sizeof(short int));
+			break;
 		case 10:
 			array->reference = calloc(count, sizeof(int));
+			break;
 		case 11:
 			array->reference = calloc(count, sizeof(long long));
+			break;
 	}
 
 	memcpy(&stackValue, &array, sizeof(u4));

@@ -12,7 +12,7 @@ void initFrameStack() {
 }
 
 cp_info getConstanPoolElement(u4 index) {
-	return frame_stack->frame->cp[index+1];
+	return frame_stack->frame->cp[index-1];
 }
 
 void pushFrame(frame_t *frame_unit) {
@@ -40,7 +40,7 @@ frame_t *popFrame() {
 	f = frame_stack->frame;
 	stack_aux = frame_stack;
 	frame_stack = frame_stack->next;
-	free(stack_aux);
+	/*free(stack_aux);*/
 
 	return f;
 }
@@ -48,7 +48,7 @@ frame_t *popFrame() {
 frame_t *createFrame(method_info *method, cp_info *cp, u4 pc) {
 	frame_t *frame_unit;
 
-	frame_unit = malloc(sizeof(frame_t));
+	frame_unit = calloc(1,sizeof(frame_t));
 	frame_unit->opStack = NULL;
 	frame_unit->local_variables = calloc(method->attributes->attribute_union.code.max_locals, sizeof(u4));
 	frame_unit->cp = cp;
@@ -78,7 +78,7 @@ u4 popOperand() {
 void pushOperand(u4 data) {
 	operand_stack *new_operand;
 
-	new_operand = malloc(sizeof(operand_stack));
+	new_operand = calloc(1,sizeof(operand_stack));
 	new_operand->data = data;
 	new_operand->next = frame_stack->frame->opStack;
 	frame_stack->frame->opStack = new_operand;

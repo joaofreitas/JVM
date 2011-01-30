@@ -6,6 +6,8 @@
  */
 
 #include "classLoader.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 classFileFormat* loadClassFile(char *arquivo) {
 	classFileFormat *classFile;
@@ -79,25 +81,20 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 		switch (tag) {
 		case 1:
 			bytes_utf8_length = u2Read(fp);
-			cp->constant_union.c_utf8.bytes = malloc(sizeof(u1));
+			cp->constant_union.c_utf8.bytes = malloc(sizeof(u1) * bytes_utf8_length + 1);
 			string_length = 0;
 
 			for (i = 0; i < bytes_utf8_length; i++) {
 				char_utf8 = u1Read(fp);
-				cp->constant_union.c_utf8.bytes = realloc(
-						cp->constant_union.c_utf8.bytes, sizeof(u1) * (i + 1));
+				/*cp->constant_union.c_utf8.bytes = realloc(cp->constant_union.c_utf8.bytes, sizeof(u1) * (i + 1));*/
 				if (!((char_utf8 >> 7) | 0)) {
-					cp->constant_union.c_utf8.bytes[string_length++]
-							= (u1) char_utf8;
+					cp->constant_union.c_utf8.bytes[string_length++] = (u1) char_utf8;
 
 				} else if ((char_utf8 >> 5) & 0xC0) {
 					char_utf8_aux = (0xC0 | ((char_utf8 >> 6) & 0x1f));
-
 					char_utf8 = u1Read(fp);
 					i++;
-
 					char_utf8_aux += (0x80 | (char_utf8 & 0x3f));
-
 					cp->constant_union.c_utf8.bytes[string_length++]
 							= (u1) char_utf8_aux;
 
@@ -119,8 +116,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 				}
 			}
-			cp->constant_union.c_utf8.bytes = realloc(
-					cp->constant_union.c_utf8.bytes, sizeof(u1) * (i + 1));
+			/*cp->constant_union.c_utf8.bytes = realloc(cp->constant_union.c_utf8.bytes, sizeof(u1) * (i + 1));*/
 			cp->constant_union.c_utf8.bytes[i] = '\0';
 			cp->constant_union.c_utf8.length = string_length;
 
