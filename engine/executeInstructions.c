@@ -91,17 +91,23 @@ u4 getLongLowBytes(u8 value) {
 
 void func_aaload(){
 	int index = popOperand();
-	u4 array_aux = popOperand();
-	u4 *arrayref;
+	arrays_t *array;
+	void *arrayref;
 
-	arrayref = malloc(sizeof(int));
-	memcpy(&arrayref, &array_aux, sizeof(u4));
+	array = (arrays_t*)popOperand();
+	arrayref = array->reference;
 
 	if (arrayref == NULL){
-		printf("\nNullPointerException at aaload.\n");
+		printf("\nNull Pointer Exception at aaload.\n");
 		return;
 	}
-	/*TODO como saber se index nao vai estourar arrayref?*/
+	if (index >= array->size)
+	{
+		printf("\n\nArray Index Out Of Bounds Exception (aaload).\n");
+		return;
+	}
+
+	//memcpy(&arrayref, &array_aux, sizeof(u4));
 	pushOperand(arrayref[index]);
 }
 
@@ -120,13 +126,11 @@ void func_aastore(){
 	}
 	if (index >= array->size)
 	{
-	    printf("\n\nNull Pointer Exception (op_aastore)\n");
+	    printf("\n\nArray Index Out Of Bounds Exception (op_aastore)\n");
 		return;
 	}
 	ref = array->reference;
-	ref = ref+index;
-	memcpy(&stackValue, ref, sizeof(u4));
-	pushOperand(stackValue);
+	ref[index] = value;
 }
 
 void func_aconst_null(){
@@ -202,6 +206,13 @@ void func_areturn(){
 }
 
 void func_arraylength(){
+	arrays_t *array;
+	u4 length;
+
+	array = (arrays_t*)popOperand();
+	length = array->size;
+
+	pushOperand(length);
 }
 
 void func_astore(){
@@ -253,12 +264,39 @@ void func_baload(){
 
 	index = popOperand();
 	array_reference = (arrays_t *) popOperand();
+	if (array_reference == NULL) {
+		printf("\n\nNull Pointer Exception (op_baload)\n");
+		return;
+	}
+	if (index >= array_reference->size)
+	{
+		printf("\n\nArray Index Out Of Bounds Exception (op_baload)\n");
+		return;
+	}
 	reference = (u1 *) array_reference->reference;
 	value = reference[index];
 	pushOperand((u4) value);
 }
 
 void func_bastore(){
+	u4 value, index;
+	arrays_t *array_reference;
+	u1 *ref;
+
+	value = popOperand();
+	index = popOperand();
+	array_reference = (arrays_t *)popOperand();
+	if (array_reference == NULL) {
+		printf("\n\nNull Pointer Exception (op_bastore)\n");
+		return;
+	}
+	if (index >= array_reference->size)
+	{
+		printf("\n\nArray Index Out Of Bounds Exception (op_bastore)\n");
+		return;
+	}
+	ref = (u1*)array_reference->reference;
+	ref[index] = value;
 }
 
 void func_bipush(){
@@ -327,7 +365,6 @@ void func_checkcast(){
 
 	resolved_class_type = getConstantPoolElementByIndexFromCurrentFrame(index);
 	/*TODO se der tempo*/
-
 
 }
 
@@ -995,6 +1032,7 @@ void func_fload(){
 }
 
 void func_fload_0(){
+	pushOperand(frame_stack->frame->local_variables[0]);
 }
 
 void func_fload_1(){
@@ -1247,13 +1285,19 @@ void func_iadd(){
 }
 
 void func_iaload(){
-	u4 index, *array_reference;
+	u4 index;
+	arrays_t *array_reference;
 
 	index = popOperand();
-	array_reference = (u4 *)popOperand();
-	if (array_reference) {
+	array_reference = (arrays_t *)popOperand();
+	if (array_reference == NULL) {
 		printf("NullPointerException!\n");
 		exit(0);
+	}
+	if (index >= array_reference->size)
+	{
+		printf("\n\nArray Index Out Of Bounds Exception (aaload).\n");
+		return;
 	}
 	pushOperand(array_reference[index]);
 }
@@ -1611,6 +1655,28 @@ void func_ifnull(){
 }
 
 void func_iinc(){
+	u4 constant;
+	int index, index2;
+
+	frame_stack->frame->pc++;
+	index = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (wide){
+		frame_stack->frame->pc++;
+		index2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		index = ((index << 8)|index2);
+		frame_stack->frame->pc++;
+		constant = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		constant = constant << 8;
+		constant |= frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		wide = 0;
+	}
+	else{
+		frame_stack->frame->pc++;
+		constant = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	}
+	frame_stack->frame->local_variables[index] += constant;
 }
 
 void func_iload(){
@@ -1675,7 +1741,6 @@ void func_instanceof(){
 }
 
 void func_invokeinterface(){
-	/*Não implementado pois os veteranos não implementaram. =D */
 }
 
 void func_invokespecial(){
