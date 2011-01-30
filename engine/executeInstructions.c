@@ -1206,6 +1206,11 @@ void func_getstatic(){
 
 	field = getConstantPoolElementByIndexFromCurrentFrame(index);
 	class_name = (char *)getConstanPoolElement(field.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+
+	if(strcmp((char *)class_name, "java/lang/System") == 0) {
+		return;
+	}
+
 	cl = getSymbolicReferenceClass(class_name);
 
 	fieldref = getResolvedFieldReference(cl, field);
@@ -1846,6 +1851,53 @@ void func_invokestatic(){
 	pushFrame(frame);
 }
 
+void println(char *descriptor) {
+	u4 value;
+	u4 long_value_high, long_value_low;
+	int64_t long_value;
+	float float_value;
+	double double_value;
+
+	if((strcmp(descriptor, "(C)V") == 0)) {
+		printf("%c\n", popOperand());
+	}
+	else if (strcmp(descriptor, "()V") == 0) {
+		printf("\n");
+	}
+	else if (strcmp(descriptor, "(I)V") == 0) {
+		printf("%d\n", popOperand());
+	}
+	else if (strcmp(descriptor, "(Z)V") == 0) {
+		printf(popOperand() ? "true\n" : "false\n");
+	}
+	else if (strcmp(descriptor, "(F)V") == 0) {
+		value = popOperand();
+		memcpy(&float_value, &value, sizeof(u4));
+		printf("%f\n", float_value);
+	}
+	else if (strcmp(descriptor, "(J)V") == 0) {
+		long_value_high = popOperand();
+		long_value_low = popOperand();
+
+		long_value = (int64_t) getLong(long_value_low, long_value_high);
+
+		printf("%lld\n", long_value);
+	}
+	else if (strcmp(descriptor, "(D)V") == 0) {
+		long_value_low = popOperand();
+		long_value_high = popOperand();
+
+		long_value = getDouble(long_value_low, long_value_high);
+
+		memcpy(&double_value, &long_value, sizeof(double));
+		printf("%f\n", double_value);
+	}
+	else if (strcmp((char *) descriptor, "(Ljava/lang/String;)V") == 0) {
+		printf("%s\n", (char *)frame_stack->frame->cp[popOperand()].constant_union.c_utf8.bytes);
+	}
+
+}
+
 void func_invokevirtual(){
 
 	unsigned char indexbyte1;
@@ -1874,6 +1926,11 @@ void func_invokevirtual(){
 	method_name_type_ref_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.name_and_type_index);
 	method_name = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
 	method_descriptor = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
+
+	if((strcmp(class_name, "java/io/PrintStream") == 0) && (strcmp(method_name, "println") == 0)) {
+		println((char *)method_descriptor);
+		return;
+	}
 
 	resolved_class = getSymbolicReferenceClass(class_name);
 	if (resolved_class == NULL) {

@@ -116,7 +116,7 @@ void func_fstore_3();
 void func_fsub();
 
 void func_getfield();
-void func_getstatic();/*f*/
+void func_getstatic();
 void func_goto();
 void func_goto_w();
 
@@ -222,8 +222,7 @@ void func_lxor();
 
 void func_monitorenter();
 void func_monitorexit();
-void func_multianewarray();/*f*/
-
+void func_multianewarray();
 void func_new();
 void func_newarray();
 void func_nop();
