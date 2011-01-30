@@ -1332,6 +1332,20 @@ void func_idiv(){
 }
 
 void func_if_acmpeq(){
+	u4 *value1, *value2;
+	u2 branchbyte1, branchbyte2, offset;
+
+
+	value1 = (u4 *)popOperand();
+	value2 = (u4 *)popOperand();
+	if (*value1 == *value2) {
+		frame_stack->frame->pc++;
+		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (branchbyte1 << 8) | branchbyte2;
+		frame_stack->frame->pc += offset - 2;
+	}
 }
 
 void func_if_acmpne(){
@@ -1390,6 +1404,20 @@ void func_if_icmpne(){
 }
 
 void func_if_icmplt(){
+	int value1, value2;
+	u2 branchbyte1, branchbyte2, offset;
+
+	value1 = (int) popOperand();
+	value2 = (int) popOperand();
+
+	if (value1 < value2) {
+		frame_stack->frame->pc++;
+		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (branchbyte1 << 8) | branchbyte2;
+		frame_stack->frame->pc += offset - 2;
+	}
 }
 
 void func_if_icmpge(){
@@ -1448,6 +1476,19 @@ void func_if_icmple(){
 }
 
 void func_ifeq(){
+	int value1;
+	u2 branchbyte1, branchbyte2, offset;
+
+	value1 = (int) popOperand();
+
+	if (value1 == 0) {
+		frame_stack->frame->pc++;
+		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (branchbyte1 << 8) | branchbyte2;
+		frame_stack->frame->pc += offset - 2;
+	}
 }
 
 void func_ifne(){
@@ -1502,6 +1543,19 @@ void func_ifge(){
 }
 
 void func_ifgt(){
+	int value1;
+	u2 branchbyte1, branchbyte2, offset;
+
+	value1 = (int) popOperand();
+
+	if (value1 > 0) {
+		frame_stack->frame->pc++;
+		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		frame_stack->frame->pc++;
+		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+		offset = (branchbyte1 << 8) | branchbyte2;
+		frame_stack->frame->pc += offset - 2;
+	}
 }
 
 void func_ifle(){
@@ -2111,37 +2165,37 @@ void func_ldc_w(){
 
 void func_ldc2_w(){
 	u4 indexbyte1, indexbyte2;
-		u4 index;
+	u4 index;
 
-		frame_stack->frame->pc++;
-		indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
-		index = (indexbyte1 << 8) | indexbyte2;
+	index = (indexbyte1 << 8) | indexbyte2;
 
 
-		switch(frame_stack->frame->cp[index].tag)
+	switch(frame_stack->frame->cp[index].tag)
+	{
+		case 3:/*CONSTANT_Integer:*/
 		{
-			case 3:/*CONSTANT_Integer:*/
-			{
-				pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
-			}
-			break;
-			case 4:/*CONSTANT_Float:*/
-			{
-				pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
-			}
-			break;
-			case 8:/*CONSTANT_String:*/
-			{
-				pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
-			}
-			break;
-			default:
-				printf("\n ldc_w ERROR\n");
-			break;
+			pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
 		}
+		break;
+		case 4:/*CONSTANT_Float:*/
+		{
+			pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
+		}
+		break;
+		case 8:/*CONSTANT_String:*/
+		{
+			pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
+		}
+		break;
+		default:
+			printf("\n ldc_w ERROR\n");
+		break;
+	}
 }
 
 void func_ldiv(){
@@ -2188,9 +2242,23 @@ void func_lload(){
 }
 
 void func_lload_0(){
+	u4 aux_value1, aux_value2;
+
+	aux_value1 = frame_stack->frame->local_variables[0];
+	aux_value2 = frame_stack->frame->local_variables[1];
+
+	pushOperand(aux_value2);
+	pushOperand(aux_value1);
 }
 
 void func_lload_1(){
+	u4 aux_value1, aux_value2;
+
+	aux_value1 = frame_stack->frame->local_variables[1];
+	aux_value2 = frame_stack->frame->local_variables[2];
+
+	pushOperand(aux_value2);
+	pushOperand(aux_value1);
 }
 
 void func_lload_2(){
@@ -2204,6 +2272,13 @@ void func_lload_2(){
 }
 
 void func_lload_3(){
+	u4 aux_value1, aux_value2;
+
+	aux_value1 = frame_stack->frame->local_variables[3];
+	aux_value2 = frame_stack->frame->local_variables[4];
+
+	pushOperand(aux_value2);
+	pushOperand(aux_value1);
 }
 
 void func_lmul(){
@@ -2432,6 +2507,13 @@ void func_lstore(){
 }
 
 void func_lstore_0(){
+	u4 aux_value1, aux_value2;
+
+	aux_value1 = popOperand();
+	aux_value2 = popOperand();
+
+	frame_stack->frame->local_variables[0] = aux_value1;
+	frame_stack->frame->local_variables[1] = aux_value2;
 }
 
 void func_lstore_1(){
@@ -2446,6 +2528,13 @@ void func_lstore_1(){
 }
 
 void func_lstore_2(){
+	u4 aux_value1, aux_value2;
+
+	aux_value1 = popOperand();
+	aux_value2 = popOperand();
+
+	frame_stack->frame->local_variables[2] = aux_value1;
+	frame_stack->frame->local_variables[3] = aux_value2;
 }
 
 void func_lstore_3(){
