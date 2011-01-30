@@ -52,7 +52,7 @@ void func_bipush();
 
 void func_caload();
 void func_castore();
-void func_checkcast();/*f*/
+void func_checkcast();
 
 void func_d2f();
 void func_d2i();
@@ -115,7 +115,7 @@ void func_fstore_2();
 void func_fstore_3();
 void func_fsub();
 
-void func_getfield();/*f*/
+void func_getfield();
 void func_getstatic();/*f*/
 void func_goto();
 void func_goto_w();
