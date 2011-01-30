@@ -46,8 +46,9 @@ instance_structure *getObject(u2 index) {
 instance_structure *instanceClass(class *cl) {
 	instance_structure *obj;
 	field_info *field;
-	u1* classNameIndex;
+	u2 classNameIndex;
 	u4 variables_count;
+	int i;
 
 	obj = malloc(sizeof(instance_structure));
 	classNameIndex = getConstantPoolElementByIndexFromCurrentFrame(cl->class_file->this_class).constant_union.c_class.name_index;
@@ -66,23 +67,17 @@ instance_structure *instanceClass(class *cl) {
 	}
 	obj->variables_count = variables_count;
 
-	if (strcmp(cl->super_class, "java/lang/Object") == 0) {
+	if (strcmp((char *)cl->super_class, "java/lang/Object") == 0) {
 		obj->super = NULL;
 	}
 	else {
 		obj->super = instanceClass(cl->super_class);
 	}
 
-	initInstanceVariables(obj);
-	return obj;
-}
-
-void initInstanceVariables(instance_structure *obj) {
-	int i;
-
-	for (i = 0; i < obj->fields_count; i++) {
+	for (i = 0; i < obj->variables_count; i++) {
 		obj->variables[i].value = 0;
 	}
+	return obj;
 }
 
 
@@ -94,7 +89,7 @@ instance_variables* getResolvedInstanceVariables(instance_structure *obj, u1 *fi
 	}
 
 	for (var = obj->variables; var < obj->variables + obj->variables_count; var++) {
-		if ((strcmp(var->descriptor, field_descriptor) == 0) && (strcmp(var->name, field_name) == 0)) {
+		if ((strcmp((char *)var->descriptor, (char *)field_descriptor) == 0) && (strcmp((char *)var->name, (char *)field_name) == 0)) {
 			return var;
 		}
 	}

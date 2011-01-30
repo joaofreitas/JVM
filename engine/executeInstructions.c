@@ -108,12 +108,12 @@ void func_aaload(){
 		return;
 	}
 
-	memcpy(&stackValue, &arrayref[index], sizeof(u4));
+	memcpy(&stackValue, (arrayref+index), sizeof(u4));
 	pushOperand(stackValue);
 }
 
 void func_aastore(){
-	u4 index, value, stackValue;
+	u4 index, value;
     arrays_t  *array;
     void *ref;
 
@@ -1149,7 +1149,7 @@ void func_fsub(){
 
 
 void func_getfield(){
-	u1 *field_descriptor, *field_name;
+	u1 *field_descriptor, *field_name, *class_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
@@ -1167,11 +1167,12 @@ void func_getfield(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	class_index = frame_stack->frame->cp[index].constant_union.c_fieldref.class_index;
-	field_class = getClass(class_index);
-	field_descriptor = getFieldDescriptor(field_class->class_file, index);
-	field_index = getFieldIndex(field_class->class_file, index);
-	field_name = getFieldName(field_class->class_file, field_index);
+	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
+	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
+	field_class = getClass((char *)class_name);
+	field_descriptor = getFieldDescriptor(field_class, index);
+	field_index = getFieldIndex(field_class, index);
+	field_name = getFieldName(field_class->class_file->constant_pool, field_index);
 
 	objectref = (instance_structure *) popOperand();
 	resolved_instance_variable = getResolvedInstanceVariables(objectref, field_descriptor, field_name);
@@ -1339,7 +1340,7 @@ void func_iaload(){
 		return;
 	}
 
-	memcpy(&stackValue, &array_reference->reference[index], sizeof(u4));
+	memcpy(&stackValue, array_reference->reference+index, sizeof(u4));
 	pushOperand(stackValue);
 }
 
@@ -1779,6 +1780,7 @@ void func_ineg(){
 }
 
 void func_instanceof(){
+	/*nao implementado*/
 }
 
 void func_invokeinterface(){
@@ -2726,7 +2728,47 @@ void func_monitorexit(){
 	/*Nao implementado*/
 }
 
+void add_multiarray(u4 ** ponteiro, u4 * tamanhos, u4 dimensoes ){
+	int i, j;
+	if(dimensoes == 0){
+		return;
+	}
+	i = tamanhos[dimensoes-1];
+	*ponteiro = (u4 *)malloc(i*sizeof(u4 *));
+	//add_array(*ponteiro, i);
+	for(j = 0; j < i; j++){
+		//		printf("criado array: %i %i %x\n", i, j, ponteiro);
+		add_multiarray(&(ponteiro[j]), tamanhos, dimensoes-1);
+	}
+}
+
 void func_multianewarray(){
+	u2 index_byte1, index_byte2;
+	u4 stack_v, dimension, *size;
+	arrays_t *array_reference  = calloc(1,sizeof(arrays_t));
+	u4 *array;
+	int i;
+
+
+	frame_stack->frame->pc++;
+	index_byte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	index_byte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	frame_stack->frame->pc++;
+	dimension = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	size = (u4 *) malloc(dimension*sizeof(u4));
+	for(i = 0; i < dimension; i++){
+		size[i] = popOperand();
+	}
+	add_multiarray(&array, size, dimension);
+
+	array_reference->reference = (void *)(array);
+
+	memcpy(&stack_v, &array_reference, sizeof(arrays_t));
+	pushOperand(stack_v);
+
 }
 
 
@@ -2747,7 +2789,7 @@ void func_new(){
 
 	simbolicRef = getConstantPoolElementByIndexFromCurrentFrame(index);
 	refName = getConstantPoolElementByIndexFromCurrentFrame(simbolicRef.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
-	cl = getSymbolicReferenceClass(refName);
+	cl = getSymbolicReferenceClass((char *)refName);
 	obj = instanceClass(cl);
 
 	memcpy(&stackValue, &obj, sizeof(u4));
@@ -2787,7 +2829,6 @@ void func_newarray(){
 			array->reference = calloc(count, sizeof(long long));
 	}
 
-	/*TODO botar o & no array tbm neh?*/
 	memcpy(&stackValue, &array, sizeof(u4));
 	pushOperand(stackValue);
 }
@@ -2807,7 +2848,7 @@ void func_pop2(){
 }
 
 void func_putfield(){
-	u1 *field_descriptor;
+	u1 *field_descriptor, *class_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
@@ -2826,11 +2867,12 @@ void func_putfield(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	class_index = frame_stack->frame->cp[index].constant_union.c_fieldref.class_index;
-	field_class = getClass(class_index);
-	field_descriptor = getFieldDescriptor(field_class->class_file, index);
-	field_index = getFieldIndex(field_class->class_file, index);
-	field_name = getFieldName(field_class->class_file, field_index);
+	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
+	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
+	field_class = getClass((char *)class_name);
+	field_descriptor = getFieldDescriptor(field_class, index);
+	field_index = getFieldIndex(field_class, index);
+	field_name = getFieldName(field_class->class_file->constant_pool, field_index);
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
 		low_bytes = popOperand();
@@ -2846,7 +2888,7 @@ void func_putfield(){
 }
 
 void func_putstatic(){
-	u1 *field_descriptor;
+	u1 *field_descriptor, *class_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
@@ -2862,10 +2904,11 @@ void func_putstatic(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	class_index = frame_stack->frame->cp[index].constant_union.c_fieldref.class_index;
-	field_class = getClass(class_index);
-	field_descriptor = getFieldDescriptor(field_class->class_file, index);
-	field_index = getFieldIndex(field_class->class_file, index);
+	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
+	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
+	field_class = getClass((char *)class_name);
+	field_descriptor = getFieldDescriptor(field_class, index);
+	field_index = getFieldIndex(field_class, index);
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
 		low_bytes = popOperand();
@@ -2991,7 +3034,7 @@ void func_tableswitch(){
 	frame_stack->frame->pc++;
 	highbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;
-	highbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	highbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;
 	highbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;

@@ -59,6 +59,8 @@ cp_info getConstantPoolElementByIndexFromCurrentFrame(int index);
 
 u1* getFieldDescriptor(class *cl, u4 index);
 
+u4 getFieldIndex(class *cl, u4 index);
+
 u1 *getFieldName(cp_info *cp, u4 index);
 
 #endif /* METHODAREA_H_ */

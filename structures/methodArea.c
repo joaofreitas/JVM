@@ -141,8 +141,8 @@ u1* getFieldDescriptor(class *cl, u4 index) {
 }
 
 u4 getFieldIndex(class *cl, u4 index) {
-	cp_info *field_ref;
-	u1 *this_field, *field_info;
+	field_info *field_ref;
+	u1 *this_field;
 	u1 *field_name;
 	int i;
 
@@ -150,7 +150,7 @@ u4 getFieldIndex(class *cl, u4 index) {
 	field_name = getFieldName(cl->class_file->constant_pool, index);
 	for (i=0; i < cl->class_file->fields_count; i++) {
 		this_field = getFieldName(cl->class_file->constant_pool, i);
-		if (strcmp(field_name, this_field)) {
+		if (strcmp((char *)field_name, (char *)this_field)) {
 			return i;
 		}
 	}

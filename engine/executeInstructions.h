@@ -162,7 +162,7 @@ void func_iload_2();
 void func_iload_3();
 void func_imul();
 void func_ineg();
-void func_instanceof();/*f*/
+void func_instanceof();
 void func_invokeinterface();
 void func_invokespecial();
 void func_invokestatic();
@@ -237,7 +237,7 @@ void func_ret();
 void func_return();
 
 void func_saload();
-void func_sastore();/*f*/
+void func_sastore();
 void func_sipush();
 void func_swap();
 
