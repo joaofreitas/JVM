@@ -214,7 +214,5 @@ void initOperands() {
 	op_info[0xaa].func = func_tableswitch;
 	op_info[0xc4].func = func_wide;
 	op_info[0xca].func = func_breakpoint;
-	op_info[0xfe].func = func_impdep1;
-	op_info[0xff].func = func_impdep2;
 	/*op_info[0xba].func = func_xxxunusedxxx;*/
 }

@@ -17,7 +17,8 @@ typedef struct object_instance {
 	class *cl;
 	u2 fields_count;
 	u4 id;
-	u8 *instance_variables;
+	instance_variables *variables;
+	u4 variables_count;
 	struct object_instance *super;
 } instance_structure;
 
@@ -48,6 +49,8 @@ void instanceObject(u1 *class_name, instance_structure *super_class);
 /* Retorna um objeto no indice dado*/
 instance_structure *getObject(u2 index);
 
+instance_structure *instanceClass(class *cl);
 
+instance_variables* getResolvedInstanceVariables(instance_structure *obj, u1 *field_descriptor, u1 *field_name);
 
 #endif /* HEAP_H_ */

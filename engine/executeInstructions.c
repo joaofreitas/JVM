@@ -93,6 +93,7 @@ void func_aaload(){
 	int index = popOperand();
 	arrays_t *array;
 	void *arrayref;
+	u4 stackValue;
 
 	array = (arrays_t*)popOperand();
 	arrayref = array->reference;
@@ -107,8 +108,8 @@ void func_aaload(){
 		return;
 	}
 
-	//memcpy(&arrayref, &array_aux, sizeof(u4));
-	pushOperand(arrayref[index]);
+	memcpy(&stackValue, &arrayref[index], sizeof(u4));
+	pushOperand(stackValue);
 }
 
 void func_aastore(){
@@ -130,7 +131,7 @@ void func_aastore(){
 		return;
 	}
 	ref = array->reference;
-	ref[index] = value;
+	memcpy((ref+index), &value, sizeof(u4));
 }
 
 void func_aconst_null(){
@@ -192,7 +193,7 @@ void func_anewarray(){
 	array->size = count;
 	array->reference = calloc(count, sizeof(void *));
 
-	memcpy(&stackValue, array, sizeof(u4));
+	memcpy(&stackValue, &array, sizeof(u4));
 	pushOperand(stackValue);
 }
 
@@ -351,7 +352,7 @@ void func_castore(){
 }
 
 void func_checkcast(){
-	u4 objectref;
+/*	u4 objectref;
 	u1 indexbyte1, indexbyte2;
 	u2 index;
 	cp_info resolved_class_type;
@@ -363,8 +364,8 @@ void func_checkcast(){
 	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	index = ((indexbyte1 << 8) | indexbyte2);
 
-	resolved_class_type = getConstantPoolElementByIndexFromCurrentFrame(index);
-	/*TODO se der tempo*/
+	resolved_class_type = getConstantPoolElementByIndexFromCurrentFrame(index);*/
+	/*TODO Pode vir a ser*/
 
 }
 
@@ -1148,6 +1149,43 @@ void func_fsub(){
 
 
 void func_getfield(){
+	u1 *field_descriptor, *field_name;
+	u4 indexbyte1, indexbyte2;
+	u4 low_bytes, high_bytes;
+	u4 index;
+	u4 field_index;
+	u4 class_index;
+	u8 value;
+	instance_structure *objectref;
+	instance_variables *resolved_instance_variable;
+	class *field_class;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	index = (indexbyte1 << 8) | indexbyte2;
+
+	class_index = frame_stack->frame->cp[index].constant_union.c_fieldref.class_index;
+	field_class = getClass(class_index);
+	field_descriptor = getFieldDescriptor(field_class->class_file, index);
+	field_index = getFieldIndex(field_class->class_file, index);
+	field_name = getFieldName(field_class->class_file, field_index);
+
+	objectref = (instance_structure *) popOperand();
+	resolved_instance_variable = getResolvedInstanceVariables(objectref, field_descriptor, field_name);
+	value = resolved_instance_variable->value;
+
+	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
+		low_bytes = getLongLowBytes(value);
+		high_bytes = getLongHighBytes(value);
+		pushOperand(low_bytes);
+		pushOperand(high_bytes);
+	} else {
+		pushOperand(getLongLowBytes(value));
+	}
+
 }
 
 void func_getstatic(){
@@ -1287,6 +1325,7 @@ void func_iadd(){
 void func_iaload(){
 	u4 index;
 	arrays_t *array_reference;
+	u4 stackValue;
 
 	index = popOperand();
 	array_reference = (arrays_t *)popOperand();
@@ -1299,7 +1338,9 @@ void func_iaload(){
 		printf("\n\nArray Index Out Of Bounds Exception (aaload).\n");
 		return;
 	}
-	pushOperand(array_reference[index]);
+
+	memcpy(&stackValue, &array_reference->reference[index], sizeof(u4));
+	pushOperand(stackValue);
 }
 
 void func_iand(){
@@ -2768,12 +2809,15 @@ void func_pop2(){
 void func_putfield(){
 	u1 *field_descriptor;
 	u4 indexbyte1, indexbyte2;
+	u4 low_bytes, high_bytes;
 	u4 index;
 	u4 field_index;
+	u1 *field_name;
 	u4 class_index;
 	u8 value;
 	instance_structure *objectref;
-	class *field_class_file;
+	instance_variables *resolved_instance_variable;
+	class *field_class;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -2786,6 +2830,7 @@ void func_putfield(){
 	field_class = getClass(class_index);
 	field_descriptor = getFieldDescriptor(field_class->class_file, index);
 	field_index = getFieldIndex(field_class->class_file, index);
+	field_name = getFieldName(field_class->class_file, field_index);
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
 		low_bytes = popOperand();
@@ -2796,17 +2841,19 @@ void func_putfield(){
 	}
 
 	objectref = (instance_structure *) popOperand();
-	objectref->instance_variables[field_index] = value;
+	resolved_instance_variable = getResolvedInstanceVariables(objectref, field_descriptor, field_name);
+	resolved_instance_variable->value = value;
 }
 
 void func_putstatic(){
 	u1 *field_descriptor;
 	u4 indexbyte1, indexbyte2;
+	u4 low_bytes, high_bytes;
 	u4 index;
 	u4 field_index;
 	u4 class_index;
 	u8 value;
-	class *field_class_file;
+	class *field_class;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -2828,7 +2875,7 @@ void func_putstatic(){
 		value = getLong(popOperand(), 0x00000000);
 	}
 
-	field_class_file->static_vars[field_index].value = value;
+	field_class->static_vars[field_index].value = value;
 }
 
 
