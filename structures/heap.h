@@ -9,12 +9,15 @@
 #define HEAP_H_
 
 #include "classFileStructures.h"
+#include "methodArea.h"
 #include <stdlib.h>
 
 typedef struct object_instance {
 	u1 *class_name;
+	class *cl;
 	u2 fields_count;
 	u4 id;
+	u8 *instance_variables;
 	struct object_instance *super;
 } instance_structure;
 

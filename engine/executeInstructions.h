@@ -38,7 +38,7 @@ void func_aload_2();
 void func_aload_3();
 void func_anewarray();
 void func_areturn();
-void func_arraylength();/*f*/
+void func_arraylength();
 void func_astore();
 void func_astore_0();
 void func_astore_1();
@@ -47,7 +47,7 @@ void func_astore_3();
 void func_athrow();
 
 void func_baload();
-void func_bastore();/*f*/
+void func_bastore();
 void func_bipush();
 
 void func_caload();
@@ -154,7 +154,7 @@ void func_ifgt();
 void func_ifle();
 void func_ifnonnull();
 void func_ifnull();
-void func_iinc();/*f*/
+void func_iinc();
 void func_iload();
 void func_iload_0();
 void func_iload_1();
@@ -220,18 +220,18 @@ void func_lsub();
 void func_lushr();
 void func_lxor();
 
-void func_monitorenter();/*f*/
-void func_monitorexit();/*f*/
+void func_monitorenter();
+void func_monitorexit();
 void func_multianewarray();/*f*/
 
-void func_new();/*f*/
+void func_new();
 void func_newarray();
-void func_nop();/*f*/
+void func_nop();
 
 void func_pop();
 void func_pop2();
 void func_putfield();
-void func_putstatic();/*f*/
+void func_putstatic();
 
 void func_ret();
 void func_return();
@@ -241,11 +241,9 @@ void func_sastore();/*f*/
 void func_sipush();
 void func_swap();
 
-void func_tableswitch();/*f*/
+void func_tableswitch();
 
 void func_wide();
 
 void func_breakpoint();
-void func_impdep1();/*f*/
-void func_impdep2();/*f*/
 #endif /* EXECUTEINSTRUCTIONS_H_ */

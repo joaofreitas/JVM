@@ -131,3 +131,65 @@ cp_info getConstantPoolElementByIndexFromCurrentFrame(int index) {
 	return cp; /*Constant Pool começa do 0, logo o elemento atual é sempre o anterior*/
 }
 
+instance_structure *instanceClass(class *cl) {
+	instance_structure *obj;
+	u1* classNameIndex;
+
+	obj = malloc(sizeof(instance_structure));
+	classNameIndex = getConstantPoolElementByIndexFromCurrentFrame(cl->class_file->this_class).constant_union.c_class.name_index;
+	obj->class_name = getConstantPoolElementByIndexFromCurrentFrame(classNameIndex).constant_union.c_utf8.bytes;
+	obj->fields_count = cl->class_file->fields_count;
+	obj->cl = cl;
+	obj->instance_variables = malloc(sizeof(u8)*obj->fields_count);
+	if (strcmp(cl->super_class, "java/lang/Object") == 0) {
+		obj->super = NULL;
+	}
+	else {
+		obj->super = instanceClass(cl->super_class);
+	}
+
+	initInstanceVariables(obj);
+	return obj;
+}
+
+void initInstanceVariables(instance_structure *obj) {
+	int i;
+
+	for (i = 0; i < obj->fields_count; i++) {
+		obj->instance_variables[i] = 0;
+	}
+}
+
+u1* getFieldDescriptor(class *cl, u4 index) {
+	cp_info field_ref;
+	cp_info name_type;
+
+	field_ref = getConstantPoolElementByIndex(cl->class_file, index);
+	name_type = getConstantPoolElementByIndex(cl->class_file, field_ref.constant_union.c_fieldref.name_and_type_index);
+	return getConstantPoolElementByIndex(name_type.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
+
+}
+
+u4 getFieldIndex(class *cl, u4 index) {
+	cp_info *field_ref;
+	u1 *this_field, *field_info;
+	u1 *field_name;
+	int i;
+
+	field_ref = cl->class_file->fields;
+	field_name = getFieldName(cl->class_file->constant_pool, index);
+	for (i=0; i < cl->class_file->fields_count; i++) {
+		this_field = getFieldName(cl->class_file->constant_pool, i);
+		if (strcmp(field_name, this_field)) {
+			return i;
+		}
+	}
+	return 0;
+}
+
+u1 *getFieldName(cp_info *cp, u4 index) {
+	u4 field_name_index;
+
+	field_name_index = cp[index]->constant_union.c_fieldref.class_index;
+	return cp[field_name_index]->constant_union.c_utf8.bytes;
+}

@@ -1741,6 +1741,7 @@ void func_instanceof(){
 }
 
 void func_invokeinterface(){
+	/*nao implementado*/
 }
 
 void func_invokespecial(){
@@ -2677,9 +2678,11 @@ void func_lxor(){
 
 
 void func_monitorenter(){
+	/*Nao implementado*/
 }
 
 void func_monitorexit(){
+	/*Nao implementado*/
 }
 
 void func_multianewarray(){
@@ -2687,6 +2690,27 @@ void func_multianewarray(){
 
 
 void func_new(){
+	u4 indexbyte1, indexbyte2;
+	u4 index;
+	cp_info simbolicRef;
+	class *cl;
+	u1 *refName;
+	instance_structure *obj;
+	u4 stackValue;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	index = (indexbyte1 << 8) | indexbyte2;
+
+	simbolicRef = getConstantPoolElementByIndexFromCurrentFrame(index);
+	refName = getConstantPoolElementByIndexFromCurrentFrame(simbolicRef.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+	cl = getSymbolicReferenceClass(refName);
+	obj = instanceClass(cl);
+
+	memcpy(&stackValue, &obj, sizeof(u4));
+	pushOperand(stackValue);
 }
 
 void func_newarray(){
@@ -2722,11 +2746,13 @@ void func_newarray(){
 			array->reference = calloc(count, sizeof(long long));
 	}
 
-	memcpy(&stackValue, array, sizeof(u4));
+	/*TODO botar o & no array tbm neh?*/
+	memcpy(&stackValue, &array, sizeof(u4));
 	pushOperand(stackValue);
 }
 
 void func_nop(){
+	/*Nothing*/
 }
 
 
@@ -2740,9 +2766,14 @@ void func_pop2(){
 }
 
 void func_putfield(){
+	u1 *field_descriptor;
 	u4 indexbyte1, indexbyte2;
 	u4 index;
-	/*u4 *objectref;*/
+	u4 field_index;
+	u4 class_index;
+	u8 value;
+	instance_structure *objectref;
+	class *field_class_file;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -2750,10 +2781,54 @@ void func_putfield(){
 	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
 	index = (indexbyte1 << 8) | indexbyte2;
-	/*TODO chapolin*/
+
+	class_index = frame_stack->frame->cp[index].constant_union.c_fieldref.class_index;
+	field_class = getClass(class_index);
+	field_descriptor = getFieldDescriptor(field_class->class_file, index);
+	field_index = getFieldIndex(field_class->class_file, index);
+
+	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
+		low_bytes = popOperand();
+		high_bytes = popOperand();
+		value = getLong(low_bytes, high_bytes);
+	} else {
+		value = getLong(popOperand(), 0x00000000);
+	}
+
+	objectref = (instance_structure *) popOperand();
+	objectref->instance_variables[field_index] = value;
 }
 
 void func_putstatic(){
+	u1 *field_descriptor;
+	u4 indexbyte1, indexbyte2;
+	u4 index;
+	u4 field_index;
+	u4 class_index;
+	u8 value;
+	class *field_class_file;
+
+	frame_stack->frame->pc++;
+	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	index = (indexbyte1 << 8) | indexbyte2;
+
+	class_index = frame_stack->frame->cp[index].constant_union.c_fieldref.class_index;
+	field_class = getClass(class_index);
+	field_descriptor = getFieldDescriptor(field_class->class_file, index);
+	field_index = getFieldIndex(field_class->class_file, index);
+
+	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
+		low_bytes = popOperand();
+		high_bytes = popOperand();
+		value = getLong(low_bytes, high_bytes);
+	} else {
+		value = getLong(popOperand(), 0x00000000);
+	}
+
+	field_class_file->static_vars[field_index].value = value;
 }
 
 
@@ -2828,6 +2903,73 @@ void func_swap(){
 
 
 void func_tableswitch(){
+	u4 byte_pad;
+	u4 defaultbyte1;
+	u4 defaultbyte2;
+	u4 defaultbyte3;
+	u4 defaultbyte4;
+	u4 lowbyte1;
+	u4 lowbyte2;
+	u4 lowbyte3;
+	u4 lowbyte4;
+	u4 highbyte1;
+	u4 highbyte2;
+	u4 highbyte3;
+	u4 highbyte4;
+	u4 default_value, low_value, high_value;
+	u4 index;
+	u4 target_adress;
+	u4 offsets_count;
+	int *offsets, i;
+
+	byte_pad = frame_stack->frame->pc % 4;
+	frame_stack->frame->pc += byte_pad;
+
+	frame_stack->frame->pc++;
+	defaultbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	defaultbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	defaultbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	defaultbyte4 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	lowbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	lowbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	lowbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	lowbyte4 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	highbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	highbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	highbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	highbyte4 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	default_value = (defaultbyte1 << 24) | (defaultbyte2 << 16) | (defaultbyte3 << 8) | defaultbyte4;
+	low_value = (lowbyte1 << 24) | (lowbyte2 << 16) | (lowbyte3 << 8) | lowbyte4;
+	high_value = (highbyte1 << 24) | (highbyte2 << 16) | (highbyte3 << 8) | highbyte4;
+
+	offsets_count = (high_value-low_value+1);
+	offsets = malloc(sizeof(int)*offsets_count);
+
+	for(i = 0; i < offsets_count; i++) {
+		frame_stack->frame->pc++;
+		offsets[i] = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	}
+
+	index = popOperand();
+	if (index < low_value || index > high_value) {
+		target_adress = offsets[default_value];
+	}
+	else {
+		target_adress = offsets[index - low_value];
+	}
+	frame_stack->frame->pc += target_adress;
 }
 
 

@@ -10,12 +10,14 @@
 
 #include "classFileStructures.h"
 #include "../reader/classLoader.h"
+#include "heap.h"
 
 /*Subestrutura do method area */
 
 typedef struct static_variables_structure {
 	u1 *variable_name;
 	u1 *type;
+	u8 value;
 } static_variables;
 
 typedef struct class_structure {
@@ -49,5 +51,9 @@ char *getClassName(classFileFormat *cf, u2 index);
 char *getMethodName(classFileFormat *cf, u2 index);
 
 cp_info getConstantPoolElementByIndexFromCurrentFrame(int index);
+
+instance_structure *instanceClass(class *cl);
+
+u1* getFieldDescriptor(class *cl);
 
 #endif /* METHODAREA_H_ */
