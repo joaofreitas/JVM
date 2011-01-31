@@ -411,12 +411,10 @@ void func_d2l(){
 	aux_value2 = popOperand();
 
 	double_value = getDouble(aux_value2, aux_value1);
-	long_value = (u8) double_value;
+	long_value = (u8)double_value;
 
-	aux_value1 = long_value >> 32;
-	aux_value2 = long_value & 0xffffffff;
-	pushOperand(aux_value2);	/*Gravo primeiro o low bytes*/
-	pushOperand(aux_value1);	/*Depois o high bytes*/
+	pushOperand(getLongLowBytes(long_value));
+	pushOperand(getLongHighBytes(long_value));
 }
 
 void func_dadd(){
@@ -958,20 +956,20 @@ void func_fcmpg(){
 void func_fcmpl(){
 	u4 value2_aux = popOperand();
 	u4 value1_aux = popOperand();
-	u4 result;
 	float value1, value2;
 
 	memcpy(&value1, &value1_aux, sizeof(u4));
 	memcpy(&value2, &value2_aux, sizeof(u4));
 
-	if (value1 > value2) {
-		result = 1;
+	if (value1 < value2) {
+		pushOperand(1);
 	}
 	else if(value1 == value2){
-		result = 0;
+		pushOperand(0);
 	}
-	else
-		result = -1;
+	else {
+		pushOperand(-1);
+	}
 }
 
 void func_fconst_0(){
@@ -1000,8 +998,8 @@ void func_fconst_2(){
 }
 
 void func_fdiv(){
-	u4 value1_aux = popOperand();
 	u4 value2_aux = popOperand();
+	u4 value1_aux = popOperand();
 	u4 result_aux;
 	float value1, value2, result;
 
@@ -1009,12 +1007,12 @@ void func_fdiv(){
 	memcpy(&value1, &value1_aux, sizeof(u4));
 	memcpy(&value2, &value2_aux, sizeof(u4));
 
-	if (value1 == 0){
+	if (value2 == 0){
 		printf("Cannot divide by zero at fdiv");
 		return;
 	}
 
-	result = value2/value1;
+	result = value1/value2;
 	memcpy(&result_aux, &result, sizeof(u4));
 
 	pushOperand(result_aux);
@@ -1081,18 +1079,12 @@ void func_frem(){
 	u4 value1_aux = popOperand();
 	u4 value2_aux = popOperand();
 	u4 result_aux;
-	int q;
 	float value1, value2, result;
 
 	memcpy(&value1, &value1_aux, sizeof(u4));
 	memcpy(&value2, &value2_aux, sizeof(u4));
 
-	if (value2/value1 < 0){
-		q = -1;
-	}
-	else
-		q = 1;
-	result = value2-((int)(value2/value1)*value1);
+	result = value2-(value1*(value2/value1));
 	memcpy(&result_aux, &result, sizeof(u4));
 
 	pushOperand(result_aux);
@@ -1137,8 +1129,8 @@ void func_fsub(){
 	u4 value1, value2;
 	float float_value1, float_value2, result;
 
-	value1 = popOperand();
 	value2 = popOperand();
+	value1 = popOperand();
 
 	memcpy(&float_value1, &value1, sizeof(float));
 	memcpy(&float_value2, &value2, sizeof(float));
@@ -2124,20 +2116,18 @@ void func_jsr_w(){
 
 
 void func_l2d(){
-	long long aux1, aux3, aux4;
-	double aux2;
-	u4 aux;
+	u4 long_low_bytes;
+	u4 long_high_bytes;
+	u8 long_value;
+	double double_value;
 
-	aux4 = popOperand();
-	aux1 = popOperand();
-	aux1 = aux1 << 32;
-	aux1 |= aux4;
-	aux2 = (double)aux1;
-	memcpy(&aux3, &aux2, sizeof(int64_t));
-	aux = aux3 >> 32;
-	pushOperand(aux);
-	aux = aux3 & 0xffffffff;
-	pushOperand(aux);
+	long_high_bytes = popOperand();
+	long_low_bytes = popOperand();
+	long_value = getLong(long_low_bytes, long_high_bytes);
+	double_value = (double)long_value;
+
+	pushOperand(getDoubleLowBytes(double_value));
+	pushOperand(getDoubleHighBytes(double_value));
 }
 
 void func_l2f(){
@@ -2214,8 +2204,8 @@ void func_laload(){
 }
 
 void func_land(){
-	u4 value1, value2, aux_value1, aux_value2;
-	u8 result;
+	u4 aux_value1, aux_value2;
+	u8 result, value1, value2;
 
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
@@ -2227,7 +2217,7 @@ void func_land(){
 
 	result = value1 & value2;
 	aux_value1 = getLongHighBytes(result);
-	aux_value2 = getLongHighBytes(result);
+	aux_value2 = getLongLowBytes(result);
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
@@ -2284,8 +2274,8 @@ void func_lconst_0(){
 }
 
 void func_lconst_1(){
-	pushOperand(0);
 	pushOperand(1);
+	pushOperand(0);
 }
 
 void func_ldc(){
@@ -2315,6 +2305,7 @@ void func_ldc(){
 void func_ldc_w(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
+	cp_info info;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -2323,22 +2314,17 @@ void func_ldc_w(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-
-	switch(frame_stack->frame->cp[index].tag)
+	info = getConstantPoolElementByIndexFromCurrentFrame(index);
+	switch(info.tag)
 	{
 		case 3:/*CONSTANT_Integer:*/
 		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
+			pushOperand(info.constant_union.c_integer.bytes);
 		}
 		break;
 		case 4:/*CONSTANT_Float:*/
 		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
-		}
-		break;
-		case 8:/*CONSTANT_String:*/
-		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
+			pushOperand(info.constant_union.c_float.bytes);
 		}
 		break;
 		default:
@@ -2351,7 +2337,7 @@ void func_ldc_w(){
 void func_ldc2_w(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
-	cp_info info, cp_long, cp_double;
+	cp_info info;
 	u4 low_bytes, high_bytes;
 
 	frame_stack->frame->pc++;
@@ -2387,8 +2373,8 @@ void func_ldc2_w(){
 }
 
 void func_ldiv(){
-	u4 value1, value2, aux_value1, aux_value2;
-	u8 result;
+	u4 aux_value1, aux_value2;
+	u8 result, value1, value2;
 
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
@@ -2400,7 +2386,7 @@ void func_ldiv(){
 
 	result = value1 / value2;
 	aux_value1 = getLongHighBytes(result);
-	aux_value2 = getLongHighBytes(result);
+	aux_value2 = getLongLowBytes(result);
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
@@ -2584,11 +2570,10 @@ void func_lookupswitch(){
 }
 
 void func_lor(){
-	u4 valor1_hi = popOperand();
-	u4 valor1_low = popOperand();
 	u4 valor2_hi = popOperand();
 	u4 valor2_low = popOperand();
-	u4 result_aux;
+	u4 valor1_hi = popOperand();
+	u4 valor1_low = popOperand();
 	u8 valor1, valor2, result;
 
 	valor1 = getLong(valor1_low, valor1_hi);
@@ -2596,10 +2581,8 @@ void func_lor(){
 
 	result = valor1 | valor2;
 
-	result_aux = result & 0xFFFFFFFF;
-	pushOperand(result_aux);
-    result_aux = result >> 32;
-    pushOperand(result_aux);
+	pushOperand(getLongLowBytes(result));
+    pushOperand(getLongHighBytes(result));
 }
 
 void func_lrem(){
@@ -2781,10 +2764,14 @@ void func_lushr(){
 }
 
 void func_lxor(){
-	u4 value2, aux_value1, aux_value2;
-	u8 value1, result;
+	u4 aux_value1, aux_value2;
+	u8 value1, value2, result;
 
-	value2 = popOperand();
+
+	aux_value1 = popOperand();
+	aux_value2 = popOperand();
+	value2 = getLong(aux_value2, aux_value1);
+
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 	value1 = getLong(aux_value2, aux_value1);
@@ -2792,7 +2779,7 @@ void func_lxor(){
 	result = value1 ^ value2;
 
 	aux_value1 = getLongHighBytes(result);
-	aux_value2 = getLongHighBytes(result);
+	aux_value2 = getLongLowBytes(result);
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
