@@ -19,7 +19,7 @@ void addObject(instance_structure *object)
 
 	if (heap_pointer == NULL)
 	{
-		heap_pointer = malloc(sizeof(heap_structure));
+		heap_pointer = (heap_structure*)malloc(sizeof(heap_structure));
 		heap_pointer->index = 0;
 		heap_pointer->object = object;
 		heap_pointer->next = NULL;
@@ -27,7 +27,7 @@ void addObject(instance_structure *object)
 	}
 	else
 	{
-		hs = malloc(sizeof(heap_structure));
+		hs = (heap_structure*)malloc(sizeof(heap_structure));
 		hs->index = index+1;
 		hs->object = object;
 		hs->next = NULL;
@@ -43,7 +43,7 @@ instance_structure *getObject(u2 index) {
 	return NULL;
 }
 
-instance_structure *instanceClass(class *cl) {
+instance_structure *instanceClass(class_struct *cl) {
 	instance_structure *obj;
 	field_info *field;
 	u2 classNameIndex, super_class_name_index;
@@ -51,7 +51,7 @@ instance_structure *instanceClass(class *cl) {
 	u1 *super_class_name;
 	int i;
 
-	obj = malloc(sizeof(instance_structure));
+	obj = (instance_structure*)malloc(sizeof(instance_structure));
 	classNameIndex = getConstantPoolElementByIndex(cl->class_file, cl->class_file->this_class).constant_union.c_class.name_index;
 	obj->class_name = getConstantPoolElementByIndex(cl->class_file, classNameIndex).constant_union.c_utf8.bytes;
 	obj->fields_count = cl->class_file->fields_count;
@@ -65,7 +65,7 @@ instance_structure *instanceClass(class *cl) {
 		}
 	}
 	obj->variables_count = variables_count;
-	obj->variables = calloc(variables_count, sizeof(instance_variables));
+	obj->variables = (instance_variables*)calloc(variables_count, sizeof(instance_variables));
 
 	i = 0;
 	for (field = cl->class_file->fields; field < cl->class_file->fields + cl->class_file->fields_count; field++) {

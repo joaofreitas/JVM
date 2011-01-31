@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 		exemplo = *++argv;
 	} else {
 		printf("Digite o nome do classFile a ser executado:\n");
-		exemplo = malloc(sizeof(char)*100);
+		exemplo = (char *)malloc(sizeof(char)*100);
 		scanf("%s", exemplo);
 	}
 

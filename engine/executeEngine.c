@@ -40,7 +40,7 @@ void runMethod() {
 char *getPath(char *className){
 	char *path_aux;
 
-	path_aux = malloc(sizeof(char)*200);
+	path_aux = (char*)malloc(sizeof(char)*200);
 	strcpy(path_aux,path);
 	strcat(path_aux, className);
 	strcat(path_aux, ".class");
@@ -56,7 +56,7 @@ void runInitMethod(classFileFormat *classFile) {
 	u2 max_locals_variables;
 
 	clinit_method = getMethod(classFile, "<clinit>", "()V");
-	super_class_name = malloc(sizeof(char)*200);
+	super_class_name = (char*)malloc(sizeof(char)*200);
 
 	strcpy(super_class_name,getClassName(classFile, classFile->super_class));
 
@@ -77,8 +77,8 @@ void runInitMethod(classFileFormat *classFile) {
 	}
 }
 
-class *getSymbolicReferenceClass(char *class_name) {
-	class *m_class;
+class_struct *getSymbolicReferenceClass(char *class_name) {
+	class_struct *m_class;
     char *file_path;
     classFileFormat *class_file;
 
@@ -97,7 +97,7 @@ class *getSymbolicReferenceClass(char *class_name) {
 	/*getchar();*/
 }
 
-field_info *getResolvedFieldReference(class *cl, cp_info fieldref) {
+field_info *getResolvedFieldReference(class_struct *cl, cp_info fieldref) {
 	field_info *field;
 	u1 *field_name, *field_descriptor;
 	u1 *field_name_aux, *field_descriptor_aux;

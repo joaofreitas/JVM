@@ -29,8 +29,8 @@ int compare(char *a, unsigned char *b, int size) {
 void ignoreAttribute(attribute_info *attribute, FILE *fp, int length) {
 	int i;
 
-	attribute->attribute_union.ignored_attribute = malloc(sizeof(ATTRIBUTE_ignored_attribute));
-	attribute->attribute_union.ignored_attribute->bytes = malloc(sizeof(u1)*length);
+	attribute->attribute_union.ignored_attribute = (ATTRIBUTE_ignored_attribute*)malloc(sizeof(ATTRIBUTE_ignored_attribute));
+	attribute->attribute_union.ignored_attribute->bytes = (u1*)malloc(sizeof(u1)*length);
 	for (i = 0; i < length; i++) {
 		attribute->attribute_union.ignored_attribute->bytes[i] = u1Read(fp);
 	}
@@ -48,7 +48,7 @@ void readAttributeCode(attribute_info *attribute, FILE *fp) {
 	attribute->attribute_union.code.max_stack = u2Read(fp);
 	attribute->attribute_union.code.max_locals = u2Read(fp);
 	attribute->attribute_union.code.code_length= u4Read(fp);
-	attribute->attribute_union.code.code = malloc(sizeof(u1)*attribute->attribute_union.code.code_length + 1);
+	attribute->attribute_union.code.code = (u1*)malloc(sizeof(u1)*attribute->attribute_union.code.code_length + 1);
 
 	for (i=0; i < attribute->attribute_union.code.code_length; i++) {
 		attribute->attribute_union.code.code[i] = u1Read(fp);
@@ -57,21 +57,21 @@ void readAttributeCode(attribute_info *attribute, FILE *fp) {
 	attribute->attribute_union.code.exception_table_length = u2Read(fp);
 
 	for (i=0; i < attribute->attribute_union.code.exception_table_length; i++) {
-		attribute->attribute_union.code.exception_table->start_pc = u2Read(fp);
-		attribute->attribute_union.code.exception_table->end_pc = u2Read(fp);
-		attribute->attribute_union.code.exception_table->handler_pc = u2Read(fp);
-		attribute->attribute_union.code.exception_table->catch_type = u2Read(fp);
+		attribute->attribute_union.code.exception_table_pointer->start_pc = u2Read(fp);
+		attribute->attribute_union.code.exception_table_pointer->end_pc = u2Read(fp);
+		attribute->attribute_union.code.exception_table_pointer->handler_pc = u2Read(fp);
+		attribute->attribute_union.code.exception_table_pointer->catch_type = u2Read(fp);
 	}
 
 	attribute->attribute_union.code.attributes_count = u2Read(fp);
-	attribute->attribute_union.code.attributes = malloc(sizeof(attribute_info)*attribute->attribute_union.code.attributes_count);
+	attribute->attribute_union.code.attributes = (attribute_info*)malloc(sizeof(attribute_info)*attribute->attribute_union.code.attributes_count);
 
 	/*Isso é opcional*/
 	for (i=0; i < attribute->attribute_union.code.attributes_count; i++) {
 		attribute_name_index = u2Read(fp);
 		attribute_length = u4Read(fp);
 
-		new_attribute = malloc(sizeof(attribute_info)*attribute_length);
+		new_attribute = (attribute_info*)malloc(sizeof(attribute_info)*attribute_length);
 		new_attribute->attribute_name_index = attribute_name_index;
 		new_attribute->attribute_length = attribute_length;
 
@@ -87,7 +87,7 @@ void readAttributeExceptions(attribute_info *attribute, FILE *fp) {
 
 	number = u2Read(fp);
 	attribute->attribute_union.exceptions.number_of_exceptions  = number;
-	attribute->attribute_union.exceptions.exception_index_table = malloc(sizeof(u2) * number);
+	attribute->attribute_union.exceptions.exception_index_table = (u2*)malloc(sizeof(u2) * number);
 
 	for(i=0; i<number; i++) {
 		attribute->attribute_union.exceptions.exception_index_table[i] = u2Read(fp);
@@ -100,7 +100,7 @@ void readAttributeInnerClasses(attribute_info *attribute, FILE *fp) {
 
 	number = u2Read(fp);
 	attribute->attribute_union.inner_classes.number_of_classes = number;
-	attribute->attribute_union.inner_classes.classes = malloc(sizeof(class_member)*number);
+	attribute->attribute_union.inner_classes.classes = (class_member*)malloc(sizeof(class_member)*number);
 	for (i=0; i<number; i++) {
 		attribute->attribute_union.inner_classes.classes[i].inner_class_info_index = u2Read(fp);
 		attribute->attribute_union.inner_classes.classes[i].outer_class_info_index = u2Read(fp);

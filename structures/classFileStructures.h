@@ -147,7 +147,7 @@ struct code_attribute_structure {
 	u4 code_length;
 	u1 *code;
 	u2 exception_table_length;
-	exception_table *exception_table;
+	exception_table *exception_table_pointer;
 	u2 attributes_count;
 	attribute_info *attributes;
 };

@@ -20,7 +20,7 @@ classFileFormat* loadClassFile(const char *arquivo) {
 		exit(1);
 	}
 
-	classFile = calloc(1, sizeof(classFileFormat));
+	classFile = (classFileFormat*)calloc(1, sizeof(classFileFormat));
 	readMagicNumber(classFile, fp);
 	readVersion(classFile, fp);
 	readConstantPoolCount(classFile, fp);
@@ -73,7 +73,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 	int i, bytes_utf8_length, string_length;
 
 	cp_size = classFile->constant_pool_count;
-	classFile->constant_pool = malloc(sizeof(cp_info) * cp_size);
+	classFile->constant_pool = (cp_info*)malloc(sizeof(cp_info) * cp_size);
 	for (cp = classFile->constant_pool; cp < classFile->constant_pool + cp_size
 			- 1; cp++) {
 		counter++;
@@ -82,7 +82,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 		switch (tag) {
 		case 1:
 			bytes_utf8_length = u2Read(fp);
-			cp->constant_union.c_utf8.bytes = malloc(sizeof(u1) * bytes_utf8_length + 1);
+			cp->constant_union.c_utf8.bytes = (u1*)malloc(sizeof(u1) * bytes_utf8_length + 1);
 			string_length = 0;
 
 			for (i = 0; i < bytes_utf8_length; i++) {
@@ -204,7 +204,7 @@ void readInterface(classFileFormat *classFile, FILE *fp) {
 	u2 *interface;
 
 	interface_size = classFile->interfaces_count;
-	classFile->interfaces = malloc(sizeof(u2) * interface_size);
+	classFile->interfaces = (u2*)malloc(sizeof(u2) * interface_size);
 
 	for (interface = classFile->interfaces; interface < classFile->interfaces
 			+ interface_size; interface++) {
@@ -225,7 +225,7 @@ void readFields(classFileFormat *classFile, FILE *fp) {
 	attribute_info *attribute;
 
 	fields_size = classFile->fields_count;
-	classFile->fields = malloc(sizeof(field_info) * fields_size);
+	classFile->fields = (field_info*)malloc(sizeof(field_info) * fields_size);
 
 	for (field = classFile->fields; field < classFile->fields + fields_size; field++) {
 		field->access_flags = u2Read(fp);
@@ -234,7 +234,7 @@ void readFields(classFileFormat *classFile, FILE *fp) {
 		field->attributes_count = u2Read(fp);
 
 		attribute_size = field->attributes_count;
-		field->attributes = malloc(sizeof(attribute_info) * attribute_size);
+		field->attributes = (attribute_info*)malloc(sizeof(attribute_info) * attribute_size);
 		for (attribute = field->attributes; attribute < field->attributes
 				+ attribute_size; attribute++) {
 			readStructureAttribute(classFile, fp, attribute);
@@ -255,7 +255,7 @@ void readMethods(classFileFormat *classFile, FILE *fp) {
 	attribute_info *attribute;
 
 	method_size = classFile->methods_count;
-	classFile->methods = malloc(sizeof(method_info) * method_size);
+	classFile->methods = (method_info*)malloc(sizeof(method_info) * method_size);
 
 	for (method = classFile->methods; method < classFile->methods + method_size; method++) {
 		method->access_flags = u2Read(fp);
@@ -264,7 +264,7 @@ void readMethods(classFileFormat *classFile, FILE *fp) {
 		method->attributes_count = u2Read(fp);
 
 		attribute_count = method->attributes_count;
-		method->attributes = malloc(sizeof(attribute_info) * attribute_count);
+		method->attributes = (attribute_info*)malloc(sizeof(attribute_info) * attribute_count);
 		for (attribute = method->attributes; attribute < method->attributes
 				+ attribute_count; attribute++) {
 			readStructureAttribute(classFile, fp, attribute);
@@ -284,7 +284,7 @@ void readAttributes(classFileFormat *classFile, FILE *fp) {
 	attribute_info *attribute;
 
 	attribute_count = classFile->attributes_count;
-	classFile->attributes = malloc(sizeof(field_info) * attribute_count);
+	classFile->attributes = (attribute_info *)malloc(sizeof(field_info) * attribute_count);
 
 	for (attribute = classFile->attributes; attribute < classFile->attributes
 			+ attribute_count; attribute++) {

@@ -114,14 +114,14 @@ void func_aaload(){
 		return;
 	}
 
-	memcpy(&stackValue, (arrayref+index*sizeof(u4)), sizeof(u4));
+	memcpy(&stackValue, ((u4*)arrayref+index*sizeof(u4)), sizeof(u4));
 	pushOperand(stackValue);
 }
 
 void func_aastore(){
 	u4 index, value;
-    arrays_t  *array;
-    void *ref;
+  arrays_t  *array;  
+  void *ref;
 
 	value = popOperand();
 	index = popOperand();
@@ -137,7 +137,7 @@ void func_aastore(){
 		return;
 	}
 	ref = array->reference;
-	memcpy((ref+index*sizeof(u4)), &value, sizeof(u4));
+	memcpy(((u4*)ref+index*sizeof(u4)), &value, sizeof(u4));
 }
 
 void func_aconst_null(){
@@ -194,7 +194,7 @@ void func_anewarray(){
 
     type = getConstantPoolElementByIndexFromCurrentFrame(index);
 
-	array = calloc(1, sizeof(arrays_t));
+	array = (arrays_t*)calloc(1, sizeof(arrays_t));
 	count = (u4)popOperand();
 	array->size = count;
 	array->reference = calloc(count, sizeof(void *));
@@ -292,7 +292,7 @@ void func_bastore(){
 
 	value = popOperand();
 	index = popOperand();
-	array_reference = popOperand();
+	array_reference = (arrays_t*)popOperand();
 	if (array_reference == NULL) {
 		printf("\n\nNull Pointer Exception (op_bastore)\n");
 		return;
@@ -500,7 +500,8 @@ void func_dastore(){
 
 void func_dcmpg(){
 	double double_value1, double_value2;
-	u4 value1, value2;
+	u4 value1, value2, aux;
+	int aux1 = -1;
 
 	value1 = popOperand();
 	value2 = popOperand();
@@ -511,12 +512,13 @@ void func_dcmpg(){
 	double_value1 = getDouble(value2, value1);
 
 	if (double_value1 > double_value2) {
-		popOperand(1);
+		pushOperand(1);
 	} else {
 		if (double_value1 < double_value2) {
-			popOperand(-1);
+      memcpy(&aux,&aux1,sizeof(u4));
+			pushOperand(aux);
 		} else {
-			popOperand(0);
+			pushOperand(0);
 		}
 	}
 }
@@ -548,8 +550,8 @@ void func_dcmpl(){
 void func_dconst_0(){
 	u4 low_bytes = 0;
 	u4 high_bytes = 0;
-	popOperand(low_bytes);
-	popOperand(high_bytes);
+	pushOperand(low_bytes);
+	pushOperand(high_bytes);
 }
 
 void func_dconst_1(){
@@ -940,7 +942,8 @@ void func_fastore(){
 
 void func_fcmpg(){
 	float float_value1, float_value2;
-	u4 value1, value2;
+	u4 value1, value2, aux;
+	int aux1 = -1;
 
 	value2 = popOperand();
 	value1 = popOperand();
@@ -952,7 +955,8 @@ void func_fcmpg(){
 		pushOperand(1);
 	} else {
 		if (float_value1 < float_value2) {
-			pushOperand(-1);
+      memcpy(&aux,&aux1,sizeof(u4));
+			pushOperand(aux);
 		} else {
 			pushOperand(0);
 		}
@@ -963,7 +967,10 @@ void func_fcmpg(){
 void func_fcmpl(){
 	u4 value2_aux = popOperand();
 	u4 value1_aux = popOperand();
+	u4 aux;
 	float value1, value2;
+	int aux1 = -1;
+	
 
 	memcpy(&value1, &value1_aux, sizeof(u4));
 	memcpy(&value2, &value2_aux, sizeof(u4));
@@ -975,7 +982,8 @@ void func_fcmpl(){
 		pushOperand(0);
 	}
 	else {
-		pushOperand(-1);
+    memcpy(&aux,&aux1,sizeof(u4));
+		pushOperand(aux);
 	}
 }
 
@@ -1159,7 +1167,7 @@ void func_getfield(){
 	u8 value;
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
-	class *field_class;
+	class_struct *field_class;
 	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
@@ -1201,7 +1209,7 @@ void func_getfield(){
 void func_getstatic(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
-	class *cl;
+	class_struct *cl;
 	cp_info field, class_name_info;
 	field_info *fieldref;
 	char *class_name;
@@ -1393,7 +1401,11 @@ void func_iastore(){
 }
 
 void func_iconst_m1(){
-	pushOperand(-1);
+  u4 aux;
+  int aux1 = -1;
+  
+  memcpy(&aux,&aux1,sizeof(u4));
+	pushOperand(aux);
 }
 
 void func_iconst_0(){
@@ -1818,9 +1830,10 @@ void func_invokestatic(){
 	cp_info method_ref_info, class_info, method_name_type_ref_info;
 	method_info *invoke_method;
 	frame_t *frame;
-	u4 operand,i;
+	u4 operand,i, aux;
+	int aux1 = -1;
 	u2 index, parameter_count;
-	class *resolved_class;
+	class_struct *resolved_class;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -1853,8 +1866,8 @@ void func_invokestatic(){
 	}
 
 	parameter_count = getParameterCount(method_descriptor);
-
-	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, -1);
+  memcpy(&aux,&aux1,sizeof(u4));
+	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, aux);
 
 	/*Devo empilhar ao contrário, pois a pilha vai conter a object reference por ultimo.
 	Comeca com 1 por causa do indice do vetor*/
@@ -1922,9 +1935,10 @@ void func_invokevirtual(){
 	cp_info method_ref_info, class_info, method_name_type_ref_info;
 	method_info *invoke_method;
 	frame_t *frame;
-	u4 operand,i;
+	u4 operand,i, aux;
+	int aux1 = -1;
 	u2 index, parameter_count;
-	class *resolved_class;
+	class_struct *resolved_class;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -1966,8 +1980,8 @@ void func_invokevirtual(){
 	}
 
 	parameter_count = getParameterCount(method_descriptor);
-
-	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, -1);
+  memcpy(&aux,&aux1,sizeof(u4));
+	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, aux);
 	for (i=0; i <= parameter_count; i++) {
 		operand = popOperand();
 		frame->local_variables[parameter_count-i] = operand;
@@ -2262,6 +2276,8 @@ void func_lcmp(){
 	u8 value1, value2;
 	u4 high_bytes1, low_bytes1;
 	u4 high_bytes2, low_bytes2;
+	u4 aux;
+	int aux1 = -1;
 
 	high_bytes2 = popOperand();
 	low_bytes2 = popOperand();
@@ -2277,7 +2293,8 @@ void func_lcmp(){
 		pushOperand(0);
 	}
 	else {
-		pushOperand(-1);
+    memcpy(&aux,&aux1,sizeof(u4));
+		pushOperand(aux);
 	}
 }
 
@@ -2536,7 +2553,7 @@ void func_lookupswitch(){
 	number_pairs |= frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;
 
-	pair = malloc(sizeof(pair_item) * number_pairs);
+	pair = (pair_item *)malloc(sizeof(pair_item) * number_pairs);
 
 	for(i = 0; i < number_pairs; i++) {
 		pair->match = 0;
@@ -2824,7 +2841,7 @@ void add_multiarray(u4 ** ponteiro, u4 * tamanhos, u4 dimensoes ){
 void func_multianewarray(){
 	u2 index_byte1, index_byte2;
 	u4 stack_v, dimension, *size;
-	arrays_t *array_reference  = calloc(1,sizeof(arrays_t));
+	arrays_t *array_reference  = (arrays_t*)calloc(1,sizeof(arrays_t));
 	u4 *array;
 	int i;
 
@@ -2855,7 +2872,7 @@ void func_new(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
 	cp_info simbolicRef;
-	class *cl;
+	class_struct *cl;
 	char *refName;
 	instance_structure *obj;
 	u4 stackValue;
@@ -2885,7 +2902,7 @@ void func_newarray(){
 	type = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	count = (u4)popOperand();
 
-	array = calloc(1, sizeof(arrays_t));
+	array = (arrays_t*)calloc(1, sizeof(arrays_t));
 	array->size = count;
 	array->type = type;
 	count = sizeof(void*);
@@ -2945,7 +2962,7 @@ void func_putfield(){
 	u8 value;
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
-	class *field_class;
+	class_struct *field_class;
 	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
@@ -2992,7 +3009,7 @@ void func_putstatic(){
 	u4 field_index;
 	u4 class_index;
 	u8 value;
-	class *field_class;
+	class_struct *field_class;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -3146,7 +3163,7 @@ void func_tableswitch(){
 	high_value = (highbyte1 << 24) | (highbyte2 << 16) | (highbyte3 << 8) | highbyte4;
 
 	offsets_count = (high_value-low_value+1);
-	offsets = malloc(sizeof(int)*offsets_count);
+	offsets = (int*)malloc(sizeof(int)*offsets_count);
 
 	for(i = 0; i < offsets_count; i++) {
 		value = 0;

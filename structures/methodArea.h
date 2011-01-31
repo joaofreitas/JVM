@@ -29,11 +29,11 @@ typedef struct class_structure {
 	struct class_structure *super_class;
 	static_variables *static_vars;
 	classFileFormat *class_file;
-} class;
+} class_struct;
 
 typedef struct method_area_structure {
 	u2 index;
-	class *class;
+	class_struct *class_pointer;
 	struct method_area_structure *next;
 } method_area;
 
@@ -41,15 +41,15 @@ method_area *method_area_ini;
 method_area *method_area_end;
 
 /* Adiciona um objeto lista de objetos */
-void addClass(class *);
+void addClass(class_struct*);
 
 void initMethodArea();
 
-class *instanceClassFromClassFile(classFileFormat *classFile);
+class_struct *instanceClassFromClassFile(classFileFormat *classFile);
 
 method_info *getMethod(classFileFormat *cf, char *method_name, char *class_type);
 
-class *getClass(char *class_name);
+class_struct *getClass(char *class_name);
 
 char *getClassName(classFileFormat *cf, u2 index);
 
@@ -57,9 +57,9 @@ char *getMethodName(classFileFormat *cf, u2 index);
 
 cp_info getConstantPoolElementByIndexFromCurrentFrame(int index);
 
-u1* getFieldDescriptor(class *cl, u4 index);
+u1* getFieldDescriptor(class_struct*cl, u4 index);
 
-u4 getFieldIndex(class *cl, u4 index);
+u4 getFieldIndex(class_struct*cl, u4 index);
 
 u1 *getFieldName(cp_info *cp, u4 index);
 

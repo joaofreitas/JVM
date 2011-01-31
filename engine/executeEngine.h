@@ -21,8 +21,8 @@ void exec(classFileFormat *, char *path);
 
 void saveFilePath(char *classPath);
 
-class *getSymbolicReferenceClass(char *class_name);
+class_struct *getSymbolicReferenceClass(char *class_name);
 
-field_info *getResolvedFieldReference(class *cl, cp_info fieldref);
+field_info *getResolvedFieldReference(class_struct *cl, cp_info fieldref);
 
 #endif /* EXEC_H_ */
