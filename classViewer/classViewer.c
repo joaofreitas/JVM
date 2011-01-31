@@ -151,6 +151,69 @@ void printAttributes(classFileFormat *classFile) {
 	}
 }
 
+int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info) {
+	u1 code;
+	int default_byte, number_pairs, match, offset, i, j;
+
+	code = attribute.attribute_union.code.code[index];
+	index++;
+
+	while (index %4 !=0){
+		index++;
+	}
+
+	default_byte = 0;
+	for(i = 0; i < 3; i++) {
+		default_byte |=  attribute.attribute_union.code.code[index];
+		default_byte = default_byte << 8;
+		index++;
+	}
+
+	default_byte |= attribute.attribute_union.code.code[index];
+	index++;
+
+	number_pairs = 0;
+	for(i = 0; i < 3; i++)
+	{
+		number_pairs |= attribute.attribute_union.code.code[index];
+		number_pairs = number_pairs << 8;
+		index++;
+	}
+
+	number_pairs |= attribute.attribute_union.code.code[index];
+	index++;
+	printf("%s %d\n", op_info[code].mnemonic, number_pairs);
+
+	for(i = 0; i < number_pairs; i++) {
+		match = 0;
+
+		for(j = 0; j < 3; j++) {
+			match |= attribute.attribute_union.code.code[index];
+			match = match << 8;
+			index++;
+		}
+
+		match |= attribute.attribute_union.code.code[index];
+		printf("%d: ", match);
+		index++;
+
+		offset = 0;
+
+		for(j = 0; j < 3; j++) {
+			offset |= attribute.attribute_union.code.code[index];
+			offset = offset << 8;
+			index++;
+		}
+
+		offset |= attribute.attribute_union.code.code[index];
+		index++;
+		printf("%d (+%d)\n", offset+3, offset);
+	}
+	printf("default: %d (+%d)\n", default_byte, default_byte+index);
+	return index;
+
+}
+
 void printAttribute(classFileFormat *classFile, attribute_info attribute, char *format,int index) {
 	cp_info cp_element;
 	opcode_info *op_info;
@@ -176,10 +239,14 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			op_info = get_opcode_info();
 			for (i=0 ; i< attribute.attribute_union.code.code_length; i++) {
 
-				/*TODO lookupswitch, tableswitch devem ser corrigidos*/
+				/*TODO tableswitch devem ser corrigidos*/
 				u1 code = attribute.attribute_union.code.code[i];
-				printf("%s\n", op_info[code].mnemonic);
-				i += op_info[code].operands_count;
+				if (code != 0xab) {
+					printf("%s\n", op_info[code].mnemonic);
+					i += op_info[code].operands_count;
+				} else {
+					i = printLookUpSwitch(attribute, i, op_info);
+				}
 			}
 			break;
 		case 3:

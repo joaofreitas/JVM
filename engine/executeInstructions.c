@@ -1898,7 +1898,7 @@ void println(char *descriptor) {
 
 		double_value = getDouble(long_value_low, long_value_high);
 
-		printf("%f\n", double_value);
+		printf("%.5f\n", double_value);
 	}
 	else if (strcmp((char *) descriptor, "(Ljava/lang/String;)V") == 0) {
 		cp = getConstantPoolElementByIndexFromCurrentFrame(popOperand());
@@ -2140,16 +2140,23 @@ void func_l2f(){
 
 	result = (float) long_value;
 
-	memcpy(&aux_value1, &result, sizeof(u4));
+	memcpy(&aux_value1, &result, sizeof(float));
 
 	pushOperand(aux_value1);
 }
 
 void func_l2i(){
-	u4 value = popOperand();
+	u4 high_bytes, low_bytes;
+	int int_value;
+	u8 long_value;
 
-	popOperand();
-	pushOperand(value);
+	high_bytes = popOperand();
+	low_bytes = popOperand();
+
+	long_value = getLong(low_bytes, high_bytes);
+	int_value = (int) long_value;
+
+	pushOperand(int_value);
 }
 
 void func_ladd(){
