@@ -9,6 +9,8 @@
 #include "instructions.h"
 #include "../structures/mnemonics.h"
 #include <string.h>
+#include "../structures/heap.h"
+#include <stdio.h>
 
 char path[100];
 
@@ -25,6 +27,8 @@ void saveFilePath(char *classPath) {
 }
 
 void runMethod() {
+
+	printf("%d %d %d\n", sizeof(void *), sizeof(arrays_t*), sizeof(int *));
 
 	while (frame_stack->frame->pc < frame_stack->frame->code_length) {
 		op_info[frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]].func();
@@ -91,6 +95,9 @@ class *getSymbolicReferenceClass(char *class_name) {
 		runInitMethod(class_file);
 	}
 	return m_class;
+
+	printf("Passou");
+	/*getchar();*/
 }
 
 field_info *getResolvedFieldReference(class *cl, cp_info fieldref) {

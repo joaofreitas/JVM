@@ -70,7 +70,7 @@ u4 popOperand() {
 	data = frame_stack->frame->opStack->data;
 	stack_aux = frame_stack->frame->opStack;
 	frame_stack->frame->opStack = frame_stack->frame->opStack->next;
-	free(stack_aux);
+	/*free(stack_aux);*/
 
 	return data;
 }

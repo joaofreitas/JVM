@@ -15,7 +15,7 @@
 #include "classFileReader.h"
 #include "attribute/attributeUtil.h"
 
-classFileFormat* loadClassFile(char *arquivo);
+classFileFormat* loadClassFile(const char *arquivo);
 
 void readMagicNumber(classFileFormat *classFile, FILE *fp);
 

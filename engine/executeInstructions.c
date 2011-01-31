@@ -501,11 +501,11 @@ void func_dcmpg(){
 
 	value1 = popOperand();
 	value2 = popOperand();
-	double_value1 = getDouble(value2, value1);
+	double_value2 = getDouble(value2, value1);
 
 	value1 = popOperand();
 	value2 = popOperand();
-	double_value2 = getDouble(value2, value1);
+	double_value1 = getDouble(value2, value1);
 
 	if (double_value1 > double_value2) {
 		popOperand(1);
@@ -519,10 +519,10 @@ void func_dcmpg(){
 }
 
 void func_dcmpl(){
-	u4 op1_hi = popOperand();
-	u4 op1_low = popOperand();
 	u4 op2_hi = popOperand();
 	u4 op2_low = popOperand();
+	u4 op1_hi = popOperand();
+	u4 op1_low = popOperand();
 	int result;
 	double op1, op2;
 
@@ -871,16 +871,18 @@ void func_f2l(){
 }
 
 void func_fadd(){
-	u4 value1_aux = popOperand();
 	u4 value2_aux = popOperand();
+	u4 value1_aux = popOperand();
 	float value1, value2, result;
+	u4 stackValue;
 
 	memcpy(&value1, &value1_aux, sizeof(u4));
 	memcpy(&value2, &value2_aux, sizeof(u4));
 
 	result = value1+value2;
 
-	memcpy(&result,&result,sizeof(u4));
+	memcpy(&stackValue,&result,sizeof(u4));
+	pushOperand(stackValue);
 }
 
 void func_faload(){
@@ -935,8 +937,8 @@ void func_fcmpg(){
 	float float_value1, float_value2;
 	u4 value1, value2;
 
-	value1 = popOperand();
 	value2 = popOperand();
+	value1 = popOperand();
 
 	memcpy(&float_value1, &value1, sizeof(float));
 	memcpy(&float_value2, &value2, sizeof(float));
@@ -944,7 +946,7 @@ void func_fcmpg(){
 	if (float_value1 > float_value2) {
 		popOperand(1);
 	} else {
-		if (value1 < value2) {
+		if (float_value1 < float_value2) {
 			popOperand(-1);
 		} else {
 			popOperand(0);
@@ -954,18 +956,18 @@ void func_fcmpg(){
 }
 
 void func_fcmpl(){
-	u4 value1_aux = popOperand();
 	u4 value2_aux = popOperand();
+	u4 value1_aux = popOperand();
 	u4 result;
 	float value1, value2;
 
 	memcpy(&value1, &value1_aux, sizeof(u4));
 	memcpy(&value2, &value2_aux, sizeof(u4));
 
-	if (value2 > value1) {
+	if (value1 > value2) {
 		result = 1;
 	}
-	else if(value2 == value1){
+	else if(value1 == value2){
 		result = 0;
 	}
 	else
@@ -1144,7 +1146,7 @@ void func_fsub(){
 	result = float_value1 - float_value2;
 
 	memcpy(&value1, &result, sizeof(u4));
-	pushOperand(result);	/* Gravo o endereço para o float */
+	pushOperand(value1);	/* Gravo o endereço para o float */
 }
 
 
@@ -1424,50 +1426,53 @@ void func_idiv(){
 }
 
 void func_if_acmpeq(){
-	u4 *value1, *value2;
+	u4 value1, value2;
 	u2 branchbyte1, branchbyte2, offset;
 
+	value2 = popOperand();
+	value1 = popOperand();
 
-	value1 = (u4 *)popOperand();
-	value2 = (u4 *)popOperand();
-	if (*value1 == *value2) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (value1 == value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
 		frame_stack->frame->pc += offset - 2;
 	}
 }
 
 void func_if_acmpne(){
-	u4 *value1, *value2;
+	u4 value1, value2;
 	u2 branchbyte1, branchbyte2, offset;
 
+	value2 = popOperand();
+	value1 = popOperand();
 
-	value1 = (u4 *)popOperand();
-	value2 = (u4 *)popOperand();
-	if (*value1 != *value2) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (value1 != value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
 		frame_stack->frame->pc += offset - 2;
 	}
 }
 
 void func_if_icmpeq(){
-	u4 value1 = popOperand();
 	u4 value2 = popOperand();
+	u4 value1 = popOperand();
 	u2 branchbyte1, branchbyte2;
 	short offset;
 
+	frame_stack->frame->pc++;
+	branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 == value2){
-		frame_stack->frame->pc++;
-		branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8)|branchbyte2;
 		frame_stack->frame->pc += offset-1;
 	}
@@ -1481,12 +1486,12 @@ void func_if_icmpne(){
 	value2 = popOperand();
 	value1 = popOperand();
 
-	if(value1 != value2) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
+	if(value1 != value2) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
 			frame_stack->frame->pc += offset-1;
@@ -1499,14 +1504,15 @@ void func_if_icmplt(){
 	int value1, value2;
 	u2 branchbyte1, branchbyte2, offset;
 
-	value1 = (int) popOperand();
 	value2 = (int) popOperand();
+	value1 = (int) popOperand();
+
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
 	if (value1 < value2) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8) | branchbyte2;
 		frame_stack->frame->pc += offset - 2;
 	}
@@ -1516,30 +1522,32 @@ void func_if_icmpge(){
 	int value1, value2;
 	u2 branchbyte1, branchbyte2, offset;
 
-	value1 = (int) popOperand();
 	value2 = (int) popOperand();
+	value1 = (int) popOperand();
+
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
 	if (value1 >= value2) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8) | branchbyte2;
 		frame_stack->frame->pc += offset - 2;
 	}
 }
 
 void func_if_icmpgt(){
-	u4 value1 = popOperand();
 	u4 value2 = popOperand();
+	u4 value1 = popOperand();
 	u2 branchbyte1, branchbyte2;
 	short offset;
 
-	if (value1 < value2){
-		frame_stack->frame->pc++;
-		branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+	if (value1 > value2){
 		offset = (branchbyte1 << 8)|branchbyte2;
 		frame_stack->frame->pc += offset-1;
 	}
@@ -1553,12 +1561,12 @@ void func_if_icmple(){
 	value2 = popOperand();
 	value1 = popOperand();
 
-	if(value1 <= value2) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
+	if(value1 <= value2) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
 			frame_stack->frame->pc += offset-1;
@@ -1573,13 +1581,14 @@ void func_ifeq(){
 
 	value1 = (int) popOperand();
 
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 == 0) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 1;
 	}
 }
 
@@ -1589,11 +1598,12 @@ void func_ifne(){
 
 	value1 = (int) popOperand();
 
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 != 0) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8) | branchbyte2;
 		frame_stack->frame->pc += offset - 2;
 	}
@@ -1604,11 +1614,12 @@ void func_iflt(){
 	u2 branchbyte1, branchbyte2;
 	short offset;
 
+	frame_stack->frame->pc++;
+	branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 > 0){
-		frame_stack->frame->pc++;
-		branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8)|branchbyte2;
 		frame_stack->frame->pc += offset-1;
 	}
@@ -1621,12 +1632,12 @@ void func_ifge(){
 
 	value = popOperand();
 
-	if(value >= 0) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
+	if(value >= 0) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
 			frame_stack->frame->pc += offset-1;
@@ -1640,13 +1651,14 @@ void func_ifgt(){
 
 	value1 = (int) popOperand();
 
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 > 0) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 1;
 	}
 }
 
@@ -1656,13 +1668,14 @@ void func_ifle(){
 
 	value1 = (int) popOperand();
 
+	frame_stack->frame->pc++;
+	branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 <= 0) {
-		frame_stack->frame->pc++;
-		branchbyte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 1;
 	}
 }
 
@@ -1672,11 +1685,13 @@ void func_ifnonnull(){
 	short offset;
 
 	value1 = (u4 *) popOperand();
+
+	frame_stack->frame->pc++;
+	branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
 	if (value1 != NULL){
-		frame_stack->frame->pc++;
-		branchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		offset = (branchbyte1 << 8)|branchbyte2;
 		frame_stack->frame->pc += offset-1;
 	}
@@ -1689,12 +1704,12 @@ void func_ifnull(){
 
 	value = (u4 *) popOperand();
 
-	if(value == NULL) {
-		frame_stack->frame->pc++;
-		brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
-		frame_stack->frame->pc++;
-		brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
+	brenchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
+	if(value == NULL) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
 			frame_stack->frame->pc += offset-1;
@@ -2336,6 +2351,8 @@ void func_ldc_w(){
 void func_ldc2_w(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
+	cp_info info, cp_long, cp_double;
+	u4 low_bytes, high_bytes;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -2344,22 +2361,23 @@ void func_ldc2_w(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-
-	switch(frame_stack->frame->cp[index].tag)
+	info = getConstantPoolElementByIndexFromCurrentFrame(index);
+	switch(info.tag)
 	{
-		case 3:/*CONSTANT_Integer:*/
+		case 5:/*CONSTANT_Long:*/
 		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_integer.bytes);
+			low_bytes = info.constant_union.c_long.low_bytes;
+			high_bytes = info.constant_union.c_long.high_bytes;
+			pushOperand(low_bytes);
+			pushOperand(high_bytes);
 		}
 		break;
-		case 4:/*CONSTANT_Float:*/
+		case 6:/*CONSTANT_Double:*/
 		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_float.bytes);
-		}
-		break;
-		case 8:/*CONSTANT_String:*/
-		{
-			pushOperand(frame_stack->frame->cp[index].constant_union.c_string.string_index);
+			low_bytes = info.constant_union.c_double.low_bytes;
+			high_bytes = info.constant_union.c_double.high_bytes;
+			pushOperand(low_bytes);
+			pushOperand(high_bytes);
 		}
 		break;
 		default:
