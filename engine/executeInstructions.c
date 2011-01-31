@@ -1254,7 +1254,7 @@ void func_goto_w(){
 void func_i2b(){
 	u1 value;
 
-	value = (char)popOperand();
+	value = (u1)popOperand();
 	pushOperand((u4) value);
 
 }
@@ -1283,13 +1283,13 @@ void func_i2d(){
 }
 
 void func_i2f(){
-	u4 value;
-	float *result;
+	int value;
+	float result;
 
-	result = malloc(sizeof(float));
-	value = popOperand();
-	*result = (float) value;
-	pushOperand((u4) result);
+	value = (int) popOperand();
+	result = (float) value;
+	memcpy(&value, &result, sizeof(float));
+	pushOperand(value);
 }
 
 void func_i2l(){
@@ -1760,7 +1760,7 @@ void func_iload_0(){
 }
 
 void func_iload_1(){
-	int value;
+	u4 value;
 	value = frame_stack->frame->local_variables[1];
 	pushOperand(value);
 }
@@ -1894,12 +1894,11 @@ void println(char *descriptor) {
 		printf("%lld\n", long_value);
 	}
 	else if (strcmp(descriptor, "(D)V") == 0) {
-		long_value_low = popOperand();
 		long_value_high = popOperand();
+		long_value_low = popOperand();
 
-		long_value = getDouble(long_value_low, long_value_high);
+		double_value = getDouble(long_value_low, long_value_high);
 
-		memcpy(&double_value, &long_value, sizeof(double));
 		printf("%f\n", double_value);
 	}
 	else if (strcmp((char *) descriptor, "(Ljava/lang/String;)V") == 0) {
