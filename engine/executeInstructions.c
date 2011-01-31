@@ -108,7 +108,7 @@ void func_aaload(){
 		return;
 	}
 
-	memcpy(&stackValue, (arrayref+index), sizeof(u4));
+	memcpy(&stackValue, (arrayref+index*sizeof(u4)), sizeof(u4));
 	pushOperand(stackValue);
 }
 
@@ -131,7 +131,7 @@ void func_aastore(){
 		return;
 	}
 	ref = array->reference;
-	memcpy((ref+index), &value, sizeof(u4));
+	memcpy((ref+index*sizeof(u4)), &value, sizeof(u4));
 }
 
 void func_aconst_null(){
@@ -1327,6 +1327,7 @@ void func_iadd(){
 void func_iaload(){
 	u4 index;
 	arrays_t *array_reference;
+	int *ref;
 	u4 stackValue;
 
 	index = popOperand();
@@ -1340,14 +1341,14 @@ void func_iaload(){
 		printf("\n\nArray Index Out Of Bounds Exception (aaload).\n");
 		return;
 	}
-
-	memcpy(&stackValue, array_reference->reference+index, sizeof(u4));
+	ref = (int*) array_reference->reference;
+	memcpy(&stackValue, &ref[index], sizeof(u4));
 	pushOperand(stackValue);
 }
 
 void func_iand(){
-	u4 value1 = popOperand();
 	u4 value2 = popOperand();
+	u4 value1 = popOperand();
 	u4 result;
 
 	result = value1 & value2;
@@ -1488,7 +1489,6 @@ void func_if_icmpne(){
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
 			frame_stack->frame->pc += offset-1;
-			/*TODO offset -1? */
 		}
 	}
 }
@@ -1507,7 +1507,7 @@ void func_if_icmplt(){
 
 	if (value1 < value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 1;
 	}
 }
 
@@ -1525,7 +1525,7 @@ void func_if_icmpge(){
 
 	if (value1 >= value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 1;
 	}
 }
 
@@ -1563,7 +1563,6 @@ void func_if_icmple(){
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
 			frame_stack->frame->pc += offset-1;
-			/*TODO offset -1? */
 		}
 	}
 }
@@ -1612,7 +1611,7 @@ void func_iflt(){
 	frame_stack->frame->pc++;
 	branchbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
-	if (value1 > 0){
+	if (value1 < 0){
 		offset = (branchbyte1 << 8)|branchbyte2;
 		frame_stack->frame->pc += offset-1;
 	}
@@ -3026,7 +3025,7 @@ void func_saload(){
 	index = popOperand();
 	arrayref = (arrays_t*)popOperand();
 	if (arrayref == NULL){
-		printf("\nNullPointerException at faload.\n");
+		printf("\nNullPointerException at saload.\n");
 		return;
 	}
 	if (index >= arrayref->size || index < 0){

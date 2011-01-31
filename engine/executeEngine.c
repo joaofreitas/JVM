@@ -27,9 +27,6 @@ void saveFilePath(char *classPath) {
 }
 
 void runMethod() {
-
-	printf("%d %d %d\n", sizeof(void *), sizeof(arrays_t*), sizeof(int *));
-
 	while (frame_stack->frame->pc < frame_stack->frame->code_length) {
 		op_info[frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc]].func();
 		if (frame_stack == NULL) {
@@ -96,7 +93,7 @@ class *getSymbolicReferenceClass(char *class_name) {
 	}
 	return m_class;
 
-	printf("Passou");
+	/*printf("Passou");*/
 	/*getchar();*/
 }
 
