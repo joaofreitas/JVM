@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	char *exemplo;
 
 	if (argc > 1) {
-		exemplo = *argv++;
+		exemplo = *++argv;
 	} else {
 		printf("Digite o nome do classFile a ser executado:\n");
 		exemplo = malloc(sizeof(char)*100);

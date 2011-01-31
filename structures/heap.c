@@ -85,16 +85,16 @@ instance_structure *instanceClass(class *cl) {
 }
 
 
-instance_variables* getResolvedInstanceVariables(instance_structure *obj, u1 *field_descriptor, u1 *field_name) {
+instance_variables *getResolvedInstanceVariables(instance_structure *obj, u1 *field_descriptor, u1 *field_name) {
+	int i;
 	instance_variables *var;
-
 	if (obj == NULL) {
 		return NULL;
 	}
 
-	for (var = obj->variables; var < obj->variables + obj->variables_count; var++) {
-		if ((strcmp((char *)var->descriptor, (char *)field_descriptor) == 0) && (strcmp((char *)var->name, (char *)field_name) == 0)) {
-			return var;
+	for (i = 0; i < obj->variables_count; i++) {
+		if ((strcmp((char *)obj->variables[i].descriptor, (char *)field_descriptor) == 0) && (strcmp((char *)obj->variables[i].name, (char *)field_name) == 0)) {
+			return &(obj->variables[i]);
 		}
 	}
 

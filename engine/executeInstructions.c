@@ -292,7 +292,7 @@ void func_bastore(){
 
 	value = popOperand();
 	index = popOperand();
-	array_reference = (arrays_t *)popOperand();
+	array_reference = popOperand();
 	if (array_reference == NULL) {
 		printf("\n\nNull Pointer Exception (op_bastore)\n");
 		return;
@@ -2880,6 +2880,7 @@ void func_newarray(){
 	array = calloc(1, sizeof(arrays_t));
 	array->size = count;
 	array->type = type;
+	count = sizeof(void*);
 	switch (type)
 	{
 		case 4:
@@ -2927,17 +2928,17 @@ void func_pop2(){
 }
 
 void func_putfield(){
-	u1 *field_descriptor, *class_name;
+	u1 *field_descriptor, *class_name, *field_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
 	u4 field_index;
-	u1 *field_name;
 	u4 class_index, class_name_index;
 	u8 value;
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
 	class *field_class;
+	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -2946,14 +2947,21 @@ void func_putfield(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
+	/*class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
 	class_name_index = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_class.name_index;
 	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_name_index).constant_union.c_utf8.bytes;
 
 	field_class = getClass((char *)class_name);
 	field_descriptor = getFieldDescriptor(field_class, index);
 	field_index = getFieldIndex(field_class, index);
-	field_name = getFieldName(field_class->class_file->constant_pool, field_index);
+	field_name = getFieldName(field_class->class_file->constant_pool, field_index);*/
+
+	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
+	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);
+	class_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_class.name_index);
+
+	field_name = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
+	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
 		low_bytes = popOperand();

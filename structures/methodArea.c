@@ -149,10 +149,10 @@ u4 getFieldIndex(class *cl, u4 index) {
 
 	field_ref = cl->class_file->fields;
 	field_name = getFieldName(cl->class_file->constant_pool, index);
-	for (i=0; i < cl->class_file->fields_count; i++) {
-		this_field = getFieldName(cl->class_file->constant_pool, i);
-		if (strcmp((char *)field_name, (char *)this_field)) {
-			return i;
+	for (field_ref = cl->class_file->fields; field_ref < cl->class_file->fields + cl->class_file->fields_count; field_ref++) {
+		this_field = getConstantPoolElementByIndex(cl->class_file, field_ref->name_index).constant_union.c_utf8.bytes;
+		if (strcmp((char *)field_name, (char *)this_field) == 0) {
+			return ;
 		}
 	}
 	return 0;
