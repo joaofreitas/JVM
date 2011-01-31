@@ -214,6 +214,69 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 
 }
 
+int printTableSwitch(attribute_info attribute, int index, opcode_info *op_info) {
+	u1 code;
+	int default_value, low_value, high_value, offsets_count, value, i, j;
+
+	code = attribute.attribute_union.code.code[index];
+	printf("%s", op_info[code].mnemonic);
+	index++;
+
+	while (index %4 !=0){
+		index++;
+	}
+
+	default_value = 0;
+	for(i = 0; i < 3; i++) {
+		default_value |=  attribute.attribute_union.code.code[index];
+		default_value = default_value << 8;
+		index++;
+	}
+
+	default_value |= attribute.attribute_union.code.code[index];
+	index++;
+
+	low_value = 0;
+	for(i = 0; i < 3; i++) {
+		low_value |=  attribute.attribute_union.code.code[index];
+		low_value = low_value << 8;
+		index++;
+	}
+
+	low_value |= attribute.attribute_union.code.code[index];
+	index++;
+
+	high_value = 0;
+	for(i = 0; i < 3; i++) {
+		high_value |=  attribute.attribute_union.code.code[index];
+		high_value = high_value << 8;
+		index++;
+	}
+
+	high_value |= attribute.attribute_union.code.code[index];
+	index++;
+
+	offsets_count = (high_value-low_value+1);
+
+
+	printf(" %d to %d\n", low_value, high_value);
+	for(i = low_value; i <= high_value; i++) {
+		value = 0;
+		for (j = 0; j < 3; j++) {
+			value |=  attribute.attribute_union.code.code[index];
+			value = value << 8;
+			index++;
+		}
+		value |= attribute.attribute_union.code.code[index];
+		index++;
+		printf("%d: %d (+%d)\n", i, value+4, value);
+	}
+
+	printf("default: %d (+%d)\n", default_value+3, default_value);
+	return index-1;
+
+}
+
 void printAttribute(classFileFormat *classFile, attribute_info attribute, char *format,int index) {
 	cp_info cp_element;
 	opcode_info *op_info;
@@ -241,11 +304,13 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 
 				/*TODO tableswitch devem ser corrigidos*/
 				u1 code = attribute.attribute_union.code.code[i];
-				if (code != 0xab) {
+				if (code == 0xaa) {
+					i = printTableSwitch(attribute, i, op_info);
+				} else if (code == 0xab) {
+					i = printLookUpSwitch(attribute, i, op_info);
+				} else {
 					printf("%s\n", op_info[code].mnemonic);
 					i += op_info[code].operands_count;
-				} else {
-					i = printLookUpSwitch(attribute, i, op_info);
 				}
 			}
 			break;

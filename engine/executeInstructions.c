@@ -1754,27 +1754,19 @@ void func_iload(){
 }
 
 void func_iload_0(){
-	int value;
-	value = frame_stack->frame->local_variables[0];
-	pushOperand(value);
+	pushOperand(frame_stack->frame->local_variables[0]);
 }
 
 void func_iload_1(){
-	u4 value;
-	value = frame_stack->frame->local_variables[1];
-	pushOperand(value);
+	pushOperand(frame_stack->frame->local_variables[1]);
 }
 
 void func_iload_2(){
-	int value;
-	 value = frame_stack->frame->local_variables[2];
-	 pushOperand(value);
+	 pushOperand(frame_stack->frame->local_variables[2]);
 }
 
 void func_iload_3(){
-	int value;
-	 value = frame_stack->frame->local_variables[3];
-	 pushOperand(value);
+	 pushOperand(frame_stack->frame->local_variables[3]);
 }
 
 void func_imul(){
@@ -3074,7 +3066,6 @@ void func_swap(){
 
 
 void func_tableswitch(){
-	u4 byte_pad;
 	u4 defaultbyte1;
 	u4 defaultbyte2;
 	u4 defaultbyte3;
@@ -3087,16 +3078,17 @@ void func_tableswitch(){
 	u4 highbyte2;
 	u4 highbyte3;
 	u4 highbyte4;
-	u4 default_value, low_value, high_value;
-	u4 index;
+	int default_value, low_value, high_value, value, j;
+	int index;
 	u4 target_adress;
 	u4 offsets_count;
 	int *offsets, i;
 
-	byte_pad = frame_stack->frame->pc % 4;
-	frame_stack->frame->pc += byte_pad;
-
 	frame_stack->frame->pc++;
+	while (frame_stack->frame->pc %4 !=0){
+		frame_stack->frame->pc++;
+	}
+
 	defaultbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;
 	defaultbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -3120,6 +3112,7 @@ void func_tableswitch(){
 	highbyte3 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;
 	highbyte4 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	frame_stack->frame->pc++;
 
 	default_value = (defaultbyte1 << 24) | (defaultbyte2 << 16) | (defaultbyte3 << 8) | defaultbyte4;
 	low_value = (lowbyte1 << 24) | (lowbyte2 << 16) | (lowbyte3 << 8) | lowbyte4;
@@ -3129,8 +3122,16 @@ void func_tableswitch(){
 	offsets = malloc(sizeof(int)*offsets_count);
 
 	for(i = 0; i < offsets_count; i++) {
+		value = 0;
+		for (j = 0; j < 3; j++) {
+			value |=  frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+			value = value << 8;
+			frame_stack->frame->pc++;
+		}
+		value |= frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 		frame_stack->frame->pc++;
-		offsets[i] = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+
+		offsets[i] = value;
 	}
 
 	index = popOperand();
@@ -3140,7 +3141,7 @@ void func_tableswitch(){
 	else {
 		target_adress = offsets[index - low_value];
 	}
-	frame_stack->frame->pc += target_adress;
+	frame_stack->frame->pc = target_adress + 3;
 }
 
 
