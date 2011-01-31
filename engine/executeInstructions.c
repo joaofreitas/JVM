@@ -942,12 +942,12 @@ void func_fcmpg(){
 	memcpy(&float_value2, &value2, sizeof(float));
 
 	if (float_value1 > float_value2) {
-		popOperand(1);
+		pushOperand(1);
 	} else {
 		if (float_value1 < float_value2) {
-			popOperand(-1);
+			pushOperand(-1);
 		} else {
-			popOperand(0);
+			pushOperand(0);
 		}
 	}
 
