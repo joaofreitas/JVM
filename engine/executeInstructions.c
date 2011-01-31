@@ -2560,7 +2560,7 @@ void func_lookupswitch(){
 	found = 0;
 	i = 0;
 
-	while ((!found) || (i < number_pairs)) {
+	while ((!found) && (i < number_pairs)) {
 		if (key == pair->match) {
 			found = 1;
 			frame_stack->frame->pc = pair->offset + opcode;
@@ -2571,7 +2571,7 @@ void func_lookupswitch(){
 	}
 
 	if(!found) {
-		frame_stack->frame->pc = default_byte + opcode;
+		frame_stack->frame->pc = default_byte + 2;
 	}
 }
 
