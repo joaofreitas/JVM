@@ -58,16 +58,23 @@ instance_structure *instanceClass(class *cl) {
 	obj->cl = cl;
 
 	variables_count = 0;
+	obj->variables = NULL;
 	for (field = cl->class_file->fields; field < cl->class_file->fields + cl->class_file->fields_count; field++) {
 		if (!(field->access_flags & 0x0008)) {
 			variables_count++;
-			obj->variables = realloc(obj->variables, sizeof(instance_variables)*variables_count);
-			obj->variables[variables_count-1].descriptor = getConstantPoolElementByIndex(obj->cl->class_file, field->descriptor_index).constant_union.c_utf8.bytes;
-			obj->variables[variables_count-1].name = getConstantPoolElementByIndex(obj->cl->class_file, field->name_index).constant_union.c_utf8.bytes;
 		}
 	}
 	obj->variables_count = variables_count;
+	obj->variables = calloc(variables_count, sizeof(instance_variables));
 
+	i = 0;
+	for (field = cl->class_file->fields; field < cl->class_file->fields + cl->class_file->fields_count; field++) {
+		if (!(field->access_flags & 0x0008)) {
+			obj->variables[i].descriptor = getConstantPoolElementByIndex(obj->cl->class_file, field->descriptor_index).constant_union.c_utf8.bytes;
+			obj->variables[i].name = getConstantPoolElementByIndex(obj->cl->class_file, field->name_index).constant_union.c_utf8.bytes;
+			i++;
+		}
+	}
 
 	super_class_name_index = getConstantPoolElementByIndex(cl->class_file, cl->class_file->super_class).constant_union.c_class.name_index;
 	super_class_name = getConstantPoolElementByIndex(cl->class_file, super_class_name_index).constant_union.c_utf8.bytes;

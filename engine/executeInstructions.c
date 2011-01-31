@@ -1160,6 +1160,7 @@ void func_getfield(){
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
 	class *field_class;
+	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -1168,12 +1169,19 @@ void func_getfield(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
+	/*class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
 	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
 	field_class = getClass((char *)class_name);
 	field_descriptor = getFieldDescriptor(field_class, index);
 	field_index = getFieldIndex(field_class, index);
-	field_name = getFieldName(field_class->class_file->constant_pool, field_index);
+	field_name = getFieldName(field_class->class_file->constant_pool, field_index);*/
+
+	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
+	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);
+	class_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_class.name_index);
+
+	field_name = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
+	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
 	objectref = (instance_structure *) popOperand();
 	resolved_instance_variable = getResolvedInstanceVariables(objectref, field_descriptor, field_name);
@@ -1846,7 +1854,7 @@ void func_invokestatic(){
 
 	parameter_count = getParameterCount(method_descriptor);
 
-	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, 0);
+	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, -1);
 
 	/*Devo empilhar ao contrário, pois a pilha vai conter a object reference por ultimo.
 	Comeca com 1 por causa do indice do vetor*/
@@ -1959,8 +1967,8 @@ void func_invokevirtual(){
 
 	parameter_count = getParameterCount(method_descriptor);
 
-	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, 0);
-	for (i=1; i <= parameter_count; i++) {
+	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, -1);
+	for (i=0; i <= parameter_count; i++) {
 		operand = popOperand();
 		frame->local_variables[parameter_count-i] = operand;
 	}
@@ -3099,6 +3107,9 @@ void func_tableswitch(){
 	u4 target_adress;
 	u4 offsets_count;
 	int *offsets, i;
+	int pc_aux;
+
+	pc_aux = frame_stack->frame->pc;
 
 	frame_stack->frame->pc++;
 	while (frame_stack->frame->pc %4 !=0){
@@ -3152,12 +3163,12 @@ void func_tableswitch(){
 
 	index = popOperand();
 	if (index < low_value || index > high_value) {
-		target_adress = offsets[default_value];
+		target_adress = default_value;
 	}
 	else {
 		target_adress = offsets[index - low_value];
 	}
-	frame_stack->frame->pc = target_adress + 3;
+	frame_stack->frame->pc = pc_aux + target_adress-1;
 }
 
 
