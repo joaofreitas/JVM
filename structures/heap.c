@@ -46,13 +46,14 @@ instance_structure *getObject(u2 index) {
 instance_structure *instanceClass(class *cl) {
 	instance_structure *obj;
 	field_info *field;
-	u2 classNameIndex;
+	u2 classNameIndex, super_class_name_index;
 	u4 variables_count;
+	u1 *super_class_name;
 	int i;
 
 	obj = malloc(sizeof(instance_structure));
-	classNameIndex = getConstantPoolElementByIndexFromCurrentFrame(cl->class_file->this_class).constant_union.c_class.name_index;
-	obj->class_name = getConstantPoolElementByIndexFromCurrentFrame(classNameIndex).constant_union.c_utf8.bytes;
+	classNameIndex = getConstantPoolElementByIndex(cl->class_file, cl->class_file->this_class).constant_union.c_class.name_index;
+	obj->class_name = getConstantPoolElementByIndex(cl->class_file, classNameIndex).constant_union.c_utf8.bytes;
 	obj->fields_count = cl->class_file->fields_count;
 	obj->cl = cl;
 
@@ -67,7 +68,10 @@ instance_structure *instanceClass(class *cl) {
 	}
 	obj->variables_count = variables_count;
 
-	if (strcmp((char *)cl->super_class, "java/lang/Object") == 0) {
+
+	super_class_name_index = getConstantPoolElementByIndex(cl->class_file, cl->class_file->super_class).constant_union.c_class.name_index;
+	super_class_name = getConstantPoolElementByIndex(cl->class_file, super_class_name_index).constant_union.c_utf8.bytes;
+	if (strcmp((char *)super_class_name, "java/lang/Object") == 0) {
 		obj->super = NULL;
 	}
 	else {

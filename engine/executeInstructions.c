@@ -382,15 +382,15 @@ void func_d2f(){
 	f_value = (float)d_value;
 
 	memcpy(&value1, &f_value, sizeof(u4));
-	pushOperand(f_value);
+	pushOperand(value1);
 }
 
 void func_d2i(){
-	u8 aux1;
+	long long aux1;
 	double aux2=0;
 	u4 aux3, aux4;
 
-	aux1 = (u8)popOperand();
+	aux1 = (long long)popOperand();
 	aux4 = popOperand();
 	aux1 = aux1 << 32;
 	aux1 |= aux4;
@@ -399,19 +399,18 @@ void func_d2i(){
 
 	aux3 = (u4)(aux2);
 	pushOperand(aux3);
-	frame_stack->frame->pc++;
 }
 
 void func_d2l(){
 	u4 aux_value1, aux_value2;
 	double double_value;
-	u8 long_value;
+	long long long_value;
 
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 
 	double_value = getDouble(aux_value2, aux_value1);
-	long_value = (u8)double_value;
+	long_value = (long long)double_value;
 
 	pushOperand(getLongLowBytes(long_value));
 	pushOperand(getLongHighBytes(long_value));
@@ -524,8 +523,8 @@ void func_dcmpl(){
 	int result;
 	double op1, op2;
 
-	op1 = getLong(op1_low, op1_hi);
-	op2 = getLong(op2_low, op2_hi);
+	op1 = getDouble(op1_low, op1_hi);
+	op2 = getDouble(op2_low, op2_hi);
 
 	if (op1 < op2){
 		result = 1;
@@ -609,10 +608,13 @@ void func_dload_0(){
 }
 
 void func_dload_1(){
-	u4 a1 = frame_stack->frame->local_variables[2];
-	pushOperand(a1);
-	a1 = frame_stack->frame->local_variables[1];
-	pushOperand(a1);
+	u4 low_bytes, high_bytes;
+
+	high_bytes = frame_stack->frame->local_variables[1];
+	low_bytes = frame_stack->frame->local_variables[2];
+
+	pushOperand(low_bytes);
+	pushOperand(high_bytes);
 }
 
 void func_dload_2(){
@@ -723,7 +725,6 @@ void func_dstore_0(){
 }
 
 void func_dstore_1(){
-
 	frame_stack->frame->local_variables[1] = popOperand();/*Pego primeiro o high bytes*/
 	frame_stack->frame->local_variables[2] = popOperand();/*Depois low bytes*/
 }
@@ -1268,7 +1269,7 @@ void func_i2c(){
 }
 
 void func_i2d(){
-	u4 a1, hi,low;
+	u4 hi,low;
 	int uint;
 	double d;
 
@@ -1862,7 +1863,7 @@ void func_invokestatic(){
 void println(char *descriptor) {
 	u4 value;
 	u4 long_value_high, long_value_low;
-	int64_t long_value;
+	long long long_value;
 	cp_info cp;
 	float float_value;
 	double double_value;
@@ -1888,7 +1889,7 @@ void println(char *descriptor) {
 		long_value_high = popOperand();
 		long_value_low = popOperand();
 
-		long_value = (int64_t) getLong(long_value_low, long_value_high);
+		long_value = (long long) getLong(long_value_low, long_value_high);
 
 		printf("%lld\n", long_value);
 	}

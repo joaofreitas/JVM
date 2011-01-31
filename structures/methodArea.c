@@ -101,7 +101,7 @@ class *getClass(char *class_name) {
 	classFileFormat *cf;
 	cp_info class_info, cp;
 
-	for (method_area_element = method_area_ini; method_area_element <= method_area_end; method_area_element++) {
+	for (method_area_element = method_area_ini; method_area_element != NULL; method_area_element = method_area_element->next) {
 		cf = method_area_element->class->class_file;
 		class_info = getConstantPoolElementByIndex(cf, cf->this_class);
 		cp = getConstantPoolElementByIndex(cf, class_info.constant_union.c_class.name_index);
