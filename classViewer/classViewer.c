@@ -194,8 +194,8 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 		}
 
 		match |= attribute.attribute_union.code.code[index];
-		printf("%d: ", match);
 		index++;
+		printf("%d: ", match);
 
 		offset = 0;
 
@@ -209,8 +209,8 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 		index++;
 		printf("%d (+%d)\n", offset+3, offset);
 	}
-	printf("default: %d (+%d)\n", default_byte, default_byte+index);
-	return index;
+	printf("default: %d (+%d)\n", default_byte+3, default_byte);
+	return index-1;
 
 }
 
