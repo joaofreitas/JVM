@@ -19,6 +19,12 @@ u2 getParameterCount(char *method_descriptor) {
 	while (*method_descriptor != ')') {
 		if (*method_descriptor == '[') {
 			method_descriptor++;
+			if ((*method_descriptor == 'J') || (*method_descriptor == 'D'))
+			{
+				count++;
+				method_descriptor++;
+				continue;
+			}
 		}
 		if (*method_descriptor == 'L') {
 			while (*method_descriptor != ';') {
@@ -589,8 +595,8 @@ void func_dload(){
 		wide = 0;
 	}
 
-	value_hi = frame_stack->frame->local_variables[index];
-	value_low = frame_stack->frame->local_variables[index+1];
+	value_hi = frame_stack->frame->local_variables[index+1];
+	value_low = frame_stack->frame->local_variables[index];
 
 	pushOperand(value_low);
 	pushOperand(value_hi);
@@ -600,8 +606,8 @@ void func_dload_0(){
 	u4 low_bytes, high_bytes;
 
 
-	high_bytes = frame_stack->frame->local_variables[0];
-	low_bytes = frame_stack->frame->local_variables[1];
+	high_bytes = frame_stack->frame->local_variables[1];
+	low_bytes = frame_stack->frame->local_variables[0];
 
 	pushOperand(low_bytes);
 	pushOperand(high_bytes);
@@ -610,8 +616,8 @@ void func_dload_0(){
 void func_dload_1(){
 	u4 low_bytes, high_bytes;
 
-	high_bytes = frame_stack->frame->local_variables[1];
-	low_bytes = frame_stack->frame->local_variables[2];
+	high_bytes = frame_stack->frame->local_variables[2];
+	low_bytes = frame_stack->frame->local_variables[1];
 
 	pushOperand(low_bytes);
 	pushOperand(high_bytes);
@@ -620,8 +626,8 @@ void func_dload_1(){
 void func_dload_2(){
 	u4 value1, value2;
 
-	value1 = frame_stack->frame->local_variables[2];
-	value2 = frame_stack->frame->local_variables[3];
+	value1 = frame_stack->frame->local_variables[3];
+	value2 = frame_stack->frame->local_variables[2];
 	pushOperand(value2); /*Gravo primeiro o low bytes*/
 	pushOperand(value1); /*Depois o high bytes*/
 }
@@ -629,8 +635,8 @@ void func_dload_2(){
 void func_dload_3(){
 	u4 low_bytes, high_bytes;
 
-	high_bytes = frame_stack->frame->local_variables[3];
-	low_bytes = frame_stack->frame->local_variables[4];
+	high_bytes = frame_stack->frame->local_variables[4];
+	low_bytes = frame_stack->frame->local_variables[3];
 
 	pushOperand(low_bytes);
 	pushOperand(high_bytes);
@@ -714,29 +720,29 @@ void func_dstore(){
 		wide = 0;
 	}
 
-	frame_stack->frame->local_variables[index] = high_bytes;
-	frame_stack->frame->local_variables[index+1] = low_bytes;
+	frame_stack->frame->local_variables[index+1] = high_bytes;
+	frame_stack->frame->local_variables[index] = low_bytes;
 
 }
 
 void func_dstore_0(){
-	frame_stack->frame->local_variables[0] = popOperand();/*Pego primeiro o high bytes*/
-	frame_stack->frame->local_variables[1] = popOperand();/*Depois low bytes*/
+	frame_stack->frame->local_variables[1] = popOperand();/*Pego primeiro o high bytes*/
+	frame_stack->frame->local_variables[0] = popOperand();/*Depois low bytes*/
 }
 
 void func_dstore_1(){
-	frame_stack->frame->local_variables[1] = popOperand();/*Pego primeiro o high bytes*/
-	frame_stack->frame->local_variables[2] = popOperand();/*Depois low bytes*/
+	frame_stack->frame->local_variables[2] = popOperand();/*Pego primeiro o high bytes*/
+	frame_stack->frame->local_variables[1] = popOperand();/*Depois low bytes*/
 }
 
 void func_dstore_2(){
-	frame_stack->frame->local_variables[2] = popOperand();
 	frame_stack->frame->local_variables[3] = popOperand();
+	frame_stack->frame->local_variables[2] = popOperand();
 }
 
 void func_dstore_3(){
-	frame_stack->frame->local_variables[3] = popOperand();
 	frame_stack->frame->local_variables[4] = popOperand();
+	frame_stack->frame->local_variables[3] = popOperand();
 }
 
 void func_dsub(){
@@ -1934,6 +1940,10 @@ void func_invokevirtual(){
 		return;
 	}
 
+	if(strcmp(class_name, "java/lang/Object") == 0) {
+		return;
+	}
+
 	resolved_class = getSymbolicReferenceClass(class_name);
 	if (resolved_class == NULL) {
 		printf("ClassNotFoundException!\n");
@@ -1950,16 +1960,12 @@ void func_invokevirtual(){
 	parameter_count = getParameterCount(method_descriptor);
 
 	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, 0);
-
-	/*Devo empilhar ao contrário, pois a pilha vai conter a object reference por ultimo.
-	Comeca com 1 por causa do indice do vetor*/
 	for (i=1; i <= parameter_count; i++) {
 		operand = popOperand();
 		frame->local_variables[parameter_count-i] = operand;
 	}
 
 	pushFrame(frame);
-
 }
 
 void func_ior(){
@@ -2406,8 +2412,8 @@ void func_lload(){
 		wide = 0;
 	}
 
-	value_hi = frame_stack->frame->local_variables[index];
-	value_low = frame_stack->frame->local_variables[index+1];
+	value_hi = frame_stack->frame->local_variables[index+1];
+	value_low = frame_stack->frame->local_variables[index];
 
 	pushOperand(value_low);
 	pushOperand(value_hi);
@@ -2417,8 +2423,8 @@ void func_lload(){
 void func_lload_0(){
 	u4 aux_value1, aux_value2;
 
-	aux_value1 = frame_stack->frame->local_variables[0];
-	aux_value2 = frame_stack->frame->local_variables[1];
+	aux_value1 = frame_stack->frame->local_variables[1];
+	aux_value2 = frame_stack->frame->local_variables[0];
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
@@ -2427,8 +2433,8 @@ void func_lload_0(){
 void func_lload_1(){
 	u4 aux_value1, aux_value2;
 
-	aux_value1 = frame_stack->frame->local_variables[1];
-	aux_value2 = frame_stack->frame->local_variables[2];
+	aux_value1 = frame_stack->frame->local_variables[2];
+	aux_value2 = frame_stack->frame->local_variables[1];
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
@@ -2437,8 +2443,8 @@ void func_lload_1(){
 void func_lload_2(){
 	u4 aux_value1, aux_value2;
 
-	aux_value1 = frame_stack->frame->local_variables[2];
-	aux_value2 = frame_stack->frame->local_variables[3];
+	aux_value1 = frame_stack->frame->local_variables[3];
+	aux_value2 = frame_stack->frame->local_variables[2];
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
@@ -2447,8 +2453,8 @@ void func_lload_2(){
 void func_lload_3(){
 	u4 aux_value1, aux_value2;
 
-	aux_value1 = frame_stack->frame->local_variables[3];
-	aux_value2 = frame_stack->frame->local_variables[4];
+	aux_value1 = frame_stack->frame->local_variables[4];
+	aux_value2 = frame_stack->frame->local_variables[3];
 
 	pushOperand(aux_value2);
 	pushOperand(aux_value1);
@@ -2671,8 +2677,8 @@ void func_lstore(){
 	high_bytes = popOperand();
 	low_bytes = popOperand();
 
-	frame_stack->frame->local_variables[index] = high_bytes;
-	frame_stack->frame->local_variables[index+1] = low_bytes;
+	frame_stack->frame->local_variables[index+1] = high_bytes;
+	frame_stack->frame->local_variables[index] = low_bytes;
 
 }
 
@@ -2682,8 +2688,8 @@ void func_lstore_0(){
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 
-	frame_stack->frame->local_variables[0] = aux_value1;
-	frame_stack->frame->local_variables[1] = aux_value2;
+	frame_stack->frame->local_variables[1] = aux_value1;
+	frame_stack->frame->local_variables[0] = aux_value2;
 }
 
 void func_lstore_1(){
@@ -2692,8 +2698,8 @@ void func_lstore_1(){
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 
-	frame_stack->frame->local_variables[1] = aux_value1;
-	frame_stack->frame->local_variables[2] = aux_value2;
+	frame_stack->frame->local_variables[2] = aux_value1;
+	frame_stack->frame->local_variables[1] = aux_value2;
 
 }
 
@@ -2703,8 +2709,8 @@ void func_lstore_2(){
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 
-	frame_stack->frame->local_variables[2] = aux_value1;
-	frame_stack->frame->local_variables[3] = aux_value2;
+	frame_stack->frame->local_variables[3] = aux_value1;
+	frame_stack->frame->local_variables[2] = aux_value2;
 }
 
 void func_lstore_3(){
@@ -2713,8 +2719,8 @@ void func_lstore_3(){
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 
-	frame_stack->frame->local_variables[3] = aux_value1;
-	frame_stack->frame->local_variables[4] = aux_value2;
+	frame_stack->frame->local_variables[4] = aux_value1;
+	frame_stack->frame->local_variables[3] = aux_value2;
 }
 
 void func_lsub(){
@@ -2927,7 +2933,7 @@ void func_putfield(){
 	u4 index;
 	u4 field_index;
 	u1 *field_name;
-	u4 class_index;
+	u4 class_index, class_name_index;
 	u8 value;
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
@@ -2941,7 +2947,9 @@ void func_putfield(){
 	index = (indexbyte1 << 8) | indexbyte2;
 
 	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
-	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
+	class_name_index = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_class.name_index;
+	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_name_index).constant_union.c_utf8.bytes;
+
 	field_class = getClass((char *)class_name);
 	field_descriptor = getFieldDescriptor(field_class, index);
 	field_index = getFieldIndex(field_class, index);

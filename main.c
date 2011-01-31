@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 	}
 
 	classFile = loadClassFile(exemplo);
-	inspectClassFile(classFile);
+	/*inspectClassFile(classFile);*/
 	exec(classFile, exemplo);
 
 

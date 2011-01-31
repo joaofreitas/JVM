@@ -160,9 +160,11 @@ u4 getFieldIndex(class *cl, u4 index) {
 
 u1 *getFieldName(cp_info *cp, u4 index) {
 	u4 field_name_index;
+	u4 class_info_index;
 
-	field_name_index = cp[index].constant_union.c_fieldref.class_index;
-	return cp[field_name_index].constant_union.c_utf8.bytes;
+	field_name_index = cp[index-1].constant_union.c_fieldref.class_index;
+	class_info_index = cp[field_name_index-1].constant_union.c_class.name_index;
+	return cp[class_info_index-1].constant_union.c_utf8.bytes;
 }
 
 
