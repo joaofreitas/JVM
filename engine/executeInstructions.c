@@ -423,10 +423,10 @@ void func_dadd(){
 	u4 result_low, result_high;
 	double op1, op2, result;
 
-	op1_hi = popOperand();
-	op1_low = popOperand();
 	op2_hi = popOperand();
 	op2_low = popOperand();
+	op1_hi = popOperand();
+	op1_low = popOperand();
 
 	op1 = getDouble(op1_low, op1_hi);
 	op2 = getDouble(op2_low, op2_hi);
@@ -527,7 +527,7 @@ void func_dcmpl(){
 	op1 = getLong(op1_low, op1_hi);
 	op2 = getLong(op2_low, op2_hi);
 
-	if (op2 > op1){
+	if (op1 < op2){
 		result = 1;
 	}
 	else if (op2 == op1){
@@ -561,11 +561,11 @@ void func_ddiv(){
 	u4 value1, value2;
 	value1 = popOperand();
 	value2 = popOperand();
-	double_value1 = getDouble(value2, value1);
+	double_value2 = getDouble(value2, value1);
 
 	value1 = popOperand();
 	value2 = popOperand();
-	double_value2 = getDouble(value2, value1);
+	double_value1 = getDouble(value2, value1);
 
 	result = double_value1/double_value2;
 
@@ -640,10 +640,10 @@ void func_dmul(){
 	u4 result_low_bytes, result_high_bytes;
 	double value1, value2, result;
 
-	high_bytes1 = popOperand();
-	low_bytes1 = popOperand();
 	high_bytes2 = popOperand();
 	low_bytes2 = popOperand();
+	high_bytes1 = popOperand();
+	low_bytes1 = popOperand();
 
 	value1 = getDouble(low_bytes1, high_bytes1);
 	value2 = getDouble(low_bytes2, high_bytes2);
@@ -658,7 +658,7 @@ void func_dmul(){
 
 void func_dneg(){
 	u4 hi,low;
-	u4 a1 = 0xf;
+	u4 a1 = 0x80000000;
 
 	hi = popOperand();
 	low = popOperand();
@@ -752,8 +752,8 @@ void func_dsub(){
 
     d1 = d2 - d1;
 
-    pushOperand(getDoubleHighBytes(d1));
     pushOperand(getDoubleLowBytes(d1));
+    pushOperand(getDoubleHighBytes(d1));
 }
 
 void func_dup(){
@@ -1269,10 +1269,11 @@ void func_i2c(){
 
 void func_i2d(){
 	u4 a1, hi,low;
+	int uint;
 	double d;
 
-	a1 = popOperand();
-    d = (double)a1;
+	uint = popOperand();
+    d = (double)uint;
 
     hi = getDoubleHighBytes(d);
     low = getDoubleLowBytes(d);
@@ -1597,12 +1598,12 @@ void func_ifne(){
 
 	if (value1 != 0) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 1;
 	}
 }
 
 void func_iflt(){
-	u4 value1 = popOperand();
+	int value1 = popOperand();
 	u2 branchbyte1, branchbyte2;
 	short offset;
 
@@ -1925,8 +1926,6 @@ void func_invokevirtual(){
 	frame_stack->frame->pc++;
 	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	index = indexbyte1 << 8 | indexbyte2;
-
-	method_ref_info = getConstanPoolElement(index);
 
 	/*Pegando o nome da classe*/
 	class_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
