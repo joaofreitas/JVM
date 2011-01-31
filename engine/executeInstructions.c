@@ -1927,6 +1927,8 @@ void func_invokevirtual(){
 	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	index = indexbyte1 << 8 | indexbyte2;
 
+	method_ref_info = getConstantPoolElementByIndexFromCurrentFrame(index);
+
 	/*Pegando o nome da classe*/
 	class_info = getConstanPoolElement(method_ref_info.constant_union.c_methodref.class_index);
 	class_name = (char *)getConstanPoolElement(class_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;

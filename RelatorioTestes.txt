@@ -46,6 +46,7 @@ Comando com resultados ordenados: ls -t `find . -name \*.class\* `|grep '.class$
 ./testes/ArquivosTesteLadeira/while/Fibonacci.class
 ./testes/ArquivosTesteLadeira/while/HarmonicSeries.class
 ./testes/Testes/byte_array_normal1.class
+./testes/Testes/TestePrintLn.class
 ./testes/Testes/byte_basic0.class
 ./testes/Testes/Classe1.class
 ./testes/Testes/Filho.class
