@@ -352,7 +352,7 @@ opcode_info* get_opcode_info() {
 	op_info[0x68].operands_count = 0;
 	op_info[0x74].operands_count = 0;
 	op_info[0xc1].operands_count = 2;
-	op_info[0xb9].operands_count = 4;
+	op_info[0xb9].operands_count = 2;
 	op_info[0xb7].operands_count = 2;
 	op_info[0xb8].operands_count = 2;
 	op_info[0xb6].operands_count = 2;
@@ -392,7 +392,7 @@ opcode_info* get_opcode_info() {
 	op_info[0x21].operands_count = 0;
 	op_info[0x69].operands_count = 0;
 	op_info[0x75].operands_count = 0;
-	op_info[0xab].operands_count = 10;
+	op_info[0xab].operands_count = 0;
 	op_info[0x81].operands_count = 0;
 	op_info[0x71].operands_count = 0;
 	op_info[0xad].operands_count = 0;
@@ -422,7 +422,7 @@ opcode_info* get_opcode_info() {
 	op_info[0x56].operands_count = 0;
 	op_info[0x11].operands_count = 2;
 	op_info[0x5f].operands_count = 0;
-	op_info[0xaa].operands_count = 14;
+	op_info[0xaa].operands_count = 0;
 	op_info[0xc4].operands_count = 7;
 	op_info[0xca].operands_count = 0;
 	op_info[0xfe].operands_count = 0;

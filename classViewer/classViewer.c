@@ -281,7 +281,9 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 	cp_info cp_element;
 	opcode_info *op_info;
 	class_member *cm;
-	int tag, i;
+	int tag, i, j;
+	u4 opcode;
+	u4 int_opcode;
 
 
 	cp_element = getConstantPoolElementByIndex(classFile, attribute.attribute_name_index);
@@ -302,15 +304,41 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			op_info = get_opcode_info();
 			for (i=0 ; i< attribute.attribute_union.code.code_length; i++) {
 
-				/*TODO tableswitch devem ser corrigidos*/
 				u1 code = attribute.attribute_union.code.code[i];
 				if (code == 0xaa) {
 					i = printTableSwitch(attribute, i, op_info);
 				} else if (code == 0xab) {
 					i = printLookUpSwitch(attribute, i, op_info);
 				} else {
-					printf("%s\n", op_info[code].mnemonic);
-					i += op_info[code].operands_count;
+					printf("%s", op_info[code].mnemonic);
+
+					/*if (op_info[code].operands_count > 0) {
+						if (code == 0xc9) {
+							int_opcode = 0;
+							for (j=0; j < 4; j++) {
+								code = attribute.attribute_union.code.code[i];
+								int_opcode = (int_opcode << 8) | (u2) code;
+								i++;
+							}
+							printf(" %d", int_opcode);
+						} else if (op_info[code].operands_count == 2) {
+							opcode = 0;
+							code = attribute.attribute_union.code.code[i];
+							i++;
+							opcode = (code << 8) | attribute.attribute_union.code.code[i];
+							i++;
+							printf(" %d", opcode);
+						} else {
+							opcode = 0;
+							for (j=0; j < op_info[code].operands_count; j++) {
+								code = attribute.attribute_union.code.code[i];
+								opcode = (opcode << 8) | (u2) code;
+								i++;
+							}
+							printf(" %d", opcode);
+						}
+					}*/
+					printf("\n");
 				}
 			}
 			break;

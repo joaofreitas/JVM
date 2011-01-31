@@ -138,7 +138,6 @@ void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info
 	} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
 		attribute->tag = 5;
 	} else {
-		printf("Ignorando atributo: [%s]\n", cp.constant_union.c_utf8.bytes);
 		attribute->tag = 6;
 		ignoreAttribute(attribute, fp, attribute->attribute_length);
 	}

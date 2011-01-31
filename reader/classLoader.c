@@ -13,7 +13,6 @@ classFileFormat* loadClassFile(const char *arquivo) {
 	classFileFormat *classFile;
 	FILE *fp;
 
-	printf("teste %s\n", arquivo);
 	fp = fopen(arquivo, "r");
 	if (fp == NULL) {
 		printf("Arquivo %s nao existe!\n", arquivo);

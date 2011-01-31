@@ -15,19 +15,32 @@
 
 int main(int argc, char **argv) {
 	classFileFormat *classFile;
-	char *exemplo;
+	int output_type; /*Saida igual a 0 -> não mostra, saida igual a 1 -> tela*/
+	char *file_name;
 
+	output_type = 0;
 	if (argc > 1) {
-		exemplo = *++argv;
+		file_name = argv[1];
+		if (argc > 2) {
+			if (*argv[2] == 'v') {
+				output_type = 1;
+
+			}
+		}
 	} else {
 		printf("Digite o nome do classFile a ser executado:\n");
-		exemplo = (char *)malloc(sizeof(char)*100);
-		scanf("%s", exemplo);
+		file_name = malloc(sizeof(char)*100);
+		scanf("%s", file_name);
 	}
 
-	classFile = loadClassFile(exemplo);
-	/*inspectClassFile(classFile);*/
-	exec(classFile, exemplo);
+	classFile = loadClassFile(file_name);
+	inspectClassFile(classFile);
+
+	if (output_type == 1) {
+		inspectClassFile(classFile);
+	} else {
+		exec(classFile, file_name);
+	}
 
 
 	return 0;
