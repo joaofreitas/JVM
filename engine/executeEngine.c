@@ -16,13 +16,21 @@ char path[100];
 
 void saveFilePath(char *classPath) {
 	int i;
-
+	int windows;
 	i = strlen(classPath);
-	while ((classPath[i] != '/') && (i >= 0)){
+	while ((classPath[i] != '/') && (classPath[i] != '\\') && (i >= 0)){
 		i--;
 	}
+	if(classPath[i]=='\\') {
+		windows = 1;
+	}
 	strncpy(path, classPath, i);
-	path[i]='/';
+	if (windows) {
+		path[i]='/';
+	}
+	else {
+		path[i]='\\';
+	}
 	path[i+1] = '\0';
 }
 

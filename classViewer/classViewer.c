@@ -6,9 +6,11 @@
  */
 
 #include "classViewer.h"
+#include "../structures/mnemonics.h"
 
 void inspectClassFile(classFileFormat *classFile) {
 
+	get_opcode_info();
 	printf("-------------- CLASS FILE -----------------\n");
 	printGeneralInformation(classFile);
 	printConstantPool(classFile);
@@ -154,7 +156,7 @@ void printAttributes(classFileFormat *classFile) {
 	}
 }
 
-int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info) {
+int printLookUpSwitch(attribute_info attribute, int index) {
 	u1 code;
 	int default_byte, number_pairs, match, offset, i, j;
 
@@ -220,7 +222,7 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 
 }
 
-int printTableSwitch(attribute_info attribute, int index, opcode_info *op_info) {
+int printTableSwitch(attribute_info attribute, int index) {
 	u1 code;
 	int default_value, low_value, high_value, offsets_count, value, i, j;
 
@@ -288,7 +290,6 @@ int printTableSwitch(attribute_info attribute, int index, opcode_info *op_info) 
 
 void printAttribute(classFileFormat *classFile, attribute_info attribute, char *format,int index) {
 	cp_info cp_element;
-	opcode_info *op_info;
 	class_member *cm;
 	int tag, i;
 
@@ -310,15 +311,15 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			printf("%sMaximum local variables: %d\n", format, attribute.attribute_union.code.max_locals);
 			printf("%sCode Length: %d\n", format, attribute.attribute_union.code.code_length);
 			fflush(stdout);
-			op_info = get_opcode_info();
+
 			for (i=0 ; i< attribute.attribute_union.code.code_length; i++) {
 				fflush(stdout);
 
 				u1 code = attribute.attribute_union.code.code[i];
 				if (code == 0xaa) {
-					i = printTableSwitch(attribute, i, op_info);
+					i = printTableSwitch(attribute, i);
 				} else if (code == 0xab) {
-					i = printLookUpSwitch(attribute, i, op_info);
+					i = printLookUpSwitch(attribute, i);
 				} else {
 					printf("%s\n", op_info[code].mnemonic);
 				}

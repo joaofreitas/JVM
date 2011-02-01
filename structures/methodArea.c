@@ -183,7 +183,7 @@ static_variables *getResolvedStaticVariables(class_struct *cl, u1 *field_descrip
 		}
 	}
 
-	var = getResolvedInstanceVariables(cl->super_class, field_descriptor, field_name);
+	var = getResolvedStaticVariables(cl->super_class, field_descriptor, field_name);
 	return var;
 }
 

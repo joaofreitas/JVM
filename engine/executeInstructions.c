@@ -1207,9 +1207,6 @@ void func_getstatic(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
 	u4 low_bytes, high_bytes;
-	class_struct *cl;
-	cp_info field, class_name_info;
-	field_info *fieldref;
 	u8 value;
 	u1 *class_name, *field_name, *field_descriptor;
 	class_struct *field_class;
@@ -1243,7 +1240,7 @@ void func_getstatic(){
 		value = getLong(popOperand(), 0x00000000);
 	}
 
-	field_class = getSymbolicReferenceClass(class_name);
+	field_class = getSymbolicReferenceClass((char*)class_name);
 	resolved_static_variable = getResolvedStaticVariables(field_class, field_descriptor, field_name);
 	value = resolved_static_variable->value;
 }
@@ -3023,8 +3020,6 @@ void func_putstatic(){
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
-	u4 field_index;
-	u4 class_index;
 	u8 value;
 	class_struct *field_class;
 	static_variables *resolved_static_variable;
@@ -3050,7 +3045,7 @@ void func_putstatic(){
 
 	field_name = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
 	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
-	field_class = getSymbolicReferenceClass(class_name);
+	field_class = getSymbolicReferenceClass((char*)class_name);
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
 		low_bytes = popOperand();
