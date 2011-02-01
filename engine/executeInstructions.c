@@ -1429,16 +1429,18 @@ void func_iconst_5(){
 }
 
 void func_idiv(){
-	int value1, value2;
+	int value1, value2, result;
 
-	value2 = popOperand();
-	value1 = popOperand();
+	value2 = (int)popOperand();
+	value1 = (int)popOperand();
 
 	if (value2 == 0) {
 		printf("\n ArithmeticException at idiv.\n");
 	}
 
-	pushOperand((u4)value1/value2);
+	result = value1/value2;
+
+	pushOperand(result);
 }
 
 void func_if_acmpeq(){
@@ -2007,8 +2009,8 @@ void func_ior(){
 }
 
 void func_irem(){
-	int value1 = (int)popOperand();
 	int value2 = (int)popOperand();
+	int value1 = (int)popOperand();
 	int result;
 
 	if (value1 == 0){
@@ -2016,7 +2018,7 @@ void func_irem(){
 		return;
 	}
 
-	result = value2-((value2/value1)*value1);
+	result = value1-(((int)(value1/value2))*value2);
 	pushOperand(result);
 }
 
@@ -2082,10 +2084,10 @@ void func_istore_3(){
 void func_isub(){
 	int value1, value2;
 
-	value2 = popOperand();
-	value1 = popOperand();
+	value2 = (int)popOperand();
+	value1 = (int)popOperand();
 
-	pushOperand((u4)value1-value2);
+	pushOperand((u4)(value1-value2));
 }
 
 void func_iushr(){
@@ -3084,17 +3086,16 @@ void func_sastore(){
 void func_sipush(){
 	u2 byte1, byte2;
 	short result;
-	u4 stackValue;
+	int short_value;
 
 	frame_stack->frame->pc++;
 	byte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	frame_stack->frame->pc++;
-	byte2 = 0;
-	byte2 |= (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
+	byte2 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	result = (byte1 << 8) | byte2;
+	short_value = result;
 
-	memcpy(&stackValue, &result, sizeof(result));
-	pushOperand(stackValue);
+	pushOperand(short_value);
 }
 
 void func_swap(){
