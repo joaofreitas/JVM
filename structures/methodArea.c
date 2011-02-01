@@ -27,7 +27,14 @@ class_struct *instanceClassFromClassFile(classFileFormat *classFile) {
 
 	for (field = classFile->fields; field < classFile->fields + classFile->fields_count; field++) {
 		if (field->access_flags & 0x0008) {
-			cl->static_vars = (static_variables*)realloc(cl->static_vars, (count+1)*sizeof(static_variables));
+			count++;
+		}
+	}
+	cl->static_vars = (static_variables*)malloc(sizeof(static_variables)*count);
+
+	count = 0;
+	for (field = classFile->fields; field < classFile->fields + classFile->fields_count; field++) {
+		if (field->access_flags & 0x0008) {
 			cp = getConstantPoolElementByIndex(classFile, field->name_index);
 			cl->static_vars[count].variable_name = cp.constant_union.c_utf8.bytes;
 			cp = getConstantPoolElementByIndex(classFile, field->descriptor_index);
