@@ -8,6 +8,7 @@
 #ifndef STRUCTURES_H_
 #define STRUCTURES_H_
 
+#include <inttypes.h>
 
 typedef unsigned char u1;
 typedef unsigned short u2;

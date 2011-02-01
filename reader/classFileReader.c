@@ -11,10 +11,11 @@
  * Leitura de formato u1. Nao é necessário conversão
  */
 u1 u1Read(FILE *fp) {
-	u1 u1Number;
+	u1 *u1Number;
 
-	fread(&u1Number, sizeof(u1), 1, fp);
-	return u1Number;
+	u1Number = calloc(1, sizeof(u1));
+	fread(u1Number, sizeof(u1), 1, fp);
+	return *u1Number;
 }
 
 /*
@@ -28,11 +29,13 @@ void convertU2(u2 *input) {
  * Leitura de formato u2 ja convertido para little-endian
  */
 u2 u2Read(FILE *fp) {
-	u2 u2Number;
+	u2 *u2Number;
 
-	fread(&u2Number, sizeof(u2), 1, fp);
-	convertU2(&u2Number);
-	return u2Number;
+	u2Number = calloc(2, sizeof(u1));
+
+	fread(u2Number, sizeof(u2), 1, fp);
+	convertU2(u2Number);
+	return *u2Number;
 }
 
 /*

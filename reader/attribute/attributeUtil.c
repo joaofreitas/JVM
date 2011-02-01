@@ -123,19 +123,19 @@ void readStructureAttribute(classFileFormat *classFile, FILE *fp, attribute_info
 
 	cte = cp.constant_union.c_utf8.bytes;
 
-	if (compare(ATTRIBUTE_ConstantValue, cte, string_length) == 0) {
+	if (strcmp((char *)ATTRIBUTE_ConstantValue, (char *)cte) == 0) {
 		readAttributeConstantValue(attribute, fp);
 		attribute->tag = 1;
-	} else if (compare(ATTRIBUTE_Code, cte, string_length) == 0) {
+	} else if (strcmp((char *)ATTRIBUTE_Code, (char *)cte) == 0) {
 		readAttributeCode(attribute, fp);
 		attribute->tag = 2;
-	} else if (compare(ATTRIBUTE_Exception, cte, string_length) == 0) {
+	} else if (strcmp((char *)ATTRIBUTE_Exception, (char *)cte) == 0) {
 		readAttributeExceptions(attribute, fp);
 		attribute->tag = 3;
-	} else if (compare(ATTRIBUTE_InnerClasses, cte, string_length) == 0) {
+	} else if (strcmp((char *)ATTRIBUTE_InnerClasses, (char *)cte) == 0) {
 		readAttributeInnerClasses(attribute, fp);
 		attribute->tag = 4;
-	} else if (compare(ATTRIBUTE_Syntetic, cte, string_length) == 0) {
+	} else if (strcmp((char *)ATTRIBUTE_Syntetic, (char *)cte) == 0) {
 		attribute->tag = 5;
 	} else {
 		attribute->tag = 6;

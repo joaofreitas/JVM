@@ -16,6 +16,7 @@ void inspectClassFile(classFileFormat *classFile) {
 	printFields(classFile);
 	printMethods(classFile);
 	printAttributes(classFile);
+	fflush(stdout);
 }
 
 void printGeneralInformation(classFileFormat *classFile) {
@@ -281,9 +282,7 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 	cp_info cp_element;
 	opcode_info *op_info;
 	class_member *cm;
-	int tag, i, j;
-	u4 opcode;
-	u4 int_opcode;
+	int tag, i;
 
 
 	cp_element = getConstantPoolElementByIndex(classFile, attribute.attribute_name_index);

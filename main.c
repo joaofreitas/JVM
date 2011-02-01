@@ -28,20 +28,20 @@ int main(int argc, char **argv) {
 			}
 		}
 	} else {
-		printf("Digite o nome do classFile a ser executado:\n");
+		printf("\nDigite o nome do classFile a ser executado:\n");
+		fflush(stdout);
 		file_name = malloc(sizeof(char)*100);
 		scanf("%s", file_name);
 	}
 
 	classFile = loadClassFile(file_name);
-	inspectClassFile(classFile);
-
+	output_type = 1;
 	if (output_type == 1) {
 		inspectClassFile(classFile);
 	} else {
 		exec(classFile, file_name);
 	}
-
+	system("pause");
 
 	return 0;
 }

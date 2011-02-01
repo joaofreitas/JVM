@@ -1158,16 +1158,13 @@ void func_fsub(){
 
 
 void func_getfield(){
-	u1 *field_descriptor, *field_name, *class_name;
+	u1 *field_descriptor, *field_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
-	u4 field_index;
-	u4 class_index;
 	u8 value;
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
-	class_struct *field_class;
 	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
@@ -1910,7 +1907,7 @@ void println(char *descriptor) {
 
 		long_value = (long long) getLong(long_value_low, long_value_high);
 
-		printf("%lld\n", long_value);
+		printf("%I64 \n", long_value);
 	}
 	else if (strcmp(descriptor, "(D)V") == 0) {
 		long_value_high = popOperand();
@@ -2953,16 +2950,13 @@ void func_pop2(){
 }
 
 void func_putfield(){
-	u1 *field_descriptor, *class_name, *field_name;
+	u1 *field_descriptor, *field_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
-	u4 field_index;
-	u4 class_index, class_name_index;
 	u8 value;
 	instance_structure *objectref;
 	instance_variables *resolved_instance_variable;
-	class_struct *field_class;
 	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;

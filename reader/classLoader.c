@@ -13,12 +13,14 @@ classFileFormat* loadClassFile(const char *arquivo) {
 	classFileFormat *classFile;
 	FILE *fp;
 
-	fp = fopen(arquivo, "r");
+	fp = fopen(arquivo, "rb");
 	if (fp == NULL) {
 		printf("Arquivo %s nao existe!\n", arquivo);
+		fflush(stdout);
+		system("pause");
 		exit(1);
 	}
-
+	rewind(fp);
 	classFile = (classFileFormat*)calloc(1, sizeof(classFileFormat));
 	readMagicNumber(classFile, fp);
 	readVersion(classFile, fp);
@@ -73,8 +75,7 @@ void readConstantPool(classFileFormat *classFile, FILE *fp) {
 
 	cp_size = classFile->constant_pool_count;
 	classFile->constant_pool = (cp_info*)malloc(sizeof(cp_info) * cp_size);
-	for (cp = classFile->constant_pool; cp < classFile->constant_pool + cp_size
-			- 1; cp++) {
+	for (cp = classFile->constant_pool; cp < classFile->constant_pool + cp_size - 1; cp++) {
 		counter++;
 		tag = u1Read(fp);
 		cp->tag = tag;
