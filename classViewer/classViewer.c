@@ -11,10 +11,15 @@ void inspectClassFile(classFileFormat *classFile) {
 
 	printf("-------------- CLASS FILE -----------------\n");
 	printGeneralInformation(classFile);
+	fflush(stdout);
 	printConstantPool(classFile);
+	fflush(stdout);
 	printInterfaces(classFile);
+	fflush(stdout);
 	printFields(classFile);
+	fflush(stdout);
 	printMethods(classFile);
+	fflush(stdout);
 	printAttributes(classFile);
 	fflush(stdout);
 }
@@ -113,6 +118,7 @@ void printFields(classFileFormat *classFile) {
 		}
 		index++;
 	}
+	fflush(stdout);
 }
 
 void printMethods(classFileFormat *classFile) {

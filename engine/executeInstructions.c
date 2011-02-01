@@ -1907,7 +1907,7 @@ void println(char *descriptor) {
 
 		long_value = (long long) getLong(long_value_low, long_value_high);
 
-		printf("%I64 \n", long_value);
+		printf("%lld \n", long_value);
 	}
 	else if (strcmp(descriptor, "(D)V") == 0) {
 		long_value_high = popOperand();
