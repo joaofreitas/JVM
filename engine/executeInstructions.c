@@ -1174,13 +1174,6 @@ void func_getfield(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	/*class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
-	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
-	field_class = getClass((char *)class_name);
-	field_descriptor = getFieldDescriptor(field_class, index);
-	field_index = getFieldIndex(field_class, index);
-	field_name = getFieldName(field_class->class_file->constant_pool, field_index);*/
-
 	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
 	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);
 	class_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_class.name_index);
@@ -1200,13 +1193,11 @@ void func_getfield(){
 	} else {
 		pushOperand(getLongLowBytes(value));
 	}
-
 }
 
 void func_getstatic(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
-	u4 low_bytes, high_bytes;
 	u8 value;
 	u1 *class_name, *field_name, *field_descriptor;
 	class_struct *field_class;
@@ -1232,17 +1223,17 @@ void func_getstatic(){
 		return;
 	}
 
-	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
-		low_bytes = popOperand();
-		high_bytes = popOperand();
-		value = getLong(low_bytes, high_bytes);
-	} else {
-		value = getLong(popOperand(), 0x00000000);
-	}
-
 	field_class = getSymbolicReferenceClass((char*)class_name);
 	resolved_static_variable = getResolvedStaticVariables(field_class, field_descriptor, field_name);
 	value = resolved_static_variable->value;
+
+	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
+		pushOperand(getLongLowBytes(value));
+		pushOperand(getLongHighBytes(value));
+	}
+	else {
+		pushOperand(getLongLowBytes(value));
+	}
 }
 
 void func_goto(){
@@ -2848,9 +2839,8 @@ void add_multiarray(u4 ** ponteiro, u4 * tamanhos, u4 dimensoes ){
 	}
 	i = tamanhos[dimensoes-1];
 	*ponteiro = (u4 *)malloc(i*sizeof(u4 *));
-	//add_array(*ponteiro, i);
+
 	for(j = 0; j < i; j++){
-		//		printf("criado array: %i %i %x\n", i, j, ponteiro);
 		add_multiarray(&(ponteiro[j]), tamanhos, dimensoes-1);
 	}
 }
@@ -2986,15 +2976,6 @@ void func_putfield(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	/*class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
-	class_name_index = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_class.name_index;
-	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_name_index).constant_union.c_utf8.bytes;
-
-	field_class = getClass((char *)class_name);
-	field_descriptor = getFieldDescriptor(field_class, index);
-	field_index = getFieldIndex(field_class, index);
-	field_name = getFieldName(field_class->class_file->constant_pool, field_index);*/
-
 	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
 	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);
 	class_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_class.name_index);
@@ -3031,12 +3012,6 @@ void func_putstatic(){
 	indexbyte2 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 
 	index = (indexbyte1 << 8) | indexbyte2;
-
-	/*class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
-	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
-	field_class = getClass((char *)class_name);
-	field_descriptor = getFieldDescriptor(field_class, index);
-	field_index = getFieldIndex(field_class, index);*/
 
 	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
 	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);

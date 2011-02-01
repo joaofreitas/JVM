@@ -26,10 +26,10 @@ void saveFilePath(char *classPath) {
 	}
 	strncpy(path, classPath, i);
 	if (windows) {
-		path[i]='/';
+		path[i]='\\';
 	}
 	else {
-		path[i]='\\';
+		path[i]='/';
 	}
 	path[i+1] = '\0';
 }
