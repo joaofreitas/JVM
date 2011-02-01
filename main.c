@@ -35,7 +35,6 @@ int main(int argc, char **argv) {
 	}
 
 	classFile = loadClassFile(file_name);
-	output_type = 1;
 	if (output_type == 1) {
 		inspectClassFile(classFile);
 	} else {

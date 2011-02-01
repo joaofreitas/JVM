@@ -11,17 +11,11 @@ void inspectClassFile(classFileFormat *classFile) {
 
 	printf("-------------- CLASS FILE -----------------\n");
 	printGeneralInformation(classFile);
-	fflush(stdout);
 	printConstantPool(classFile);
-	fflush(stdout);
 	printInterfaces(classFile);
-	fflush(stdout);
 	printFields(classFile);
-	fflush(stdout);
 	printMethods(classFile);
-	fflush(stdout);
 	printAttributes(classFile);
-	fflush(stdout);
 }
 
 void printGeneralInformation(classFileFormat *classFile) {
@@ -90,6 +84,7 @@ void printConstantPool(classFileFormat *classFile) {
 			default:
 				break;
 		}
+		fflush(stdout);
 	}
 }
 
@@ -118,7 +113,6 @@ void printFields(classFileFormat *classFile) {
 		}
 		index++;
 	}
-	fflush(stdout);
 }
 
 void printMethods(classFileFormat *classFile) {
@@ -141,6 +135,7 @@ void printMethods(classFileFormat *classFile) {
 		printf("\tAttributes:\n");
 		for (i = 0; i < attribute_size; i++) {
 			printAttribute(classFile, method->attributes[i], formatacao, i);
+			fflush(stdout);
 		}
 		printf("\n");
 		index++;
@@ -155,6 +150,7 @@ void printAttributes(classFileFormat *classFile) {
 	attribute_size = classFile->attributes_count;
 	for (i = 0; i < attribute_size; i++) {
 		printAttribute(classFile, classFile->attributes[i], formatacao, i);
+		fflush(stdout);
 	}
 }
 
@@ -190,6 +186,7 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 	number_pairs |= attribute.attribute_union.code.code[index];
 	index++;
 	printf("%s %d\n", op_info[code].mnemonic, number_pairs);
+	fflush(stdout);
 
 	for(i = 0; i < number_pairs; i++) {
 		match = 0;
@@ -203,7 +200,7 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 		match |= attribute.attribute_union.code.code[index];
 		index++;
 		printf("%d: ", match);
-
+		fflush(stdout);
 		offset = 0;
 
 		for(j = 0; j < 3; j++) {
@@ -215,8 +212,10 @@ int printLookUpSwitch(attribute_info attribute, int index, opcode_info *op_info)
 		offset |= attribute.attribute_union.code.code[index];
 		index++;
 		printf("%d (+%d)\n", offset+3, offset);
+		fflush(stdout);
 	}
 	printf("default: %d (+%d)\n", default_byte+3, default_byte);
+	fflush(stdout);
 	return index-1;
 
 }
@@ -267,6 +266,7 @@ int printTableSwitch(attribute_info attribute, int index, opcode_info *op_info) 
 
 
 	printf(" %d to %d\n", low_value, high_value);
+	fflush(stdout);
 	for(i = low_value; i <= high_value; i++) {
 		value = 0;
 		for (j = 0; j < 3; j++) {
@@ -277,9 +277,11 @@ int printTableSwitch(attribute_info attribute, int index, opcode_info *op_info) 
 		value |= attribute.attribute_union.code.code[index];
 		index++;
 		printf("%d: %d (+%d)\n", i, value+4, value);
+		fflush(stdout);
 	}
 
 	printf("default: %d (+%d)\n", default_value+3, default_value);
+	fflush(stdout);
 	return index-1;
 
 }
@@ -296,6 +298,7 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 	printf("%s[%d] %s\n", format, index, cp_element.constant_union.c_utf8.bytes);
 	printf("%sAttribute name index %d\n", format, attribute.attribute_name_index);
 	printf("%sAttribute length %d\n", format, attribute.attribute_length);
+	fflush(stdout);
 	tag = attribute.tag;
 
 	switch(tag) {
@@ -306,8 +309,10 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			printf("%sMaximum stack depth: %d\n", format, attribute.attribute_union.code.max_stack);
 			printf("%sMaximum local variables: %d\n", format, attribute.attribute_union.code.max_locals);
 			printf("%sCode Length: %d\n", format, attribute.attribute_union.code.code_length);
+			fflush(stdout);
 			op_info = get_opcode_info();
 			for (i=0 ; i< attribute.attribute_union.code.code_length; i++) {
+				fflush(stdout);
 
 				u1 code = attribute.attribute_union.code.code[i];
 				if (code == 0xaa) {
@@ -315,36 +320,9 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 				} else if (code == 0xab) {
 					i = printLookUpSwitch(attribute, i, op_info);
 				} else {
-					printf("%s", op_info[code].mnemonic);
-
-					/*if (op_info[code].operands_count > 0) {
-						if (code == 0xc9) {
-							int_opcode = 0;
-							for (j=0; j < 4; j++) {
-								code = attribute.attribute_union.code.code[i];
-								int_opcode = (int_opcode << 8) | (u2) code;
-								i++;
-							}
-							printf(" %d", int_opcode);
-						} else if (op_info[code].operands_count == 2) {
-							opcode = 0;
-							code = attribute.attribute_union.code.code[i];
-							i++;
-							opcode = (code << 8) | attribute.attribute_union.code.code[i];
-							i++;
-							printf(" %d", opcode);
-						} else {
-							opcode = 0;
-							for (j=0; j < op_info[code].operands_count; j++) {
-								code = attribute.attribute_union.code.code[i];
-								opcode = (opcode << 8) | (u2) code;
-								i++;
-							}
-							printf(" %d", opcode);
-						}
-					}*/
-					printf("\n");
+					printf("%s\n", op_info[code].mnemonic);
 				}
+				/*fflush(stdout);*/
 			}
 			break;
 		case 3:
@@ -352,6 +330,7 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 			for (i=0; i<attribute.attribute_union.exceptions.number_of_exceptions; i++) {
 				printf("Exception index table: %d\n", attribute.attribute_union.exceptions.exception_index_table[i]);
 			}
+			fflush(stdout);
 			break;
 		case 4:
 			printf("%sException index table: %d\n", format, attribute.attribute_union.inner_classes.number_of_classes);
@@ -360,13 +339,16 @@ void printAttribute(classFileFormat *classFile, attribute_info attribute, char *
 				printf("%s\tInner class info index: %d\n", format, cm->inner_class_info_index);
 				printf("%s\tInner name index: %d\n", format, cm->inner_name_index);
 				printf("%s\tOuter class info index: %d\n", format, cm->outer_class_info_index);
+				fflush(stdout);
 			}
 			break;
 		case 5:
 			printf("%sSynthetic attribute\n", format);
+			fflush(stdout);
 			break;
 		case 6:
 			printf("%sAtributo da jvm ignorado por ser opcional\n", format);
+			fflush(stdout);
 			break;
 		default:
 			break;

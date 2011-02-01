@@ -6,7 +6,6 @@
  */
 
 #include "methodArea.h"
-#include "stdlib.h"
 #include "string.h"
 #include "frame.h"
 
@@ -21,7 +20,7 @@ class_struct *instanceClassFromClassFile(classFileFormat *classFile) {
 	cp_info cp;
 	int count = 0;
 
-	cl = (class_struct*)calloc(1 ,sizeof(class_struct));
+	cl = (class_struct*)malloc(sizeof(class_struct));
 	field = classFile->fields;
 	cl->static_vars_count = 0;
 
