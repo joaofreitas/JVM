@@ -23,7 +23,7 @@ class_struct *instanceClassFromClassFile(classFileFormat *classFile) {
 
 	cl = (class_struct*)calloc(1 ,sizeof(class_struct));
 	field = classFile->fields;
-
+	cl->static_vars_count = 0;
 
 	for (field = classFile->fields; field < classFile->fields + classFile->fields_count; field++) {
 		if (field->access_flags & 0x0008) {
@@ -32,6 +32,7 @@ class_struct *instanceClassFromClassFile(classFileFormat *classFile) {
 			cl->static_vars[count].variable_name = cp.constant_union.c_utf8.bytes;
 			cp = getConstantPoolElementByIndex(classFile, field->descriptor_index);
 			cl->static_vars[count].type = cp.constant_union.c_utf8.bytes;
+			cl->static_vars_count++;
 			count++;
 		}
 	}
@@ -168,5 +169,22 @@ u1 *getFieldName(cp_info *cp, u4 index) {
 	return cp[class_info_index-1].constant_union.c_utf8.bytes;
 }
 
+
+static_variables *getResolvedStaticVariables(class_struct *cl, u1 *field_descriptor, u1 *field_name) {
+	int i;
+	static_variables *var;
+	if (cl == NULL) {
+		return NULL;
+	}
+
+	for (i = 0; i < cl->static_vars_count; i++) {
+		if ((strcmp((char *)cl->static_vars[i].type, (char *)field_descriptor) == 0) && (strcmp((char *)cl->static_vars[i].variable_name, (char *)field_name) == 0)) {
+			return &(cl->static_vars[i]);
+		}
+	}
+
+	var = getResolvedInstanceVariables(cl->super_class, field_descriptor, field_name);
+	return var;
+}
 
 

@@ -1206,10 +1206,15 @@ void func_getfield(){
 void func_getstatic(){
 	u4 indexbyte1, indexbyte2;
 	u4 index;
+	u4 low_bytes, high_bytes;
 	class_struct *cl;
 	cp_info field, class_name_info;
 	field_info *fieldref;
-	char *class_name;
+	u8 value;
+	u1 *class_name, *field_name, *field_descriptor;
+	class_struct *field_class;
+	static_variables *resolved_static_variable;
+	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -1218,30 +1223,35 @@ void func_getstatic(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	field = getConstantPoolElementByIndexFromCurrentFrame(index);
-	class_name_info = getConstanPoolElement(field.constant_union.c_fieldref.class_index);
-	class_name = (char *) getConstanPoolElement(class_name_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
+	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);
+	class_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_class.name_index);
+	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+
+	field_name = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
+	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
 	if(strcmp((char *)class_name, "java/lang/System") == 0) {
 		return;
 	}
 
-	cl = getSymbolicReferenceClass(class_name);
-
-	fieldref = getResolvedFieldReference(cl, field);
-
-	if(fieldref == NULL) {
-		return;
+	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
+		low_bytes = popOperand();
+		high_bytes = popOperand();
+		value = getLong(low_bytes, high_bytes);
+	} else {
+		value = getLong(popOperand(), 0x00000000);
 	}
 
-	/*value = getConstantPoolElementByIndexFromCurrentFrame(fieldref->attributes.attribute_union.constant_value.constant_value_index);
-	pushOperand();*/
+	field_class = getSymbolicReferenceClass(class_name);
+	resolved_static_variable = getResolvedStaticVariables(field_class, field_descriptor, field_name);
+	value = resolved_static_variable->value;
 }
 
 void func_goto(){
 	unsigned char indexbyte1;
 	unsigned char indexbyte2;
-	u2 index;
+	short index;
 
 	frame_stack->frame->pc++;
     indexbyte1 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -1249,7 +1259,7 @@ void func_goto(){
 	indexbyte2 = (unsigned char)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	index = indexbyte1 << 8 | indexbyte2;
 
-	frame_stack->frame->pc += index;
+	frame_stack->frame->pc += index-2/*o offset eh apartir do opcode do goto, -2 devido aos pc++*/;
 	frame_stack->frame->pc--;
 }
 
@@ -1384,7 +1394,6 @@ void func_iastore(){
 	stackValue = popOperand();
 	index = popOperand();
 	arrayref = (arrays_t *)popOperand();
-	ref = (int *)arrayref->reference;
 
 	if (arrayref == NULL){
 		printf("\nNullPointerException at iastore.\n");
@@ -1394,6 +1403,7 @@ void func_iastore(){
 		printf("\n ArrayIndexOutOfBoundsException at iastore.\n");
 		return;
 	}
+	ref = (int *)arrayref->reference;
 	ref[index] = stackValue;
 }
 
@@ -1457,7 +1467,7 @@ void func_if_acmpeq(){
 
 	if (value1 == value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
@@ -1475,7 +1485,7 @@ void func_if_acmpne(){
 
 	if (value1 != value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 2;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
@@ -1492,7 +1502,7 @@ void func_if_icmpeq(){
 
 	if (value1 == value2){
 		offset = (branchbyte1 << 8)|branchbyte2;
-		frame_stack->frame->pc += offset-1;
+		frame_stack->frame->pc += offset-3;
 	}
 }
 
@@ -1512,14 +1522,15 @@ void func_if_icmpne(){
 	if(value1 != value2) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
+			frame_stack->frame->pc += offset-3;
 		}
 	}
 }
 
 void func_if_icmplt(){
 	int value1, value2;
-	u2 branchbyte1, branchbyte2, offset;
+	short offset;
+	u2 branchbyte1, branchbyte2;
 
 	value2 = (int) popOperand();
 	value1 = (int) popOperand();
@@ -1531,13 +1542,14 @@ void func_if_icmplt(){
 
 	if (value1 < value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 1;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
 void func_if_icmpge(){
 	int value1, value2;
-	u2 branchbyte1, branchbyte2, offset;
+	short offset;
+	u2 branchbyte1, branchbyte2;
 
 	value2 = (int) popOperand();
 	value1 = (int) popOperand();
@@ -1549,7 +1561,7 @@ void func_if_icmpge(){
 
 	if (value1 >= value2) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 1;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
@@ -1566,7 +1578,7 @@ void func_if_icmpgt(){
 
 	if (value1 > value2){
 		offset = (branchbyte1 << 8)|branchbyte2;
-		frame_stack->frame->pc += offset-1;
+		frame_stack->frame->pc += offset-3;
 	}
 }
 
@@ -1586,15 +1598,15 @@ void func_if_icmple(){
 	if(value1 <= value2) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
+			frame_stack->frame->pc += offset-3;
 		}
 	}
 }
 
 void func_ifeq(){
 	int value1;
-	u2 branchbyte1, branchbyte2, offset;
-
+	u2 branchbyte1, branchbyte2;
+	short offset;
 	value1 = (int) popOperand();
 
 	frame_stack->frame->pc++;
@@ -1604,13 +1616,14 @@ void func_ifeq(){
 
 	if (value1 == 0) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 1;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
 void func_ifne(){
 	int value1;
-	u2 branchbyte1, branchbyte2, offset;
+	u2 branchbyte1, branchbyte2;
+	short offset;
 
 	value1 = (int) popOperand();
 
@@ -1621,7 +1634,7 @@ void func_ifne(){
 
 	if (value1 != 0) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 1;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
@@ -1637,7 +1650,7 @@ void func_iflt(){
 
 	if (value1 < 0){
 		offset = (branchbyte1 << 8)|branchbyte2;
-		frame_stack->frame->pc += offset-1;
+		frame_stack->frame->pc += offset-3;
 	}
 }
 
@@ -1656,14 +1669,15 @@ void func_ifge(){
 	if(value >= 0) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
+			frame_stack->frame->pc += offset-3;
 		}
 	}
 }
 
 void func_ifgt(){
 	int value1;
-	u2 branchbyte1, branchbyte2, offset;
+	u2 branchbyte1, branchbyte2;
+	short offset;
 
 	value1 = (int) popOperand();
 
@@ -1674,13 +1688,14 @@ void func_ifgt(){
 
 	if (value1 > 0) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 1;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
 void func_ifle(){
 	int value1;
-	u2 branchbyte1, branchbyte2, offset;
+	u2 branchbyte1, branchbyte2;
+	short offset;
 
 	value1 = (int) popOperand();
 
@@ -1691,7 +1706,7 @@ void func_ifle(){
 
 	if (value1 <= 0) {
 		offset = (branchbyte1 << 8) | branchbyte2;
-		frame_stack->frame->pc += offset - 1;
+		frame_stack->frame->pc += offset - 3;
 	}
 }
 
@@ -1709,7 +1724,7 @@ void func_ifnonnull(){
 
 	if (value1 != NULL){
 		offset = (branchbyte1 << 8)|branchbyte2;
-		frame_stack->frame->pc += offset-1;
+		frame_stack->frame->pc += offset-3;
 	}
 }
 
@@ -1728,13 +1743,14 @@ void func_ifnull(){
 	if(value == NULL) {
 		offset = (brenchbyte1 << 8) | brenchbyte2;
 		if ((frame_stack->frame->pc + offset) < frame_stack->frame->code_length) {
-			frame_stack->frame->pc += offset-1;
+			frame_stack->frame->pc += offset-3;
 		}
 	}
 }
 
 void func_iinc(){
-	u4 constant;
+	u1 constant;
+	int inc;
 	int index, index2;
 
 	frame_stack->frame->pc++;
@@ -1755,7 +1771,14 @@ void func_iinc(){
 		frame_stack->frame->pc++;
 		constant = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	}
-	frame_stack->frame->local_variables[index] += constant;
+	if(constant & 0x80) {
+		inc = -1;
+	}
+	else {
+		inc = 0;
+	}
+	memcpy(&inc, &constant, sizeof(u1));
+	frame_stack->frame->local_variables[index] += inc;
 }
 
 void func_iload(){
@@ -1977,7 +2000,7 @@ void func_invokevirtual(){
 	}
 
 	parameter_count = getParameterCount(method_descriptor);
-  memcpy(&aux,&aux1,sizeof(u4));
+	memcpy(&aux,&aux1,sizeof(u4));
 	frame = createFrame(invoke_method, resolved_class->class_file->constant_pool, aux);
 	for (i=0; i <= parameter_count; i++) {
 		operand = popOperand();
@@ -2983,8 +3006,8 @@ void func_putfield(){
 	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
-		low_bytes = popOperand();
 		high_bytes = popOperand();
+		low_bytes = popOperand();
 		value = getLong(low_bytes, high_bytes);
 	} else {
 		value = getLong(popOperand(), 0x00000000);
@@ -2996,7 +3019,7 @@ void func_putfield(){
 }
 
 void func_putstatic(){
-	u1 *field_descriptor, *class_name;
+	u1 *field_descriptor, *class_name, *field_name;
 	u4 indexbyte1, indexbyte2;
 	u4 low_bytes, high_bytes;
 	u4 index;
@@ -3004,6 +3027,8 @@ void func_putstatic(){
 	u4 class_index;
 	u8 value;
 	class_struct *field_class;
+	static_variables *resolved_static_variable;
+	cp_info field_info, class_info, field_name_and_type_info;
 
 	frame_stack->frame->pc++;
 	indexbyte1 = frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -3012,11 +3037,20 @@ void func_putstatic(){
 
 	index = (indexbyte1 << 8) | indexbyte2;
 
-	class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
+	/*class_index = getConstantPoolElementByIndexFromCurrentFrame(index).constant_union.c_fieldref.class_index;
 	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_index).constant_union.c_utf8.bytes;
 	field_class = getClass((char *)class_name);
 	field_descriptor = getFieldDescriptor(field_class, index);
-	field_index = getFieldIndex(field_class, index);
+	field_index = getFieldIndex(field_class, index);*/
+
+	field_info = getConstantPoolElementByIndexFromCurrentFrame(index);
+	field_name_and_type_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_fieldref.name_and_type_index);
+	class_info = getConstantPoolElementByIndexFromCurrentFrame(field_info.constant_union.c_class.name_index);
+	class_name = getConstantPoolElementByIndexFromCurrentFrame(class_info.constant_union.c_class.name_index).constant_union.c_utf8.bytes;
+
+	field_name = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
+	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
+	field_class = getSymbolicReferenceClass(class_name);
 
 	if((field_descriptor[0] == 'J') || (field_descriptor[0] == 'D')) {
 		low_bytes = popOperand();
@@ -3025,8 +3059,8 @@ void func_putstatic(){
 	} else {
 		value = getLong(popOperand(), 0x00000000);
 	}
-
-	field_class->static_vars[field_index].value = value;
+	resolved_static_variable = getResolvedStaticVariables(field_class, field_descriptor, field_name);
+	resolved_static_variable->value = value;
 }
 
 
@@ -3079,7 +3113,8 @@ void func_sastore(){
 
 void func_sipush(){
 	u2 byte1, byte2;
-	u4 result;
+	short result;
+	u4 stackValue;
 
 	frame_stack->frame->pc++;
 	byte1 = (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
@@ -3088,7 +3123,8 @@ void func_sipush(){
 	byte2 |= (signed)frame_stack->frame->method->attributes->attribute_union.code.code[frame_stack->frame->pc];
 	result = (byte1 << 8) | byte2;
 
-	pushOperand(result);
+	memcpy(&stackValue, &result, sizeof(result));
+	pushOperand(stackValue);
 }
 
 void func_swap(){

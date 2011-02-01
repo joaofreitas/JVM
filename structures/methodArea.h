@@ -28,6 +28,7 @@ typedef struct instance_variables_structure {
 typedef struct class_structure {
 	struct class_structure *super_class;
 	static_variables *static_vars;
+	u2 static_vars_count;
 	classFileFormat *class_file;
 } class_struct;
 
@@ -62,5 +63,7 @@ u1* getFieldDescriptor(class_struct*cl, u4 index);
 u4 getFieldIndex(class_struct*cl, u4 index);
 
 u1 *getFieldName(cp_info *cp, u4 index);
+
+static_variables *getResolvedStaticVariables(class_struct *cl, u1 *field_descriptor, u1 *field_name);
 
 #endif /* METHODAREA_H_ */
