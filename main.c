@@ -21,7 +21,8 @@ int main(int argc, char **argv) {
 	if (argc > 1) {
 		strcpy(file_name, argv[1]);
 		if (argc > 2) {
-			if (argv[2][0] == 'v') {
+			printf("Parametro %s\n", argv[2]);
+			if (strcmp(argv[2], "v") == 0) {
 				output_type = 1;
 			}
 		}
