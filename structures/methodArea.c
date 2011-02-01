@@ -6,7 +6,8 @@
  */
 
 #include "methodArea.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
 #include "frame.h"
 
 void initMethodArea() {
