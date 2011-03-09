@@ -8,12 +8,12 @@
 #ifndef STRUCTURES_H_
 #define STRUCTURES_H_
 
-#include <inttypes.h>
+#include <stdint.h>
 
 typedef unsigned char u1;
 typedef unsigned short u2;
 typedef unsigned int u4;
-typedef unsigned long long u8;
+typedef uint64_t u8;
 
 /*---------------------------------------------------------
  * Constantes

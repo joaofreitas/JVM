@@ -392,11 +392,11 @@ void func_d2f(){
 }
 
 void func_d2i(){
-	long long aux1;
+	uint64_t aux1;
 	double aux2=0;
 	u4 aux3, aux4;
 
-	aux1 = (long long)popOperand();
+	aux1 = (uint64_t)popOperand();
 	aux4 = popOperand();
 	aux1 = aux1 << 32;
 	aux1 |= aux4;
@@ -410,13 +410,13 @@ void func_d2i(){
 void func_d2l(){
 	u4 aux_value1, aux_value2;
 	double double_value;
-	long long long_value;
+	uint64_t long_value;
 
 	aux_value1 = popOperand();
 	aux_value2 = popOperand();
 
 	double_value = getDouble(aux_value2, aux_value1);
-	long_value = (long long)double_value;
+	long_value = (uint64_t)double_value;
 
 	pushOperand(getLongLowBytes(long_value));
 	pushOperand(getLongHighBytes(long_value));
@@ -1219,7 +1219,7 @@ void func_getstatic(){
 	field_name = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
 	field_descriptor = getConstantPoolElementByIndexFromCurrentFrame(field_name_and_type_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
-	if(strcmp((char *)class_name, "java/lang/System") == 0) {
+	if(strstr((char *)class_name, "java/lang/System") != NULL) {
 		return;
 	}
 
@@ -1892,7 +1892,7 @@ void func_invokestatic(){
 void println(char *descriptor) {
 	u4 value;
 	u4 long_value_high, long_value_low;
-	long long long_value;
+	uint64_t long_value;
 	cp_info cp;
 	float float_value;
 	double double_value;
@@ -1918,7 +1918,7 @@ void println(char *descriptor) {
 		long_value_high = popOperand();
 		long_value_low = popOperand();
 
-		long_value = (long long) getLong(long_value_low, long_value_high);
+		long_value = (uint64_t) getLong(long_value_low, long_value_high);
 
 		printf("%lld \n", long_value);
 	}
@@ -1967,7 +1967,7 @@ void func_invokevirtual(){
 	method_name = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.name_index).constant_union.c_utf8.bytes;
 	method_descriptor = (char *)getConstanPoolElement(method_name_type_ref_info.constant_union.c_nametype.descriptor_index).constant_union.c_utf8.bytes;
 
-	if((strcmp(class_name, "java/io/PrintStream") == 0) && (strcmp(method_name, "println") == 0)) {
+	if((strstr(class_name, "java/io/PrintStream") != NULL) && (strcmp(method_name, "println") == 0)) {
 		println((char *)method_descriptor);
 		return;
 	}
@@ -2939,7 +2939,7 @@ void func_newarray(){
 			array->reference = calloc(count, sizeof(int));
 			break;
 		case 11:
-			array->reference = calloc(count, sizeof(long long));
+			array->reference = calloc(count, sizeof(uint64_t));
 			break;
 	}
 

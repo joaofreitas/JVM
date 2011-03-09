@@ -10,7 +10,7 @@
 opcode_info* get_opcode_info() {
 	int i;
 
-	op_info = (opcode_info*)malloc(sizeof(opcode_info)*255);
+	op_info = (opcode_info*)malloc(sizeof(opcode_info)*256);
 
 	strcpy(op_info[0x32].mnemonic, "aaload");
 	strcpy(op_info[0x53].mnemonic, "aastore");

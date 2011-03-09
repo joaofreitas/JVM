@@ -14,6 +14,7 @@ classFileFormat* loadClassFile(const char *arquivo) {
 	FILE *fp;
 
 	fp = fopen(arquivo, "rb");
+
 	if (fp == NULL) {
 		printf("Arquivo %s nao existe!\n", arquivo);
 		fflush(stdout);
@@ -225,7 +226,7 @@ void readFields(classFileFormat *classFile, FILE *fp) {
 	attribute_info *attribute;
 
 	fields_size = classFile->fields_count;
-	classFile->fields = (field_info*)malloc(sizeof(field_info) * fields_size);
+	classFile->fields = (field_info*)calloc(fields_size, sizeof(field_info));
 
 	for (field = classFile->fields; field < classFile->fields + fields_size; field++) {
 		field->access_flags = u2Read(fp);
