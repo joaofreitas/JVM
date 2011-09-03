@@ -1,0 +1,447 @@
+-------------- CLASS FILE -----------------
+Magic Number: CAFEBABE
+Minor Version: 0
+Major Version: 46
+Constant Pool Count: 81
+Access Flags: 0x000020
+This class: 1
+Super class: 3
+Interface Count: 0
+Fields Count: 5
+Methods Count: 7
+Attributes count: 1
+----------- CONSTANT POOL -------------
+	[1] Class index: #2
+	[2] Length 10. String: testeArray
+	[3] Class index: #4
+	[4] Length 16. String: java/lang/Object
+	[5] Length 6. String: vetint
+	[6] Length 2. String: [I
+	[7] Length 7. String: vetlong
+	[8] Length 2. String: [J
+	[9] Length 7. String: vetbyte
+	[10] Length 2. String: [B
+	[11] Length 8. String: vetfloat
+	[12] Length 2. String: [F
+	[13] Length 9. String: vetdouble
+	[14] Length 2. String: [D
+	[15] Length 6. String: <init>
+	[16] Length 3. String: ()V
+	[17] Length 4. String: Code
+	[18] Metodref class index: 3. Metodref name and type index: 19
+	[19] Nametype class index: 15. Nametype name and type index: 16
+	[20] Length 15. String: LineNumberTable
+	[21] Length 8. String: printint
+	[22] Length 5. String: ([I)V
+	[23] FieldRef class index: 24. Fieldref name and type index: 26
+	[24] Class index: #25
+	[25] Length 16. String: java/lang/System
+	[26] Nametype class index: 27. Nametype name and type index: 28
+	[27] Length 3. String: out
+	[28] Length 21. String: Ljava/io/PrintStream;
+	[29] Metodref class index: 30. Metodref name and type index: 32
+	[30] Class index: #31
+	[31] Length 19. String: java/io/PrintStream
+	[32] Nametype class index: 33. Nametype name and type index: 34
+	[33] Length 7. String: println
+	[34] Length 4. String: (I)V
+	[35] Length 9. String: printlong
+	[36] Length 5. String: ([J)V
+	[37] Metodref class index: 30. Metodref name and type index: 38
+	[38] Nametype class index: 33. Nametype name and type index: 39
+	[39] Length 4. String: (J)V
+	[40] Length 9. String: printbyte
+	[41] Length 5. String: ([B)V
+	[42] Length 10. String: printfloat
+	[43] Length 5. String: ([F)V
+	[44] Metodref class index: 30. Metodref name and type index: 45
+	[45] Nametype class index: 33. Nametype name and type index: 46
+	[46] Length 4. String: (F)V
+	[47] Length 11. String: printdouble
+	[48] Length 5. String: ([D)V
+	[49] Metodref class index: 30. Metodref name and type index: 50
+	[50] Nametype class index: 33. Nametype name and type index: 51
+	[51] Length 4. String: (D)V
+	[52] Length 4. String: main
+	[53] Length 22. String: ([Ljava/lang/String;)V
+	[54] FieldRef class index: 1. Fieldref name and type index: 55
+	[55] Nametype class index: 5. Nametype name and type index: 6
+	[56] FieldRef class index: 1. Fieldref name and type index: 57
+	[57] Nametype class index: 7. Nametype name and type index: 8
+	[58] FieldRef class index: 1. Fieldref name and type index: 59
+	[59] Nametype class index: 11. Nametype name and type index: 12
+	[60] FieldRef class index: 1. Fieldref name and type index: 61
+	[61] Nametype class index: 9. Nametype name and type index: 10
+	[62] FieldRef class index: 1. Fieldref name and type index: 63
+	[63] Nametype class index: 13. Nametype name and type index: 14
+	[64] High Bytes: 0x00000. Low Bytes 0x0000F
+	[65] (large numeric continued)
+	[66] Value: 1103626240
+	[67] High Bytes: 0z403E0000. Low Bytes 0x0
+	[68] (large numeric continued)
+	[69] Metodref class index: 1. Metodref name and type index: 70
+	[70] Nametype class index: 21. Nametype name and type index: 22
+	[71] Metodref class index: 1. Metodref name and type index: 72
+	[72] Nametype class index: 35. Nametype name and type index: 36
+	[73] Metodref class index: 1. Metodref name and type index: 74
+	[74] Nametype class index: 40. Nametype name and type index: 41
+	[75] Metodref class index: 1. Metodref name and type index: 76
+	[76] Nametype class index: 42. Nametype name and type index: 43
+	[77] Metodref class index: 1. Metodref name and type index: 78
+	[78] Nametype class index: 47. Nametype name and type index: 48
+	[79] Length 10. String: SourceFile
+	[80] Length 15. String: testeArray.java
+----------- FIELDS -------------
+	-----------> [0] vetint -----------
+	Name index: 5
+	Descriptor index: 6
+	Access Flags: 0x8
+	Attributes count: 0
+	-----------> [1] vetlong -----------
+	Name index: 7
+	Descriptor index: 8
+	Access Flags: 0x8
+	Attributes count: 0
+	-----------> [2] vetbyte -----------
+	Name index: 9
+	Descriptor index: 10
+	Access Flags: 0x8
+	Attributes count: 0
+	-----------> [3] vetfloat -----------
+	Name index: 11
+	Descriptor index: 12
+	Access Flags: 0x8
+	Attributes count: 0
+	-----------> [4] vetdouble -----------
+	Name index: 13
+	Descriptor index: 14
+	Access Flags: 0x8
+	Attributes count: 0
+----------- METHODS -------------
+	-----------> [0] <init> -----------
+	Name index: 15
+	Descriptor index: 16
+	Access Flag: 0
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 29
+		Maximum stack depth: 1
+		Maximum local variables: 1
+		Code Length: 5
+aload_0
+invokespecial
+nop
+ldc
+return
+
+	-----------> [1] printint -----------
+	Name index: 21
+	Descriptor index: 22
+	Access Flag: 8
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 59
+		Maximum stack depth: 3
+		Maximum local variables: 2
+		Code Length: 23
+iconst_0
+istore_1
+goto
+nop
+dconst_1
+getstatic
+nop
+fload
+aload_0
+iload_1
+iaload
+invokevirtual
+nop
+iload_3
+iinc
+aconst_null
+aconst_null
+iload_1
+iconst_5
+if_icmplt
+impdep2
+(no name)
+return
+
+	-----------> [2] printlong -----------
+	Name index: 35
+	Descriptor index: 36
+	Access Flag: 8
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 59
+		Maximum stack depth: 3
+		Maximum local variables: 2
+		Code Length: 23
+iconst_0
+istore_1
+goto
+nop
+dconst_1
+getstatic
+nop
+fload
+aload_0
+iload_1
+laload
+invokevirtual
+nop
+fload_3
+iinc
+aconst_null
+aconst_null
+iload_1
+iconst_5
+if_icmplt
+impdep2
+(no name)
+return
+
+	-----------> [3] printbyte -----------
+	Name index: 40
+	Descriptor index: 41
+	Access Flag: 8
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 59
+		Maximum stack depth: 3
+		Maximum local variables: 2
+		Code Length: 23
+iconst_0
+istore_1
+goto
+nop
+dconst_1
+getstatic
+nop
+fload
+aload_0
+iload_1
+baload
+invokevirtual
+nop
+iload_3
+iinc
+aconst_null
+aconst_null
+iload_1
+iconst_5
+if_icmplt
+impdep2
+(no name)
+return
+
+	-----------> [4] printfloat -----------
+	Name index: 42
+	Descriptor index: 43
+	Access Flag: 8
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 59
+		Maximum stack depth: 3
+		Maximum local variables: 2
+		Code Length: 23
+iconst_0
+istore_1
+goto
+nop
+dconst_1
+getstatic
+nop
+fload
+aload_0
+iload_1
+faload
+invokevirtual
+nop
+aload_2
+iinc
+aconst_null
+aconst_null
+iload_1
+iconst_5
+if_icmplt
+impdep2
+(no name)
+return
+
+	-----------> [5] printdouble -----------
+	Name index: 47
+	Descriptor index: 48
+	Access Flag: 8
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 59
+		Maximum stack depth: 3
+		Maximum local variables: 2
+		Code Length: 23
+iconst_0
+istore_1
+goto
+nop
+dconst_1
+getstatic
+nop
+fload
+aload_0
+iload_1
+daload
+invokevirtual
+nop
+daload
+iinc
+aconst_null
+aconst_null
+iload_1
+iconst_5
+if_icmplt
+impdep2
+(no name)
+return
+
+	-----------> [6] main -----------
+	Name index: 52
+	Descriptor index: 53
+	Access Flag: 9
+	Attributes count: 1
+	Attributes:
+		[0] Code
+		Attribute name index 17
+		Attribute length 203
+		Maximum stack depth: 4
+		Maximum local variables: 2
+		Code Length: 111
+iconst_5
+newarray
+lconst_1
+putstatic
+nop
+istore
+iconst_5
+newarray
+fconst_0
+putstatic
+nop
+fstore
+iconst_5
+newarray
+iconst_3
+putstatic
+nop
+astore
+iconst_5
+newarray
+iconst_5
+putstatic
+nop
+istore_1
+iconst_5
+newarray
+iconst_4
+putstatic
+nop
+istore_3
+iconst_0
+istore_1
+goto
+nop
+aload_1
+getstatic
+nop
+istore
+iload_1
+bipush
+lconst_1
+iastore
+getstatic
+nop
+fstore
+iload_1
+ldc2_w
+nop
+lstore_1
+lastore
+getstatic
+nop
+istore_1
+iload_1
+bipush
+ldc2_w
+bastore
+getstatic
+nop
+astore
+iload_1
+ldc
+lstore_3
+fastore
+getstatic
+nop
+istore_3
+iload_1
+ldc2_w
+nop
+fstore_0
+dastore
+iinc
+aconst_null
+aconst_null
+iload_1
+iconst_5
+if_icmplt
+impdep2
+(no name)
+getstatic
+nop
+istore
+invokestatic
+nop
+fstore_2
+getstatic
+nop
+fstore
+invokestatic
+nop
+dstore_0
+getstatic
+nop
+istore_1
+invokestatic
+nop
+dstore_2
+getstatic
+nop
+astore
+invokestatic
+nop
+astore_0
+getstatic
+nop
+istore_3
+invokestatic
+nop
+astore_2
+return
+
+----------- ATTRIBUTES -------------
+	[0] SourceFile
+	Attribute name index 79
+	Attribute length 2
+	Atributo da jvm ignorado por ser opcional
