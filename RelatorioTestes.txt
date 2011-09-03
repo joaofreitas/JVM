@@ -1,4 +1,4 @@
-----------------------------------------------------
+ ----------------------------------------------------
 Testes
 Comando: ls -t `find . -name \*.class\* `|grep '.class$'
 Comando com resultados ordenados: ls -t `find . -name \*.class\* `|grep '.class$'|sort
